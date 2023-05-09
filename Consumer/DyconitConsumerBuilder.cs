@@ -14,19 +14,22 @@ namespace Dyconit.Kafka.Consumer
             SetStatisticsHandler((_, json) =>
             {
                 var stats = JObject.Parse(json);
-                var requestLatency = stats["brokers"][$"{config.BootstrapServers}/1"]["rtt"]["avg"];
+                var s1 = stats["brokers"][$"{config.BootstrapServers}/1"]["rtt"]["avg"];
+                var s2 = stats["brokers"][$"{config.BootstrapServers}/1"]["outbuf_msg_cnt"];
+                int s3 = Convert.ToInt32(stats["msg_max"]);
+                var s4 = stats["msg_size_max"];
 
                 // turn requestlatency into an integer
-                double requestLatencyy = Convert.ToDouble(requestLatency);
+                double rtt = Convert.ToDouble(s1);
 
                 // turn it into milliseconds
-                requestLatencyy = requestLatencyy / 1000;
+                rtt = rtt / 1000;
                 var min = 500 - (500 * 0.1);
                 var max = 500 + (500 * 0.1);
-                if (requestLatencyy < min || requestLatencyy > max)
+                if (rtt < min || rtt > max)
                 {
                     // _statisticsHandler?.Invoke((string)stats["name"], requestLatencyy);
-                    Console.WriteLine($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {requestLatencyy}");
+                    Console.WriteLine($"rtt: {rtt}, reqAwait: {s2} - {s3} - {s4}");
                 }
             });
         }

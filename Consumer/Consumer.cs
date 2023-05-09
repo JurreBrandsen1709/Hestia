@@ -18,12 +18,6 @@ class Consumer {
             EnableAutoCommit = true,
             AutoOffsetReset = AutoOffsetReset.Earliest,
             StatisticsIntervalMs = 2000,
-            // FetchMaxBytes = 20000001,
-            // FetchWaitMaxMs = 10000,
-            // SessionTimeoutMs = 6000,
-            // MaxPollIntervalMs = 6000,
-            // FetchMinBytes = 1,
-            // MessageMaxBytes = 500000,
         };
 
 
