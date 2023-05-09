@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Dyconit\Dyconit.csproj" />
+  </ItemGroup>
+
 </Project>

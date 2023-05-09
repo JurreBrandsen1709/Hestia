@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Dyconit.Conit</id>
+    <version>1.0.0</version>
+    <title>DotNetDyconits</title>
+    <authors>J.J.Brandsen</authors>
+    <license type="expression">GPL-3.0-or-later</license>
+    <licenseUrl>https://licenses.nuget.org/GPL-3.0-or-later</licenseUrl>
+    <description>WieDitLeestIsGek</description>
+    <copyright>© 2023 J.J.Brandsen</copyright>
+    <dependencies>
+      <group targetFramework="net7.0">
+        <dependency id="Confluent.Kafka" version="1.9.3" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Ini" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="13.0.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\bin\Debug\net7.0\Dyconit.dll" target="lib\net7.0\Dyconit.dll" />
+  </files>
+</package>

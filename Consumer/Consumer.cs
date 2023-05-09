@@ -6,7 +6,8 @@ using System.Threading;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using Dyconit.Kafka.Consumer;
+using Dyconit.Consumer;
+using Dyconit.Overlord;
 
 class Consumer {
     static void Main(string[] args)
@@ -20,6 +21,7 @@ class Consumer {
             StatisticsIntervalMs = 2000,
         };
 
+        var adminClient = new DyconitOverlord("localhost:9092");
 
 
         const string topic = "TestTopicccc";
@@ -30,7 +32,7 @@ class Consumer {
             cts.Cancel();
         };
 
-        using (var consumer = new DyconitConsumerBuilder<string, byte[]>(configuration)
+        using (var consumer = new DyconitConsumerBuilder<string, byte[]>(configuration, adminClient)
     .SetKeyDeserializer(Deserializers.Utf8)
     .SetValueDeserializer(Deserializers.ByteArray)
     .Build())

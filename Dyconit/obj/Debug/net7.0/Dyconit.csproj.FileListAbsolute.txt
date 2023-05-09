@@ -1,0 +1,12 @@
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.csproj.AssemblyReference.cache
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.AssemblyInfoInputs.cache
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.AssemblyInfo.cs
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.csproj.CoreCompileInputs.cache
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\bin\Debug\net7.0\Dyconit.deps.json
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\bin\Debug\net7.0\Dyconit.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\bin\Debug\net7.0\Dyconit.pdb
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\refint\Dyconit.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\Dyconit.pdb
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\obj\Debug\net7.0\ref\Dyconit.dll

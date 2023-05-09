@@ -327,6 +327,23 @@
         "build": {
           "buildTransitive/netcoreapp3.1/_._": {}
         }
+      },
+      "Dyconit.Conit/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "Confluent.Kafka": "1.9.3",
+          "Microsoft.Extensions.Configuration": "6.0.0",
+          "Microsoft.Extensions.Configuration.Binder": "6.0.0",
+          "Microsoft.Extensions.Configuration.Ini": "6.0.0",
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "compile": {
+          "bin/placeholder/Dyconit.Conit.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Dyconit.Conit.dll": {}
+        }
       }
     }
   },
@@ -680,11 +697,17 @@
         "system.runtime.compilerservices.unsafe.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "Dyconit.Conit/1.0.0": {
+      "type": "project",
+      "path": "../Dyconit/Dyconit.csproj",
+      "msbuildProject": "../Dyconit/Dyconit.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net7.0": [
       "Confluent.Kafka >= 1.9.3",
+      "Dyconit.Conit >= 1.0.0",
       "Microsoft.Extensions.Configuration >= 6.0.0",
       "Microsoft.Extensions.Configuration.Binder >= 6.0.0",
       "Microsoft.Extensions.Configuration.Ini >= 6.0.0",
@@ -717,7 +740,11 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Dyconit\\Dyconit.csproj": {
+              "projectPath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Dyconit\\Dyconit.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

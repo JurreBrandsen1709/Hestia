@@ -50,3 +50,5 @@ C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Consumer\obj\Debug\net7.0
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Consumer\obj\Debug\net7.0\Consumer.genruntimeconfig.cache
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Consumer\obj\Debug\net7.0\ref\Consumer.dll
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Consumer\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Consumer\bin\Debug\net7.0\Dyconit.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Consumer\bin\Debug\net7.0\Dyconit.pdb

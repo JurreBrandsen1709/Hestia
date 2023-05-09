@@ -9,10 +9,12 @@
       "Consumer/1.0.0": {
         "dependencies": {
           "Confluent.Kafka": "1.9.3",
+          "Dyconit.Conit": "1.0.0",
           "Microsoft.Extensions.Configuration": "6.0.0",
           "Microsoft.Extensions.Configuration.Binder": "6.0.0",
           "Microsoft.Extensions.Configuration.Ini": "6.0.0",
-          "Newtonsoft.Json": "13.0.3"
+          "Newtonsoft.Json": "13.0.3",
+          "Dyconit": "1.0.0.0"
         },
         "runtime": {
           "Consumer.dll": {}
@@ -274,7 +276,27 @@
         }
       },
       "System.Memory/4.5.0": {},
-      "System.Runtime.CompilerServices.Unsafe/6.0.0": {}
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
+      "Dyconit.Conit/1.0.0": {
+        "dependencies": {
+          "Confluent.Kafka": "1.9.3",
+          "Microsoft.Extensions.Configuration": "6.0.0",
+          "Microsoft.Extensions.Configuration.Binder": "6.0.0",
+          "Microsoft.Extensions.Configuration.Ini": "6.0.0",
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "runtime": {
+          "Dyconit.dll": {}
+        }
+      },
+      "Dyconit/1.0.0.0": {
+        "runtime": {
+          "Dyconit.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
     }
   },
   "libraries": {
@@ -380,6 +402,16 @@
       "sha512": "sha512-/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    },
+    "Dyconit.Conit/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Dyconit/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
