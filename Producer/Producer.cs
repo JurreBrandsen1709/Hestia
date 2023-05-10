@@ -14,7 +14,10 @@ class Producer {
         var configuration = new ProducerConfig
         {
             BootstrapServers = "localhost:9092",
-            StatisticsIntervalMs = 2000
+            StatisticsIntervalMs = 2000,
+            EnableIdempotence = true, // When set to true, the producer will ensure that messages are successfully produced exactly once and in the original produce order.
+            Acks = Acks.All,
+            MaxInFlight = 5
         };
 
         var adminClient = new DyconitOverlord("localhost:9092");
@@ -39,7 +42,7 @@ class Producer {
             timer.Elapsed += (sender, e) => {
                 for (int i = 0; i < 5; i++) {
                     // Create a byte array to hold the larger payload data
-                    byte[] payload = new byte[409600];
+                    byte[] payload = new byte[4096];
                     rnd.NextBytes(payload);
 
                     var message = new Message<string, byte[]>

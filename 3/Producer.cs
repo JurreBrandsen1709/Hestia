@@ -1,51 +1,67 @@
 using Confluent.Kafka;
 using System;
-using Microsoft.Extensions.Configuration;
-using System.Text;
+using System.Diagnostics;
+using System.Linq;
 
-class Producer {
+class Producer
+{
     static void Main(string[] args)
     {
-        // configure bootstrap.servers in text
-        var configuration = new ProducerConfig
+        var config = new ProducerConfig
         {
-            BootstrapServers = "localhost:9092"
+            BootstrapServers = "localhost:9092",
+            BatchNumMessages = 32768,
+            CompressionType = CompressionType.None,
+            QueueBufferingBackpressureThreshold = 1,
+            RetryBackoffMs = 50,
+            MessageSendMaxRetries = 3,
+            LingerMs = 0,
+            QueueBufferingMaxKbytes = 1048576,
+            QueueBufferingMaxMessages = 500000,
+            Acks = Acks.None,
         };
 
-        const string topic = "TestTopicccc";
 
-        string[] users = { "eabara", "jsmith", "sgarcia", "jbernard", "htanaka", "awalther" };
-        string[] items = { "a"};
+        const int numMessages = 10000;
 
-        using (var producer = new ProducerBuilder<string, byte[]>(configuration)
-                                    .SetKeySerializer(Serializers.Utf8)
-                                    .SetValueSerializer(Serializers.ByteArray)
-                                    .Build())
+        var elapsedTimes = new double[10];
+        var throughputs = new double[10];
+
+        for (var i = 0; i < 10; i++)
         {
-
-            var numProduced = 0;
-            Random rnd = new Random();
-            const int numMessages = 5000;
-            for (int i = 0; i < numMessages; ++i)
+            using (var producer = new ProducerBuilder<Null, string>(config).Build())
             {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-                // Create a byte array to hold the larger payload data
-                byte[] payload = new byte[409600];
-                rnd.NextBytes(payload);
-
-                var message = new Message<string, byte[]>
+                var message = new Message<Null, string>
                 {
-                    Key = "b"+i,
-                    Value = payload
+                    Value = new string('X', 100000)
                 };
 
-                var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
-                Console.WriteLine($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {i}");
-                numProduced += 1;
-            }
+                for (var j = 0; j < numMessages; j++)
+                {
+                    producer.ProduceAsync("test-topic", message).Wait();
+                }
 
-            producer.Flush(TimeSpan.FromSeconds(10));
-            Console.WriteLine($"{numProduced} messages were produced to topic {topic}");
+                producer.Flush(TimeSpan.FromSeconds(10));
+
+                stopwatch.Stop();
+
+                var elapsedTime = stopwatch.Elapsed.TotalMilliseconds;
+                var throughput = numMessages / stopwatch.Elapsed.TotalSeconds;
+
+                elapsedTimes[i] = elapsedTime;
+                throughputs[i] = throughput;
+
+                Console.WriteLine($"Test {i + 1}: Elapsed time: {elapsedTime} ms, Throughput: {throughput} messages/sec");
+            }
         }
+
+        var averageElapsedTime = elapsedTimes.Average();
+        var averageThroughput = throughputs.Average();
+
+        Console.WriteLine($"Average elapsed time: {averageElapsedTime} ms");
+        Console.WriteLine($"Average throughput: {averageThroughput} messages/sec");
     }
 }
