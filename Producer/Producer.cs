@@ -15,23 +15,23 @@ class Producer {
         {
             BootstrapServers = "localhost:9092",
             StatisticsIntervalMs = 2000,
-            EnableIdempotence = true, // When set to true, the producer will ensure that messages are successfully produced exactly once and in the original produce order.
-            Acks = Acks.All,
-            MaxInFlight = 5
         };
 
-        var adminClient = new DyconitOverlord("localhost:9092");
+        var adminClient = new DyconitOverlord("localhost:9092", 2000);
+
+
 
         const string topic = "TestTopicccc";
 
         string[] users = { "eabara", "jsmith", "sgarcia", "jbernard", "htanaka", "awalther" };
         string[] items = { "a"};
 
-        using (var producer = new DyconitProducerBuilder<string, byte[]>(configuration, adminClient)
+        using (var producer = new DyconitProducerBuilder<string, byte[]>(configuration, adminClient, 1337)
                                     .SetKeySerializer(Serializers.Utf8)
                                     .SetValueSerializer(Serializers.ByteArray)
                                     .Build())
         {
+            Console.WriteLine("Press Ctrl+C to quit.");
 
             var numProduced = 0;
             Random rnd = new Random();

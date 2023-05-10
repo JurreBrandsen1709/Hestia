@@ -22,9 +22,6 @@ class Producer {
         using (var producer = new ProducerBuilder<string, int>(configuration)
                                     .Build())
         {
-
-
-
             var numProduced = 0;
             Random rnd = new Random();
             const int numMessages = 100000;

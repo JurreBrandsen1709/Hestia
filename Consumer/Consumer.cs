@@ -20,8 +20,8 @@ class Consumer {
             StatisticsIntervalMs = 2000,
         };
 
-        var adminClient = new DyconitOverlord("localhost:9092");
-        const string topic = "TestTopicccc";
+        var adminClient = new DyconitOverlord("localhost:9092", 100000);
+        const string topic = "TestTopiccc";
 
         CancellationTokenSource cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) => {
@@ -54,7 +54,7 @@ class Consumer {
                         }
 
                         var message = consumeResult.Message;
-                        Console.WriteLine($"Received message at {message.Timestamp.DateTime}:\n\t{message.Value}");
+                        Console.WriteLine($"Received message at {message.Timestamp.UtcDateTime}:\n\t{message.Value}");
 
 
                         lastProcessedOffsets[offset.TopicPartition] = offset.Offset;
