@@ -1,0 +1,54 @@
+# Ignore bin and obj folders
+**/bin/
+**/obj/
+
+# Ignore .env files
+**/.env
+
+# Ignore the data folder
+/data
+
+# Ignore user-specific files
+*.user
+*.suo
+*.userprefs
+*.usertasks
+
+# Ignore build files
+*.build
+*.msbuild
+*.lck
+*.dbmdl
+*.log
+*.cache
+
+# Ignore NuGet packages
+*.nupkg
+packages/
+project.lock.json
+
+# Ignore Visual Studio files
+*.vscode/
+.vs/
+*.sln.docstates
+*.suo
+*.user
+*.vbw
+*.vbw6
+*.scc
+
+# Ignore ReSharper files
+_ReSharper*/
+*.ReSharper*
+*.DotSettings
+*.resharper
+*.crproj
+
+# Ignore build output
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Oo]bj/
+[Ll]og/
