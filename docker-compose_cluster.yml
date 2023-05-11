@@ -1,93 +1,83 @@
----
-version: '2'
+## DESCRIPTION
+#
+# A Docker Compose to spin up a Kafka Development Cluster.
+# This is NOT what you should use in production.
+# The docker images used here are provided by Confluent Platform,
+# and listed here: https://hub.docker.com/u/confluentinc/.
+#
+# Source: https://github.com/kafkesc/kafka-dev-cluster
 
+version: '3.8'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    hostname: zookeeper
     container_name: zookeeper
+    image: confluentinc/cp-zookeeper:${CP_ZOOKEEPER_VER}
     ports:
-      - "2181:2181"
+      - '2181:2181'
+      - '2888:2888'
+      - '3888:3888'
+    healthcheck:
+      test: echo stat | nc localhost 2181
+      interval: 10s
+      timeout: 10s
+      retries: 3
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  broker:
-    image: confluentinc/cp-kafka:7.3.0
-    hostname: broker
-    container_name: broker
+      - ZOOKEEPER_SERVER_ID=1
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+      - ZOOKEEPER_INIT_LIMIT=5
+      - ZOOKEEPER_SYNC_LIMIT=2
+      - ZOOKEEPER_SERVERS=zookeeper:2888:3888
+  kafka-01:
+    container_name: kafka-01
+    image: confluentinc/cp-kafka:${CP_KAFKA_VER}
     depends_on:
       - zookeeper
     ports:
-      - "29092:29092"
+      - '9091:9091'
+      - '19091:19091'
     environment:
-      KAFKA_BROKER_ID: 101
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-
-  broker2:
-    image: confluentinc/cp-kafka:7.3.0
-    hostname: broker2
-    container_name: broker2
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-01:9091,PLAINTEXT_HOST://localhost:19091
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9091,PLAINTEXT_HOST://0.0.0.0:19091
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ZOOKEEPER=zookeeper:2181
+  kafka-02:
+    container_name: kafka-02
+    image: confluentinc/cp-kafka:${CP_KAFKA_VER}
     depends_on:
       - zookeeper
     ports:
-      - "29093:29093"
+      - '9092:9092'
+      - '19092:19092'
     environment:
-      KAFKA_BROKER_ID: 102
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:9093,PLAINTEXT_HOST://localhost:29093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.3.0
-    hostname: schema-registry
-    container_name: schema-registry
+      - KAFKA_BROKER_ID=2
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-02:9092,PLAINTEXT_HOST://localhost:19092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:19092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ZOOKEEPER=zookeeper:2181
+  kafka-03:
+    container_name: kafka-03
+    image: confluentinc/cp-kafka:${CP_KAFKA_VER}
     depends_on:
-      - broker
+      - zookeeper
     ports:
-      - "8081:8081"
+      - '9093:9093'
+      - '19093:19093'
     environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:9092'
+      - KAFKA_BROKER_ID=3
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-03:9093,PLAINTEXT_HOST://localhost:19093
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:19093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ZOOKEEPER=zookeeper:2181
 
-  ksqldb-server:
-    image: confluentinc/ksqldb-server:0.28.2
-    hostname: ksqldb-server
-    container_name: ksqldb-server
-    depends_on:
-      - broker
-      - schema-registry
-    ports:
-      - "8088:8088"
-    environment:
-      KSQL_CONFIG_DIR: "/etc/ksqldb"
-      KSQL_LOG4J_OPTS: "-Dlog4j.configuration=file:/etc/ksqldb/log4j.properties"
-      KSQL_BOOTSTRAP_SERVERS: "broker:9092"
-      KSQL_HOST_NAME: ksqldb-server
-      KSQL_LISTENERS: "http://0.0.0.0:8088"
-      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
-      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
-
-  ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.28.2
-    container_name: ksqldb-cli
-    depends_on:
-      - broker
-      - ksqldb-server
-    entrypoint: /bin/sh
-    environment:
-      KSQL_CONFIG_DIR: "/etc/ksqldb"
-    tty: true
-    volumes:
-      - ./src:/opt/app/src
-      - ./test:/opt/app/test
+networks:
+  default:
+    name: ${NETWORK_NAME}
+    driver: bridge

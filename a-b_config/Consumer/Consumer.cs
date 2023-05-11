@@ -15,7 +15,6 @@ class Consumer {
         {
             BootstrapServers = "localhost:9092",
             GroupId = "kafka-dotnet-getting-started",
-            EnableAutoCommit = true,
             AutoOffsetReset = AutoOffsetReset.Earliest,
             StatisticsIntervalMs = 2000,
         };
@@ -29,45 +28,25 @@ class Consumer {
             cts.Cancel();
         };
 
-        var lastProcessedOffsets = new Dictionary<TopicPartition, long>();
+        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, adminClient, 1337).Build())
+        {
+            consumer.Subscribe(topic);
 
-        using (var consumer = new DyconitConsumerBuilder<string, byte[]>(configuration, adminClient, 1337)
-            .SetKeyDeserializer(Deserializers.Utf8)
-            .SetValueDeserializer(Deserializers.ByteArray)
-            .Build())
+            try
             {
-                consumer.Subscribe(topic);
-
-                try
+                while (true)
                 {
-                    while (true)
-                    {
-                        var consumeResult = consumer.Consume(cts.Token);
-                        var offset = consumeResult.TopicPartitionOffset;
-
-                        if (lastProcessedOffsets.TryGetValue(offset.TopicPartition, out var lastProcessedOffset))
-                        {
-                            if (offset.Offset != lastProcessedOffset + 1)
-                            {
-                                Console.WriteLine($"Out-of-order message! Expected offset: {lastProcessedOffset + 1}, actual offset: {offset.Offset}");
-                            }
-                        }
-
-                        var message = consumeResult.Message;
-                        Console.WriteLine($"Received message at {message.Timestamp.UtcDateTime}:\n\t{message.Value}");
-
-
-                        lastProcessedOffsets[offset.TopicPartition] = offset.Offset;
-                    }
+                    Console.WriteLine($"Received message at {message.Timestamp.UtcDateTime}:\n\t{message.Value}");
                 }
-                catch (OperationCanceledException)
-                {
-                    // Ctrl-C was pressed.
-                }
-                finally
-                {
-                    consumer.Close();
-                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Ctrl-C was pressed.
+            }
+            finally
+            {
+                consumer.Close();
             }
         }
     }
+}

@@ -19,17 +19,9 @@ class Producer {
 
         var adminClient = new DyconitOverlord("localhost:9092", 2000);
 
+        const string topic = "input_topic";
 
-
-        const string topic = "TestTopicccc";
-
-        string[] users = { "eabara", "jsmith", "sgarcia", "jbernard", "htanaka", "awalther" };
-        string[] items = { "a"};
-
-        using (var producer = new DyconitProducerBuilder<string, byte[]>(configuration, adminClient, 1337)
-                                    .SetKeySerializer(Serializers.Utf8)
-                                    .SetValueSerializer(Serializers.ByteArray)
-                                    .Build())
+        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, adminClient, 1337).Build())
         {
             Console.WriteLine("Press Ctrl+C to quit.");
 
@@ -41,13 +33,12 @@ class Producer {
             var timer = new Timer(1000); // 1000 milliseconds = 1 second
             timer.Elapsed += (sender, e) => {
                 for (int i = 0; i < 5; i++) {
-                    // Create a byte array to hold the larger payload data
-                    byte[] payload = new byte[4096];
-                    rnd.NextBytes(payload);
 
-                    var message = new Message<string, byte[]>
+                    // create a random length payload string
+                    var payload = new string('x', rnd.Next(1, 1000));
+
+                    var message = new Message<Null, string>
                     {
-                        Key = "d" + numProduced,
                         Value = payload
                     };
 
