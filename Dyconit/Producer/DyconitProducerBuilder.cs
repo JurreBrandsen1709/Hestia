@@ -22,10 +22,10 @@ namespace Dyconit.Producer
 
             SetStatisticsHandler((_, json) =>
             {
-                _adminClient.ProcessProducerStatisticsAsync(json, config);
+                _adminClient.ProcessProducerStatistics(json, config);
             });
 
-            Task.Run(ListenForMessagesAsync);;
+            Task.Run(ListenForMessagesAsync);
         }
 
         public DyconitProducerBuilder<TKey, TValue> SetStatisticsHandler(Action<string, double> handler)
