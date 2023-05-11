@@ -13,13 +13,13 @@ class Consumer {
     {
         var configuration = new ConsumerConfig
         {
-            BootstrapServers = "kafka-a:9092",
+            BootstrapServers = "localhost:19091,localhost:19092,localhost:19093",
             GroupId = "kafka-dotnet-getting-started",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             // StatisticsIntervalMs = 2000,
         };
 
-        var adminClient = new DyconitOverlord("kafka-a:9092", 100000);
+        // var adminClient = new DyconitOverlord("kafka-a:9092", 100000);
         const string topic = "input_topicc";
 
         CancellationTokenSource cts = new CancellationTokenSource();
@@ -28,7 +28,7 @@ class Consumer {
             cts.Cancel();
         };
 
-        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, adminClient, 1337).Build())
+        using (var consumer = new ConsumerBuilder<Null, string>(configuration).Build())
         {
             consumer.Subscribe(topic);
 
