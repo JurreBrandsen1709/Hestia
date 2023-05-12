@@ -1,0 +1,1 @@
+Each cluster is an active participant in the system and can produce and consume events. The events are replicated to the other cluster. This is useful for high availability and disaster recovery scenarios. The replication is asynchronous and the events are replicated in batches. The replication is done using the Kafka MirrorMaker tool.

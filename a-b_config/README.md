@@ -1,0 +1,1 @@
+Classic producer to consumer configuration.

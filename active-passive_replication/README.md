@@ -1,0 +1,1 @@
+One cluster serves as the active cluster, producing events and consuming events. Events are replicated from the active cluster to the passive cluster. The passive cluster can take over seamlessly.
