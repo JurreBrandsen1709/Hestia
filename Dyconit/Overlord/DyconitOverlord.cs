@@ -10,7 +10,6 @@ namespace Dyconit.Overlord
     public class DyconitOverlord
     {
         private readonly AdminClientConfig _adminClientConfig;
-        private readonly IProducer<Null, string> _producer;
         private readonly int _rttThreshold;
 
         public DyconitOverlord(string bootstrapServers, int rttThreshold)

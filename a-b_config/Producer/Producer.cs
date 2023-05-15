@@ -5,6 +5,7 @@ using System.Text;
 using System.Timers;
 using System.IO;
 using Dyconit.Producer;
+using Dyconit.Message;
 using Dyconit.Overlord;
 
 class Producer {
@@ -19,7 +20,7 @@ class Producer {
 
         var adminClient = new DyconitOverlord("localhost:9092", 2000);
 
-        const string topic = "input_topic";
+        const string topic = "input_topicc";
 
         using (var producer = new DyconitProducerBuilder<Null, String>(configuration, adminClient, 1337).Build())
         {
@@ -35,11 +36,12 @@ class Producer {
                 for (int i = 0; i < 5; i++) {
 
                     // create a random length payload string
-                    var payload = new string('x', rnd.Next(1, 1000));
+                    var payload = new string('x', rnd.Next(1, 10));
 
-                    var message = new Message<Null, string>
+                    var message = new DyconitMessage<Null, string>
                     {
-                        Value = payload
+                        Value = payload,
+                        Weight = 3.0
                     };
 
                     var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();

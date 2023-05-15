@@ -13,13 +13,13 @@ class Producer {
         // configure bootstrap.servers in text
         var configuration = new ProducerConfig
         {
-            BootstrapServers = "localhost:19091,localhost:19092,localhost:19093",
+            BootstrapServers = "localhost:19091,localhost:19092, localhost:19093",
             // StatisticsIntervalMs = 2000,
         };
 
         // var adminClient = new DyconitOverlord("127.0.0.1:19092", 2000);
 
-        const string topic = "input_topic";
+        const string topic = "input_topicc";
 
         using (var producer = new ProducerBuilder<Null, String>(configuration).Build())
         {
@@ -37,9 +37,10 @@ class Producer {
                     // create a random length payload string
                     var payload = new string('x', rnd.Next(1, 1000));
 
-                    var message = new Message<Null, string>
+                    var message = new DyconitMessage<Null, string>
                     {
-                        Value = payload
+                        Value = payload,
+                        Weight = 3
                     };
 
                     var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();

@@ -60,6 +60,15 @@ services:
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ZOOKEEPER=zookeeper:2181
+  # mirrormaker:
+  #   image: 'wpietri/mirror-maker:2'
+  #   depends_on:
+  #     - kafka-01
+  #     - kafka-02
+  #   environment:
+  #     - SOURCE=localhost:19091
+  #     - DESTINATION=localhost:19092
+  #     - TOPICS=Topic1,Topic2
   kafka-03:
     container_name: kafka-03
     image: confluentinc/cp-kafka:${CP_KAFKA_VER}

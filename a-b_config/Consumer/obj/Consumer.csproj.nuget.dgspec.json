@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Consumer\\Consumer.csproj": {}
+    "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer\\Consumer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Consumer\\Consumer.csproj": {
+    "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer\\Consumer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Consumer\\Consumer.csproj",
+        "projectUniqueName": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer\\Consumer.csproj",
         "projectName": "Consumer",
-        "projectPath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Consumer\\Consumer.csproj",
+        "projectPath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer\\Consumer.csproj",
         "packagesPath": "C:\\Users\\JurreB\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Consumer\\obj\\",
+        "outputPath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\JurreB\\AppData\\Roaming\\NuGet\\NuGet.Config",

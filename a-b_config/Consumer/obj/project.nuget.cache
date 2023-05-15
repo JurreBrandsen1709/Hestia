@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0hbc4ELn+JXmASJiNNNKDgbhCp+Eb7OnWGle4L6m1W5LHoomdSXDuIrALkfialsc5nw2go9D9QbWNngT2E++LA==",
+  "dgSpecHash": "wd1XCXdo5FcJGhDrK6Zfli5AcrIgcZW8RBDQPhCGXCnSqFNlpcE38Vwuo/L/rs2ai9BbAw5bPmEb3L8czsDc4A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\Consumer\\Consumer.csproj",
+  "projectFilePath": "C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer\\Consumer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\JurreB\\.nuget\\packages\\confluent.kafka\\1.9.3\\confluent.kafka.1.9.3.nupkg.sha512",
     "C:\\Users\\JurreB\\.nuget\\packages\\librdkafka.redist\\1.9.2\\librdkafka.redist.1.9.2.nupkg.sha512",
