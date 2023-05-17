@@ -20,6 +20,7 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\bin\Debug\net7.0\Dyconit.runtimeconfig.json" target="lib\net7.0\Dyconit.runtimeconfig.json" />
     <file src="C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\bin\Debug\net7.0\Dyconit.dll" target="lib\net7.0\Dyconit.dll" />
   </files>
 </package>

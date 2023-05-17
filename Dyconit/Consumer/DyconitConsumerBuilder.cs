@@ -21,10 +21,10 @@ namespace Dyconit.Consumer
             _adminClient = adminClient;
             _listenPort = listenPort;
 
-            SetStatisticsHandler((_, json) =>
-            {
-                _adminClient.ProcessConsumerStatistics(json, config);
-            });
+            // SetStatisticsHandler((_, json) =>
+            // {
+            //     _adminClient.ProcessConsumerStatistics(json, config);
+            // });
 
             Task.Run(ListenForMessagesAsync);
         }

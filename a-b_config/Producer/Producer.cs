@@ -1,3 +1,7 @@
+// TODO add difference between read and write in messages that are send.
+// Read is a command that is send to the broker to get the data from the topic.
+// Write is a event that is send to the broker to write the data to the topic.
+
 using Confluent.Kafka;
 using System;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +11,7 @@ using System.IO;
 using Dyconit.Producer;
 using Dyconit.Message;
 using Dyconit.Overlord;
+using System.Collections.Generic;
 
 class Producer {
     static void Main(string[] args)
@@ -18,11 +23,29 @@ class Producer {
             StatisticsIntervalMs = 2000,
         };
 
-        var adminClient = new DyconitOverlord("localhost:9092", 2000);
 
-        const string topic = "input_topicc";
+        const string topic = "input_topic";
 
-        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, adminClient, 1337).Build())
+        // Add what collection the conits are in.
+        string collection = "bankTransaction";
+
+        // Make a dictionary with the collection and the conits in it.
+        Dictionary<string, object> conitConfiguration = new Dictionary<string, object>
+        {
+            { "collection", collection },
+            { "Staleness", 1000 },
+            { "OrderError", 0.1 },
+            { "NumericalError", 0.1 }
+        };
+
+        // Create debug saying that we created the conitConfiguration and it's content.
+        Console.WriteLine("Created conitConfiguration with the following content:");
+        foreach (KeyValuePair<string, object> kvp in conitConfiguration)
+        {
+            Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+        }
+
+        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, conitConfiguration, 2).Build())
         {
             Console.WriteLine("Press Ctrl+C to quit.");
 
@@ -49,6 +72,7 @@ class Producer {
                     numProduced += 1;
                 }
             };
+
             timer.Start();
 
             // Wait until all messages have been sent

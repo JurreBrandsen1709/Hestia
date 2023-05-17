@@ -163,3 +163,6 @@ C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\bin\D
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\obj\Debug\net7.0\Producer.csproj.CopyComplete
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\obj\Debug\net7.0\Producer.genruntimeconfig.cache
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\obj\Debug\net7.0\ref\Producer.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\bin\Debug\net7.0\Dyconit.deps.json
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\bin\Debug\net7.0\Dyconit.runtimeconfig.json
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Producer\bin\Debug\net7.0\Dyconit.exe

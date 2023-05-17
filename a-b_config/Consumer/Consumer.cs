@@ -1,3 +1,5 @@
+// todo: Do something with the weights.
+
 using Confluent.Kafka;
 using System;
 using System.Threading;
@@ -57,16 +59,6 @@ class Consumer {
                     var inputMessage = consumeResult.Message.Value;
 
                     Console.WriteLine($"Consumed message with value '{consumeResult.Value}', weight '{GetMessageWeight(consumeResult)}'");
-
-
-                    // Console.WriteLine($"Consumed message '{weight}' at: '{consumeResult.TopicPartitionOffset}'.");
-
-                    // var parts = inputMessage.Split(',');
-                    // var weight = double.Parse(parts[0]);
-                    // var payload = parts[1];
-
-                    // Console.WriteLine($"Consumed message '{payload}' with weight '{weight}' at: '{consumeResult.TopicPartitionOffset}'.");
-
                 }
             }
             catch (OperationCanceledException)

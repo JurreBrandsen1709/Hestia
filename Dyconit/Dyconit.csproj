@@ -12,12 +12,14 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
       <Folder Include="Consumer" />
       <Folder Include="Overlord" />
       <Folder Include="Producer" />
+      <Folder Include="Message" />
     </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,31 @@
+{
+    "policy": "throughput-threshold-policy",
+    "description": "If the threshold of the throughput is reached, we multiply the bounds by 2, otherwise we decrease the bound by 50.",
+    "parameters": {
+      "threshold": 1000,
+      "bounds": [
+        100,
+        1000
+      ]
+    },
+    "rules": [
+      {
+        "condition": "throughput >= threshold",
+        "actions": [
+          {
+            "type": "multiply",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "condition": "throughput < threshold",
+        "actions": [
+          {
+            "type": "multiply",
+            "value": 0.5
+          }
+        ]
+      }
+    ]
+  }
