@@ -15,7 +15,7 @@ Jurre Brandsen (Github username: JurreBrandsen1709) is the author of this thesis
 
 ## Getting Started
 ### Prerequisites
-*.NET Core SDK version 3.0 or later
+* .NET Core SDK version 3.0 or later
 * Confluent.Kafka version 1.9.3
 
 ### Installation
