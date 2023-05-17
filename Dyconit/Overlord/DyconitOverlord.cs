@@ -1,5 +1,6 @@
 // todo there must be a way to let the dyconits subscribe to each other so they can send messages.
 // todo create a collection of dyconits where we know what these bounds are and which port the admin clients are listening on.
+// todo We must know whether it is a producer or consumer or both.
 
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;

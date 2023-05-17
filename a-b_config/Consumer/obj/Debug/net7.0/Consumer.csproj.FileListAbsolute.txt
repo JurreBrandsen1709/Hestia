@@ -106,3 +106,6 @@ C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\obj\D
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\obj\Debug\net7.0\Consumer.pdb
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\obj\Debug\net7.0\Consumer.genruntimeconfig.cache
 C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\obj\Debug\net7.0\ref\Consumer.dll
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\bin\Debug\net7.0\Dyconit.deps.json
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\bin\Debug\net7.0\Dyconit.runtimeconfig.json
+C:\Users\JurreB\Documents\kafka-dotnet-getting-started\a-b_config\Consumer\bin\Debug\net7.0\Dyconit.exe

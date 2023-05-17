@@ -24,7 +24,7 @@ class Producer {
         };
 
 
-        const string topic = "input_topic";
+        const string topic = "input_topicc";
 
         // Add what collection the conits are in.
         string collection = "Transactions";
@@ -45,7 +45,7 @@ class Producer {
             Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
         }
 
-        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, conitConfiguration, 2).Build())
+        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, conitConfiguration, 1).Build())
         {
             Console.WriteLine("Press Ctrl+C to quit.");
 

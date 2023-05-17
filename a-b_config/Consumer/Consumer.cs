@@ -39,8 +39,26 @@ class Consumer {
             // StatisticsIntervalMs = 2000,
         };
 
-        var adminClient = new DyconitOverlord("localhost:9092", 100000);
         const string topic = "input_topicc";
+
+        // Add what collection the conits are in.
+        string collection = "Transactions_consumer";
+
+        // Make a dictionary with the collection and the conits in it.
+        Dictionary<string, object> conitConfiguration = new Dictionary<string, object>
+        {
+            { "collection", collection },
+            { "Staleness", 1337 },
+            { "OrderError", 42 },
+            { "NumericalError", 8 }
+        };
+
+        // Create debug saying that we created the conitConfiguration and it's content.
+        Console.WriteLine("Created conitConfiguration with the following content:");
+        foreach (KeyValuePair<string, object> kvp in conitConfiguration)
+        {
+            Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+        }
 
         CancellationTokenSource cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) => {
@@ -48,7 +66,7 @@ class Consumer {
             cts.Cancel();
         };
 
-        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, adminClient, 1337).Build())
+        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1).Build())
         {
             consumer.Subscribe(topic);
             try
