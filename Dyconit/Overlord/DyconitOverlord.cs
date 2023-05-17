@@ -20,7 +20,7 @@ namespace Dyconit.Overlord
         public DyconitOverlord()
         {
             _dyconitCollections = new Dictionary<string, Dictionary<string, object>>();
-            Console.WriteLine("Dyconit overlord started.");
+            Console.WriteLine("- Dyconit overlord started.");
             Task.Run(ListenForMessagesAsync);
         }
 
@@ -37,6 +37,9 @@ namespace Dyconit.Overlord
 
                 // Parse message and act accordingly
                 ParseMessage(message);
+
+                reader.Close();
+                client.Close();
             }
         }
 
@@ -57,10 +60,10 @@ namespace Dyconit.Overlord
                     var adminClientPort = json["adminClientPort"]?.ToObject<int>();
                     if (adminClientPort == null)
                     {
-                        Console.WriteLine($"Invalid newAdminEvent message received: missing adminClientPort. Message: {message}");
+                        Console.WriteLine($"-- Invalid newAdminEvent message received: missing adminClientPort. Message: {message}");
                         break;
                     }
-                    Console.WriteLine($"Received newAdminEvent message. Admin client listening on port {adminClientPort}.");
+                    Console.WriteLine($"-- Received newAdminEvent message. Admin client listening on port {adminClientPort}.");
 
                     // Check if we already have a dyconit collection in the dyconitCollections dictionary
                     var dyconitCollection = json["conits"]["collection"].ToString();
@@ -72,14 +75,24 @@ namespace Dyconit.Overlord
                             { "ports", new List<int>() },
                             { "bounds", new Dictionary<string, int>() }
                         });
+                        Console.WriteLine($"--- Added dyconit collection '{dyconitCollection}' to the dyconit collections.");
+                    }
+
+                    else
+                    {
+                        Console.WriteLine($"--- Dyconit collection '{dyconitCollection}' already exists.");
                     }
 
                     // Add the admin client port to the dyconit collection
                     ((List<int>)_dyconitCollections[dyconitCollection]["ports"]).Add(adminClientPort.Value);
 
+                    Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollection}'.");
+
                     // Add the bounds to the dyconit collection
                     var conits = json["conits"];
-                    if (conits != null)
+
+                    // Check if bounds is still empty
+                    if (((Dictionary<string, int>)_dyconitCollections[dyconitCollection]["bounds"]).Count == 0)
                     {
                         var staleness = conits["Staleness"]?.ToObject<int>();
                         var orderError = conits["OrderError"]?.ToObject<int>();
@@ -89,18 +102,21 @@ namespace Dyconit.Overlord
                         ((Dictionary<string, int>)_dyconitCollections[dyconitCollection]["bounds"]).Add("OrderError", orderError.Value);
                         ((Dictionary<string, int>)_dyconitCollections[dyconitCollection]["bounds"]).Add("NumericalError", numericalError.Value);
 
+                        Console.WriteLine($"--- Added bounds to dyconit collection '{dyconitCollection}'.");
                     }
-
-                    // print the debug message
-                    Console.WriteLine($"Added admin client listening on port {adminClientPort} to dyconit collection {dyconitCollection}.");
+                    else
+                    {
+                        Console.WriteLine($"--- Bounds for dyconit collection '{dyconitCollection}' already exist.");
+                    }
+                    Console.WriteLine($"--- Bounds: {string.Join(", ", ((Dictionary<string, int>)_dyconitCollections[dyconitCollection]["bounds"]))}");
 
                     // Print the dyconit collections
-                    Console.WriteLine("Current dyconit collections:");
+                    Console.WriteLine("--- Current dyconit collections:");
                     foreach (var collection in _dyconitCollections)
                     {
-                        Console.WriteLine($"Collection: {collection.Key}");
-                        Console.WriteLine($"Ports: {string.Join(", ", ((List<int>)collection.Value["ports"]))}");
-                        Console.WriteLine($"Bounds: {string.Join(", ", ((Dictionary<string, int>)collection.Value["bounds"]))}");
+                        Console.WriteLine($"---- Collection: {collection.Key}");
+                        Console.WriteLine($"---- Ports: {string.Join(", ", ((List<int>)collection.Value["ports"]))}");
+                        Console.WriteLine($"---- Bounds: {string.Join(", ", ((Dictionary<string, int>)collection.Value["bounds"]))}");
                     }
 
                     break;

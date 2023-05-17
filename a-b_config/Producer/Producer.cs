@@ -27,15 +27,15 @@ class Producer {
         const string topic = "input_topic";
 
         // Add what collection the conits are in.
-        string collection = "bankTransaction";
+        string collection = "Transactions";
 
         // Make a dictionary with the collection and the conits in it.
         Dictionary<string, object> conitConfiguration = new Dictionary<string, object>
         {
             { "collection", collection },
-            { "Staleness", 1000 },
-            { "OrderError", 0.1 },
-            { "NumericalError", 0.1 }
+            { "Staleness", 50000 },
+            { "OrderError", 50 },
+            { "NumericalError", 3 }
         };
 
         // Create debug saying that we created the conitConfiguration and it's content.
