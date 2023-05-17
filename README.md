@@ -34,29 +34,43 @@ Jurre Brandsen (Github username: JurreBrandsen1709) is the author of this thesis
 1. Navigate to the `Dyconit` folder.
 1. Run `dotnet run` to start the Overlord application.
 1. Navigate to the `a-b_config\Producer` folder in a new terminal.
+1. Run `dotnet run` to start the Producer application.
+1. Navigate to the `a-b_config\Consumer` folder in a new terminal.
 1. Run `dotnet run` to start the Consumer application.
 
 You can now send messages to the Kafka cluster using the Producer application. The Consumer application will consume the messages and send them to the Overlord application. The Overlord application will then process the messages according to the policy defined in the `Policies` folder.
 
-### Examples
+### Example
 ```bash
 - Dyconit overlord started.
--- Received newAdminEvent message. Admin client listening on port 6703.
+-- Received newAdminEvent message. Admin client listening on port 9566.
 --- Added dyconit collection 'Transactions' to the dyconit collections.
---- Added new admin client listening on port '6703' to dyconit collection 'Transactions'.
+--- Added new admin client listening on port '9566' to dyconit collection 'Transactions'.
 --- Added bounds to dyconit collection 'Transactions'.
 --- Bounds: [Staleness, 50000], [OrderError, 50], [NumericalError, 3]
 --- Current dyconit collections:
 ---- Collection: Transactions
----- Ports: 6703
+---- Ports: 9566
 ---- Bounds: [Staleness, 50000], [OrderError, 50], [NumericalError, 3]
--- Received newAdminEvent message. Admin client listening on port 9842.
+-- Received newAdminEvent message. Admin client listening on port 9479.
 --- Dyconit collection 'Transactions' already exists.
---- Added new admin client listening on port '9842' to dyconit collection 'Transactions'.
+--- Added new admin client listening on port '9479' to dyconit collection 'Transactions'.
 --- Bounds for dyconit collection 'Transactions' already exist.
 --- Bounds: [Staleness, 50000], [OrderError, 50], [NumericalError, 3]
 --- Current dyconit collections:
 ---- Collection: Transactions
----- Ports: 6703, 9842
+---- Ports: 9566, 9479
 ---- Bounds: [Staleness, 50000], [OrderError, 50], [NumericalError, 3]
+-- Received newAdminEvent message. Admin client listening on port 8604.
+--- Added dyconit collection 'Transactions_consumer' to the dyconit collections.
+--- Added new admin client listening on port '8604' to dyconit collection 'Transactions_consumer'.
+--- Added bounds to dyconit collection 'Transactions_consumer'.
+--- Bounds: [Staleness, 1337], [OrderError, 42], [NumericalError, 8]
+--- Current dyconit collections:
+---- Collection: Transactions
+---- Ports: 9566, 9479
+---- Bounds: [Staleness, 50000], [OrderError, 50], [NumericalError, 3]
+---- Collection: Transactions_consumer
+---- Ports: 8604
+---- Bounds: [Staleness, 1337], [OrderError, 42], [NumericalError, 8]
 ```
