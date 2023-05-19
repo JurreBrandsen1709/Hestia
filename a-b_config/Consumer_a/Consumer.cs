@@ -76,9 +76,11 @@ class Consumer {
             {
                 while (true)
                 {
-                    // Here we need to know what is the last time we saw data.
-                    // if this time exceeds the staleness, we need to ask all other conits if they have data in a blocking way.
-                    // if we do not exceed this bound, we can still ask other conits if they have data, but do it async.
+
+                    // The Staleness actor checks for each remote node that shares one of the affected Dynamic Conits if it has synchronized its
+                    // updates within the set staleness bound. If this is not the case, the Staleness actor synchronizes with
+                    // the remote node by requesting its updates.
+
                     var consumeResult = consumer.Consume(cts.Token);
                     var consumedTime = DateTime.Now; // Get the current time as the consumed time
 
@@ -87,11 +89,11 @@ class Consumer {
                     int waitTime = rnd.Next(0, 3000);
                     await Task.Delay(waitTime);
 
-                    DyconitLogger.LogConsumedMessage(consumedTime); // Log the consumed message time
+                    DyconitLogger.BoundStaleness(consumedTime); // Log the consumed message time
 
                     var inputMessage = consumeResult.Message.Value;
 
-                    // Console.WriteLine($"Consumed message with value '{consumeResult.Value}', weight '{GetMessageWeight(consumeResult)}'");
+                    Console.WriteLine($"Consumed message with value '{consumeResult.Value}', weight '{GetMessageWeight(consumeResult)}'");
                 }
             }
             catch (OperationCanceledException)

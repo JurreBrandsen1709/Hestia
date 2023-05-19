@@ -12,24 +12,12 @@ public class DyconitPerformanceLogger
         this.stalenessBound = stalenessBound;
     }
 
-    public void LogConsumedMessage(DateTime consumedTime)
+    public void BoundStaleness(DateTime consumedTime)
     {
-        if (lastConsumedTime.HasValue)
-        {
-            var timeDifference = consumedTime - lastConsumedTime.Value;
-            Console.WriteLine($"Time difference from last consumed message: {timeDifference.TotalMilliseconds}");
+        // send message to dyconit overlord with consumedTime
+        // The overlord will check if other affected nodes belonging to the same Collection of dyconit has synchronized its updates
+        // with the rest of the nodes within the set stalenessBound. if not, it will direct that node to synchronize its updates with
+        // this node.
 
-            if (timeDifference.TotalMilliseconds  > stalenessBound)
-            {
-                Console.WriteLine("Time is outside the staleness bound.");
-            }
-            else
-            {
-                Console.WriteLine("Time is within the staleness bound.");
-            }
-        }
-
-        lastConsumedTime = consumedTime;
-        Console.WriteLine($"Last consumed message time: {lastConsumedTime}");
     }
 }

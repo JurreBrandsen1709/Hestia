@@ -74,7 +74,8 @@ namespace Dyconit.Overlord
                     {
                         _dyconitCollections.Add(dyconitCollection, new Dictionary<string, object> {
                             { "ports", new List<int>() },
-                            { "bounds", new Dictionary<string, int>() }
+                            { "bounds", new Dictionary<string, int>() },
+                            { "last_time_since_pull", new Dictionary<int, DateTime>() }
                         });
                         Console.WriteLine($"--- Added dyconit collection '{dyconitCollection}' to the dyconit collections.");
                     }
@@ -88,6 +89,12 @@ namespace Dyconit.Overlord
                     ((List<int>)_dyconitCollections[dyconitCollection]["ports"]).Add(adminClientPort.Value);
 
                     Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollection}'.");
+
+                    // Initialize the last_time_since_pull for the admin client port
+                    var lastTimeSincePull = new DateTime(1970, 1, 1, 0, 0, 0);
+                    ((Dictionary<int, DateTime>)_dyconitCollections[dyconitCollection]["last_time_since_pull"]).Add(adminClientPort.Value, lastTimeSincePull);
+
+                    Console.WriteLine($"--- last_time_since_pull for {adminClientPort}: {lastTimeSincePull.ToString("dd-MM-yyyy HH:mm:ss")}");
 
                     // Add the bounds to the dyconit collection
                     var conits = json["conits"];
@@ -118,6 +125,7 @@ namespace Dyconit.Overlord
                         Console.WriteLine($"---- Collection: {collection.Key}");
                         Console.WriteLine($"---- Ports: {string.Join(", ", ((List<int>)collection.Value["ports"]))}");
                         Console.WriteLine($"---- Bounds: {string.Join(", ", ((Dictionary<string, int>)collection.Value["bounds"]))}");
+                        Console.WriteLine($"---- last_time_since_pull: {string.Join(", ", ((Dictionary<int, DateTime>)collection.Value["last_time_since_pull"]))}");
                     }
 
                     break;
@@ -166,31 +174,5 @@ namespace Dyconit.Overlord
                 Console.WriteLine($"Failed to send message over TCP: {ex.Message}");
             }
         }
-
-        // public async Task<int> GetPartitionCount(string topicName)
-        // {
-        //     using var adminClient = new AdminClientBuilder(_adminClientConfig).Build();
-
-        //     var metadata = adminClient.GetMetadata(topicName, TimeSpan.FromSeconds(10));
-
-        //     return metadata.Topics[0].Partitions.Count;
-        // }
-
-        // public async Task<int> AddPartitions(string topicName, int partitionCount)
-        // {
-        //     using var adminClient = new AdminClientBuilder(_adminClientConfig).Build();
-
-        //     var partitionSpecification = new PartitionsSpecification
-        //     {
-        //         Topic = topicName,
-        //         IncreaseTo = partitionCount
-        //     };
-
-        //     await adminClient.CreatePartitionsAsync(new[] { partitionSpecification });
-
-        //     var metadata = adminClient.GetMetadata(topicName, TimeSpan.FromSeconds(10));
-
-        //     return metadata.Topics[0].Partitions.Count;
-        // }
     }
 }
