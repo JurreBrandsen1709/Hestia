@@ -74,13 +74,6 @@ namespace Dyconit.Consumer
                         // Write a message to the server
                         writer.WriteLine(json);
                         writer.Flush();
-
-                        // // Wait for acknowledgement message from the server
-                        // var response = reader.ReadLine();
-                        // if (response != "ACK")
-                        // {
-                        //     Console.WriteLine($"Received unexpected response: {response}");
-                        // }
                     }
                 }
             }

@@ -24,7 +24,7 @@ class Producer {
         };
 
 
-        const string topic = "input_topicc";
+        const string topic = "input_topic";
 
         // Add what collection the conits are in.
         string collection = "Transactions";
@@ -66,6 +66,9 @@ class Producer {
                         Value = payload,
                         Weight = 3.0
                     };
+
+                    // add random wait time to simulate real world
+                    System.Threading.Thread.Sleep(rnd.Next(1, 1000));
 
                     var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
                     Console.WriteLine($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {numProduced}");
