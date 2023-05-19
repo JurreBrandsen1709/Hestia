@@ -130,15 +130,9 @@ namespace Dyconit.Overlord
 
                     break;
 
-                case "dataEvent":
-                    var data = json["data"];
-                    if (data == null)
-                    {
-                        Console.WriteLine($"Invalid dataEvent message received: missing data field. Message: {message}");
-                        break;
-                    }
-                    Console.WriteLine($"Received dataEvent message with data: {data}.");
-                    // Todo: handle data
+                case "checkStalenessEvent":
+                    // get the affected collection of conits
+
                     break;
 
                 default:

@@ -21,14 +21,14 @@ namespace Dyconit.Consumer
         public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type) : base(config)
         {
             _type = type;
-            _adminPort = FindPort();
-            _adminClient = new DyconitAdmin(config.BootstrapServers, type, _adminPort);
+            // _adminPort = FindPort();
+            // _adminClient = new DyconitAdmin(config.BootstrapServers, type, _adminPort);
             _conits = Conits;
 
-            SetStatisticsHandler((_, json) =>
-            {
-                _adminClient.ProcessStatistics(json, config);
-            });
+            // SetStatisticsHandler((_, json) =>
+            // {
+            //     _adminClient.ProcessStatistics(json, config);
+            // });
 
             // Send message to overlord, notifying the following:
             // - I am a producer
@@ -101,10 +101,10 @@ namespace Dyconit.Consumer
             return adminClientPort;
         }
 
-        public DyconitConsumerBuilder<TKey, TValue> SetStatisticsHandler(Action<string, double> handler)
-        {
-            _statisticsHandler = handler;
-            return this;
-        }
+        // public DyconitConsumerBuilder<TKey, TValue> SetStatisticsHandler(Action<string, double> handler)
+        // {
+        //     _statisticsHandler = handler;
+        //     return this;
+        // }
     }
 }

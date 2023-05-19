@@ -12,9 +12,12 @@ using Dyconit.Producer;
 using Dyconit.Overlord;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 class Consumer {
 
+    // TODO move these helper functions to a seperate file.
     static double GetMessageWeight(ConsumeResult<Null, string> result)
     {
         double weight = -1.0;
@@ -28,6 +31,26 @@ class Consumer {
 
         return weight;
     }
+
+    private static int FindPort()
+        {
+            var random = new Random();
+            int adminClientPort;
+            while (true)
+            {
+                adminClientPort = random.Next(5000, 10000);
+                var isPortInUse = IPGlobalProperties.GetIPGlobalProperties()
+                    .GetActiveTcpListeners()
+                    .Any(x => x.Port == adminClientPort);
+                if (!isPortInUse)
+                {
+                    break;
+                }
+            }
+            return adminClientPort;
+        }
+
+
     public static async Task Main()
     {
         var configuration = new ConsumerConfig
@@ -39,7 +62,6 @@ class Consumer {
             // StatisticsIntervalMs = 2000,
         };
 
-        var DyconitLogger = new DyconitPerformanceLogger(1337); // TODO put in the complete configuration and parse it at the performance logger.
 
         const string topic = "input_topic";
 
@@ -51,10 +73,13 @@ class Consumer {
         Dictionary<string, object> conitConfiguration = new Dictionary<string, object>
         {
             { "collection", collection },
-            { "Staleness", 1337 }, // wanneer heb ik voor het laatst data gezien? Ben ik er overheen, dan moet ik aan alle andere conits vragen of ze nog data hebben.
+            { "Staleness", 1337 },
             { "OrderError", 42 },
             { "NumericalError", 8 }
         };
+
+        // var DyconitLogger = new DyconitPerformanceLogger(conitConfiguration);
+        var DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, FindPort(), conitConfiguration);
 
         // Create debug saying that we created the conitConfiguration and it's content.
         Console.WriteLine("Created conitConfiguration with the following content:");
@@ -93,7 +118,7 @@ class Consumer {
 
                     var inputMessage = consumeResult.Message.Value;
 
-                    Console.WriteLine($"Consumed message with value '{consumeResult.Value}', weight '{GetMessageWeight(consumeResult)}'");
+                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
                 }
             }
             catch (OperationCanceledException)
