@@ -39,6 +39,7 @@ namespace Dyconit.Overlord
                 // Parse message and act accordingly
                 ParseMessage(message);
 
+
                 reader.Close();
                 client.Close();
             }
@@ -48,6 +49,9 @@ namespace Dyconit.Overlord
         {
             // Check if message is a newAdminEvent
             var json = JObject.Parse(message);
+            var adminClientPort = json["adminClientPort"]?.ToObject<int>();
+            var dyconitCollection = json["conits"]["collection"].ToString();
+
             var eventType = json["eventType"]?.ToString();
             if (eventType == null)
             {
@@ -58,7 +62,7 @@ namespace Dyconit.Overlord
             switch (eventType)
             {
                 case "newAdminEvent":
-                    var adminClientPort = json["adminClientPort"]?.ToObject<int>();
+
                     if (adminClientPort == null)
                     {
                         Console.WriteLine($"-- Invalid newAdminEvent message received: missing adminClientPort. Message: {message}");
@@ -67,7 +71,7 @@ namespace Dyconit.Overlord
                     Console.WriteLine($"-- Received newAdminEvent message. Admin client listening on port {adminClientPort}.");
 
                     // Check if we already have a dyconit collection in the dyconitCollections dictionary
-                    var dyconitCollection = json["conits"]["collection"].ToString();
+
 
                     // If not, create a new one
                     if (!_dyconitCollections.ContainsKey(dyconitCollection))
@@ -91,7 +95,7 @@ namespace Dyconit.Overlord
                     Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollection}'.");
 
                     // Initialize the last_time_since_pull for the admin client port
-                    var lastTimeSincePull = new DateTime(1970, 1, 1, 0, 0, 0);
+                    var lastTimeSincePull = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local);
                     ((Dictionary<int, DateTime>)_dyconitCollections[dyconitCollection]["last_time_since_pull"]).Add(adminClientPort.Value, lastTimeSincePull);
 
                     Console.WriteLine($"--- last_time_since_pull for {adminClientPort}: {lastTimeSincePull.ToString("dd-MM-yyyy HH:mm:ss")}");
@@ -131,7 +135,57 @@ namespace Dyconit.Overlord
                     break;
 
                 case "checkStalenessEvent":
-                    // get the affected collection of conits
+
+                    Console.WriteLine($"-- Received checkStalenessEvent message from {adminClientPort}.");
+
+                    // update the last_time_since_pull for the admin client port
+                    var consumedTime = json["consumedTime"].ToObject<DateTime>();
+
+                    if (adminClientPort.HasValue)
+                    {
+                        Console.WriteLine($"--- Admin client port: {adminClientPort}");
+
+                        ((Dictionary<int, DateTime>) _dyconitCollections[dyconitCollection]["last_time_since_pull"])[adminClientPort.Value] = DateTime.Now;
+                    }
+
+                    Console.WriteLine($"--- Updated last_time_since_pull for {adminClientPort}: {DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss")}");
+
+                    // Get all the last_time_since_pull values that are not the adminClientPort and
+                    // check if the difference between the consumedTime and the last_time_since_pull is bigger
+                    // than the staleness bound for that collection.
+                    var stalenessBound = ((Dictionary<string, int>)_dyconitCollections[dyconitCollection]["bounds"])["Staleness"];
+
+                    Console.WriteLine($"Staleness bound: {stalenessBound} miliseconds.");
+
+                    foreach (var portEntry in ((Dictionary<int, DateTime>)_dyconitCollections[dyconitCollection]["last_time_since_pull"]))
+                    {
+                        var port = portEntry.Key;
+                        var ltsp = portEntry.Value; // last time since pull
+
+                        Console.WriteLine($"Port: {port}, last_time_since_pull: {ltsp.ToString("dd-MM-yyyy HH:mm:ss")}");
+
+                        if (port != adminClientPort)
+                        {
+                            var timeDifference = consumedTime - ltsp;
+                            if (timeDifference.TotalMilliseconds > stalenessBound)
+                            {
+                                // Staleness violation, perform necessary actions
+                                Console.WriteLine($"Staleness violation for admin client port {port}. Time difference: {timeDifference.TotalMilliseconds} miliseconds.");
+
+                                // simulate actions
+                                Thread.Sleep(1000);
+
+                                // Send a message to the admin client
+                                var stalenessCompletedMessage = new JObject
+                                {
+                                    { "eventType", "completedStalenessEvent" },
+                                    { "data", "xxx" },
+                                }.ToString();
+
+                                SendMessageOverTcp(stalenessCompletedMessage, port);
+                            }
+                        }
+                    }
 
                     break;
 

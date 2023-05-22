@@ -62,6 +62,8 @@ class Consumer {
             // StatisticsIntervalMs = 2000,
         };
 
+        var adminPort = FindPort();
+
 
         const string topic = "input_topic";
 
@@ -79,7 +81,7 @@ class Consumer {
         };
 
         // var DyconitLogger = new DyconitPerformanceLogger(conitConfiguration);
-        var DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, FindPort(), conitConfiguration);
+        var DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, adminPort, conitConfiguration);
 
         // Create debug saying that we created the conitConfiguration and it's content.
         Console.WriteLine("Created conitConfiguration with the following content:");
@@ -94,7 +96,7 @@ class Consumer {
             cts.Cancel();
         };
 
-        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1).Build())
+        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build())
         {
             consumer.Subscribe(topic);
             try

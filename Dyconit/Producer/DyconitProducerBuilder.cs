@@ -18,10 +18,10 @@ namespace Dyconit.Producer
 
         private readonly int _adminPort;
 
-        public DyconitProducerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type) : base(config)
+        public DyconitProducerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort) : base(config)
         {
             _type = type;
-            // _adminPort = FindPort();
+            _adminPort = adminPort;
             // _adminClient = new DyconitAdmin(config.BootstrapServers, type, _adminPort);
             _conits = Conits;
 

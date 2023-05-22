@@ -4,6 +4,7 @@ using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -46,8 +47,7 @@ namespace Dyconit.Overlord
                 BootstrapServers = bootstrapServers
             };
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
-            // _throughputThreshold = getThroughputThreshold(); // the overlord should send this.
-            // Task.Run(ListenForMessagesAsync);
+            Task.Run(ListenForMessagesAsync);
         }
 
 
@@ -59,6 +59,54 @@ namespace Dyconit.Overlord
         private int setThroughputThreshold()
         {
             return 0;
+        }
+
+        private async Task ListenForMessagesAsync()
+        {
+            var listener = new TcpListener(IPAddress.Any, _listenPort);
+            listener.Start();
+
+            while (true)
+            {
+                var client = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
+                var reader = new StreamReader(client.GetStream());
+                var message = await reader.ReadToEndAsync().ConfigureAwait(false);
+
+                // Parse message and act accordingly
+                await ParseMessageAsync(message);
+
+                reader.Close();
+                client.Close();
+            }
+        }
+
+        private async Task ParseMessageAsync(string message)
+        {
+            var json = JObject.Parse(message);
+            var eventType = json["eventType"]?.ToString();
+            if (eventType == null)
+            {
+                Console.WriteLine($"Invalid message received: missing eventType. Message: {message}");
+                return;
+            }
+
+            switch (eventType)
+            {
+                case "completedStalenessEvent":
+
+                // Simulate processing data received from dyconit overlord.
+                Random rnd = new Random();
+                int waitTime = rnd.Next(0, 3000);
+                await Task.Delay(waitTime);
+
+                Console.WriteLine($"[{_listenPort}] - Completed processing new data from other actors. Processing took {waitTime} ms.");
+
+                break;
+
+                default:
+                    Console.WriteLine($"Unknown message received with eventType '{eventType}': {message}");
+                break;
+            }
         }
 
         // We receive the statistics. We calculate the throughput.
@@ -83,10 +131,60 @@ namespace Dyconit.Overlord
 
         public void BoundStaleness(DateTime consumedTime)
         {
-            // send message to dyconit overlord with consumedTime
-            // The overlord will check if other affected nodes belonging to the same Collection of dyconit has synchronized its updates
-            // with the rest of the nodes within the set stalenessBound. if not, it will direct that node to synchronize its updates with
-            // this node.
+            // Create a JSON message containing the EventType as checkStalenessEvent and the consumedTime as the consumedTime (from parameter)
+
+            var message = new Dictionary<string, object>
+            {
+                { "eventType", "checkStalenessEvent" },
+                { "consumedTime", consumedTime },
+                { "adminClientPort", _listenPort },
+                { "conits", _conit }
+            };
+
+            // Serialize message to JSON
+            var json = JObject.FromObject(message).ToString();
+
+            Console.WriteLine($"[{_listenPort}] - Sending checkStalenessEvent to Dyconit Overlord.");
+
+            // send message to dyconit overlord.
+            SendMessageOverTcp(json, 6666);
+        }
+
+         private void SendMessageOverTcp(string message, int port)
+        {
+            try
+            {
+                // Create a TCP client and connect to the server
+                using (var client = new TcpClient())
+                {
+                    client.Connect("localhost", port);
+
+                    // Get a stream object for reading and writing
+                    using (var stream = client.GetStream())
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        // Write a message to the server
+                        writer.WriteLine(message);
+
+                        // Flush the stream to ensure that the message is sent immediately
+                        writer.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send message over TCP: {ex.Message}");
+            }
+        }
+
+        public void BoundNumericalError(int numericalError)
+        {
+            // send message to dyconit overlord with numericalError
+        }
+
+        public void BoundOrderError(int orderError)
+        {
+            // send message to dyconit overlord with orderError
         }
 
     }

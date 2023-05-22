@@ -18,10 +18,10 @@ namespace Dyconit.Consumer
 
         private readonly int _adminPort;
 
-        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type) : base(config)
+        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort) : base(config)
         {
             _type = type;
-            // _adminPort = FindPort();
+            _adminPort = adminPort;
             // _adminClient = new DyconitAdmin(config.BootstrapServers, type, _adminPort);
             _conits = Conits;
 
@@ -83,23 +83,23 @@ namespace Dyconit.Consumer
             }
         }
 
-        private int FindPort()
-        {
-            var random = new Random();
-            int adminClientPort;
-            while (true)
-            {
-                adminClientPort = random.Next(5000, 10000);
-                var isPortInUse = IPGlobalProperties.GetIPGlobalProperties()
-                    .GetActiveTcpListeners()
-                    .Any(x => x.Port == adminClientPort);
-                if (!isPortInUse)
-                {
-                    break;
-                }
-            }
-            return adminClientPort;
-        }
+        // private int FindPort()
+        // {
+        //     var random = new Random();
+        //     int adminClientPort;
+        //     while (true)
+        //     {
+        //         adminClientPort = random.Next(5000, 10000);
+        //         var isPortInUse = IPGlobalProperties.GetIPGlobalProperties()
+        //             .GetActiveTcpListeners()
+        //             .Any(x => x.Port == adminClientPort);
+        //         if (!isPortInUse)
+        //         {
+        //             break;
+        //         }
+        //     }
+        //     return adminClientPort;
+        // }
 
         // public DyconitConsumerBuilder<TKey, TValue> SetStatisticsHandler(Action<string, double> handler)
         // {

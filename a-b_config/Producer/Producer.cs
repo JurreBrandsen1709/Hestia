@@ -12,6 +12,8 @@ using Dyconit.Producer;
 using Dyconit.Message;
 using Dyconit.Overlord;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using System.Linq;
 
 class Producer {
     static void Main(string[] args)
@@ -22,6 +24,8 @@ class Producer {
             BootstrapServers = "localhost:9092",
             StatisticsIntervalMs = 2000,
         };
+
+        var adminPort = FindPort();
 
 
         const string topic = "input_topic";
@@ -45,7 +49,7 @@ class Producer {
             Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
         }
 
-        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, conitConfiguration, 1).Build())
+        using (var producer = new DyconitProducerBuilder<Null, String>(configuration, conitConfiguration, 2, adminPort).Build())
         {
             Console.WriteLine("Press Ctrl+C to quit.");
 
@@ -89,4 +93,22 @@ class Producer {
             Console.WriteLine($"{numProduced} messages were produced to topic {topic}");
         }
     }
+
+    private static int FindPort()
+        {
+            var random = new Random();
+            int adminClientPort;
+            while (true)
+            {
+                adminClientPort = random.Next(5000, 10000);
+                var isPortInUse = IPGlobalProperties.GetIPGlobalProperties()
+                    .GetActiveTcpListeners()
+                    .Any(x => x.Port == adminClientPort);
+                if (!isPortInUse)
+                {
+                    break;
+                }
+            }
+            return adminClientPort;
+        }
 }
