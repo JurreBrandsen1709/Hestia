@@ -115,7 +115,7 @@ class Consumer {
                     int waitTime = rnd.Next(0, 3000);
                     await Task.Delay(waitTime);
 
-                    // await DyconitLogger.BoundStaleness(consumedTime); // Log the consumed message time
+                    await DyconitLogger.BoundStaleness(consumedTime); // Log the consumed message time
 
                     var inputMessage = consumeResult.Message.Value;
 

@@ -129,7 +129,7 @@ namespace Dyconit.Overlord
         //     // TODO: Adjust configuration
         // }
 
-        public void BoundStaleness(DateTime consumedTime)
+        public async Task BoundStaleness(DateTime consumedTime)
         {
             // Create a JSON message containing the EventType as checkStalenessEvent and the consumedTime as the consumedTime (from parameter)
 
@@ -144,13 +144,15 @@ namespace Dyconit.Overlord
             // Serialize message to JSON
             var json = JObject.FromObject(message).ToString();
 
-            Console.WriteLine($"[{_listenPort}] - Sending checkStalenessEvent to Dyconit Overlord.");
+            await Task.Run(() => Console.WriteLine($"[{_listenPort}] - Sending checkStalenessEvent to Dyconit Overlord."));
+
+            // Console.WriteLine($"[{_listenPort}] - Sending checkStalenessEvent to Dyconit Overlord.");
 
             // send message to dyconit overlord.
             SendMessageOverTcp(json, 6666);
         }
 
-         private void SendMessageOverTcp(string message, int port)
+        private async Task SendMessageOverTcp(string message, int port)
         {
             try
             {
@@ -164,7 +166,8 @@ namespace Dyconit.Overlord
                     using (var writer = new StreamWriter(stream))
                     {
                         // Write a message to the server
-                        writer.WriteLine(message);
+                        // writer.WriteLine(message);
+                        await Task.Run(() => writer.WriteLine(message));
 
                         // Flush the stream to ensure that the message is sent immediately
                         writer.Flush();
