@@ -75,12 +75,11 @@ class Consumer {
         Dictionary<string, object> conitConfiguration = new Dictionary<string, object>
         {
             { "collection", collection },
-            { "Staleness", 1337 },
+            { "Staleness", 5000 },
             { "OrderError", 42 },
             { "NumericalError", 8 }
         };
 
-        // var DyconitLogger = new DyconitPerformanceLogger(conitConfiguration);
         var DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, adminPort, conitConfiguration);
 
         // Create debug saying that we created the conitConfiguration and it's content.
@@ -116,7 +115,7 @@ class Consumer {
                     int waitTime = rnd.Next(0, 3000);
                     await Task.Delay(waitTime);
 
-                    DyconitLogger.BoundStaleness(consumedTime); // Log the consumed message time
+                    // await DyconitLogger.BoundStaleness(consumedTime); // Log the consumed message time
 
                     var inputMessage = consumeResult.Message.Value;
 
