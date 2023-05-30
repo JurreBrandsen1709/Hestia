@@ -173,7 +173,9 @@ namespace Dyconit.Overlord
                                 Console.WriteLine($"Staleness violation for admin client port {port}. Time difference: {timeDifference.TotalMilliseconds} miliseconds.");
 
                                 // simulate actions
+                                Console.WriteLine($"Starting synchronisation with port {port}...");
                                 Thread.Sleep(1000);
+                                Console.WriteLine($"Synchronisation completed with port {port}.");
 
                                 // Send a message to the admin client
                                 var stalenessCompletedMessage = new JObject
