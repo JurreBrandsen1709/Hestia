@@ -1,23 +1,153 @@
-// todo: Do something with the weights.
-
 using Confluent.Kafka;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using Newtonsoft.Json.Linq;
-using Dyconit.Consumer;
-using Dyconit.Producer;
-using Dyconit.Overlord;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using Dyconit.Overlord;
+using Dyconit.Consumer;
 
-class Consumer {
+class Consumer
+{
+    private static List<string> _storedMessages;
+    static async Task Main()
+    {
+        _storedMessages = new List<string>();
+        var configuration = GetConsumerConfiguration();
 
-    // TODO move these helper functions to a seperate file.
+        var adminPort = FindPort();
+
+        const string topic = "input_topic";
+        string collection = "Transactions_consumer";
+
+        Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
+
+        var DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, adminPort, conitConfiguration);
+
+        PrintConitConfiguration(conitConfiguration);
+
+        int i = 1;
+        CancellationTokenSource cts = new CancellationTokenSource();
+        Console.CancelKeyPress += (_, e) =>
+        {
+            e.Cancel = true; // prevent the process from terminating.
+            cts.Cancel();
+        };
+
+        using (var consumer = CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
+        {
+            consumer.Subscribe(topic);
+            try
+            {
+
+
+                while (true)
+                {
+                    var consumeResult = consumer.Consume(cts.Token);
+                    var consumedTime = DateTime.Now;
+
+                    // Random rnd = new Random();
+                    // int waitTime = rnd.Next(0, 3000);
+                    // await Task.Delay(waitTime);
+
+                    // PrintStoredMessages();
+                    _storedMessages = await DyconitLogger.BoundStaleness(consumedTime, _storedMessages);
+                    // Console.WriteLine("------------------------------------------");
+                    // PrintStoredMessages();
+
+                    var inputMessage = consumeResult.Message.Value;
+
+                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
+
+                    if (ShouldStoreMessage(i))
+                    {
+                        _storedMessages.Add(consumeResult.Message.Value);
+                    }
+                    else
+                    {
+                        CommitStoredMessages(consumer, _storedMessages);
+                        Console.WriteLine("Committed messages");
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Ctrl-C was pressed.
+            }
+            finally
+            {
+                consumer.Close();
+            }
+        }
+    }
+
+    //create a funciton that prints to stored messages
+    static void PrintStoredMessages()
+    {
+        Console.WriteLine("Stored messages:");
+        foreach (var message in _storedMessages)
+        {
+            Console.WriteLine($"Message with value '{message}");
+        }
+    }
+
+    static ConsumerConfig GetConsumerConfiguration()
+    {
+        return new ConsumerConfig
+        {
+            BootstrapServers = "localhost:9092",
+            GroupId = "kafka-dotnet-getting-started-1",
+            EnableAutoCommit = false,
+            AutoOffsetReset = AutoOffsetReset.Earliest,
+        };
+    }
+
+    // TODO move to dyconit helper functions.
+    static int FindPort()
+    {
+        var random = new Random();
+        int adminClientPort;
+        while (true)
+        {
+            adminClientPort = random.Next(5000, 10000);
+            var isPortInUse = IPGlobalProperties.GetIPGlobalProperties()
+                .GetActiveTcpListeners()
+                .Any(x => x.Port == adminClientPort);
+            if (!isPortInUse)
+            {
+                break;
+            }
+        }
+        return adminClientPort;
+    }
+
+    static Dictionary<string, object> GetConitConfiguration(string collection)
+    {
+        return new Dictionary<string, object>
+        {
+            { "collection", collection },
+            { "Staleness", 5000 },
+            { "OrderError", 42 },
+            { "NumericalError", 8 }
+        };
+    }
+
+    static void PrintConitConfiguration(Dictionary<string, object> conitConfiguration)
+    {
+        Console.WriteLine("Created conitConfiguration with the following content:");
+        foreach (KeyValuePair<string, object> kvp in conitConfiguration)
+        {
+            Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+        }
+    }
+
+    static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort)
+    {
+        return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build();
+    }
+
     static double GetMessageWeight(ConsumeResult<Null, string> result)
     {
         double weight = -1.0;
@@ -32,104 +162,17 @@ class Consumer {
         return weight;
     }
 
-    private static int FindPort()
-        {
-            var random = new Random();
-            int adminClientPort;
-            while (true)
-            {
-                adminClientPort = random.Next(5000, 10000);
-                var isPortInUse = IPGlobalProperties.GetIPGlobalProperties()
-                    .GetActiveTcpListeners()
-                    .Any(x => x.Port == adminClientPort);
-                if (!isPortInUse)
-                {
-                    break;
-                }
-            }
-            return adminClientPort;
-        }
-
-
-    public static async Task Main()
+    static bool ShouldStoreMessage(int i)
     {
-        var configuration = new ConsumerConfig
+        // Replace with your actual condition
+        return i % 10 != 0;
+    }
+
+    static void CommitStoredMessages(IConsumer<Null, string> consumer, List<string> storedMessages)
+    {
+        foreach (var storedMessage in storedMessages)
         {
-            BootstrapServers = "localhost:9092",
-            GroupId = "something-else",
-            // EnableAutoCommit = true,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-            // StatisticsIntervalMs = 2000,
-        };
-
-        var adminPort = FindPort();
-
-
-        const string topic = "input_topic";
-
-        // TODO maybe add áway to let programmers create collections seperately and then add them to the place where they are needed.
-        // Add what collection the conits are in.
-        string collection = "Transactions_consumer";
-
-        // Make a dictionary with the collection and the conits in it.
-        Dictionary<string, object> conitConfiguration = new Dictionary<string, object>
-        {
-            { "collection", collection },
-            { "Staleness", 5000 },
-            { "OrderError", 42 },
-            { "NumericalError", 8 }
-        };
-
-        var DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, adminPort, conitConfiguration);
-
-        // Create debug saying that we created the conitConfiguration and it's content.
-        Console.WriteLine("Created conitConfiguration with the following content:");
-        foreach (KeyValuePair<string, object> kvp in conitConfiguration)
-        {
-            Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-        }
-
-        CancellationTokenSource cts = new CancellationTokenSource();
-        Console.CancelKeyPress += (_, e) => {
-            e.Cancel = true; // prevent the process from terminating.
-            cts.Cancel();
-        };
-
-        using (var consumer = new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build())
-        {
-            consumer.Subscribe(topic);
-            try
-            {
-                while (true)
-                {
-
-                    // The Staleness actor checks for each remote node that shares one of the affected Dynamic Conits if it has synchronized its
-                    // updates within the set staleness bound. If this is not the case, the Staleness actor synchronizes with
-                    // the remote node by requesting its updates.
-
-                    var consumeResult = consumer.Consume(cts.Token);
-                    var consumedTime = DateTime.Now; // Get the current time as the consumed time
-
-                    // add random wait time to simulate processing time.
-                    Random rnd = new Random();
-                    int waitTime = rnd.Next(0, 3000);
-                    await Task.Delay(waitTime);
-
-                    await DyconitLogger.BoundStaleness(consumedTime); // Log the consumed message time
-
-                    var inputMessage = consumeResult.Message.Value;
-
-                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Ctrl-C was pressed.
-            }
-            finally
-            {
-                consumer.Close();
-            }
+            consumer.Commit();
         }
     }
 }

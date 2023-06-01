@@ -55,12 +55,16 @@ class Producer {
 
             var numProduced = 0;
             Random rnd = new Random();
-            const int numMessages = 5000;
+
+            for (int i = 0; i<100000; i++)
+            {
+
+
 
             // Set up a timer to send 5 messages every second
-            var timer = new Timer(1000); // 1000 milliseconds = 1 second
-            timer.Elapsed += (sender, e) => {
-                for (int i = 0; i < 5; i++) {
+            // var timer = new Timer(1000); // 1000 milliseconds = 1 second
+            // timer.Elapsed += (sender, e) => {
+                // for (int i = 0; i < 5; i++) {
 
                     // create a random length payload string
                     var payload = new string('x', rnd.Next(1, 10));
@@ -76,18 +80,19 @@ class Producer {
 
                     var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
                     Console.WriteLine($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {numProduced}");
-                    numProduced += 1;
-                }
-            };
+                    // numProduced += 1;
+                    }
+            //     }
+            // };
 
-            timer.Start();
+            // timer.Start();
 
             // Wait until all messages have been sent
-            while (numProduced < numMessages) {
+            // while (numProduced < numMessages) {
                 // You can do something else while waiting here
-            }
+            // }
 
-            timer.Stop();
+            // timer.Stop();
 
             producer.Flush(TimeSpan.FromSeconds(10));
             Console.WriteLine($"{numProduced} messages were produced to topic {topic}");
