@@ -16,19 +16,80 @@ namespace Dyconit.Overlord
     {
         private readonly int _listenPort = 6666;
 
-        private readonly Dictionary<string, Dictionary<string, object>> _dyconitCollections;
+        private Dictionary<string, Dictionary<string, object>> _dyconitCollections;
 
         public DyconitOverlord()
         {
             _dyconitCollections = new Dictionary<string, Dictionary<string, object>>();
             Console.WriteLine("- Dyconit overlord started.");
-            Task.Run(ListenForMessagesAsync);
+            ListenForMessagesAsync();
+            SendHeartbeatAsync();
+            KeepTrackOfNodesAsync();
         }
 
-        private async Task ListenForMessagesAsync()
+        private async void SendHeartbeatAsync()
+        {
+            // Send a heartbeat response to the requesting node
+            var heartbeatEvent = new JObject
+            {
+                { "eventType", "heartbeatEvent" }
+            };
+
+
+            while (true)
+            {
+                await Task.Delay(1000).ConfigureAwait(false);
+
+                // Send heartbeat to all admin clients
+                foreach (var dyconitCollection in _dyconitCollections)
+                {
+                    var dyconitCollectionData = dyconitCollection.Value;
+                    var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
+
+
+                    foreach (var adminClientPort in adminClientPorts)
+                    {
+                        // send heartbeat to this node
+                        SendMessageOverTcp(heartbeatEvent.ToString(), adminClientPort.Item1);
+                    }
+                }
+            }
+        }
+
+        // Every 5 seconds, check if we have received a heartbeat from all nodes
+        private async void KeepTrackOfNodesAsync()
+        {
+            while (true)
+            {
+                await Task.Delay(5000).ConfigureAwait(false);
+
+                // Check if we have received a heartbeat from all nodes
+                foreach (var dyconitCollection in _dyconitCollections)
+                {
+                    var dyconitCollectionData = dyconitCollection.Value;
+                    var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
+
+                    foreach (var adminClientPort in adminClientPorts)
+                    {
+                        // check if we have received a heartbeat from this node
+                        // if not, remove it from the list
+                        if (adminClientPort.Item2.AddSeconds(10) < DateTime.Now)
+                        {
+                            adminClientPorts.Remove(adminClientPort);
+                            Console.WriteLine($"- Removed node {adminClientPort.Item1} from collection {dyconitCollection.Key}");
+                        }
+                    }
+                }
+            }
+        }
+
+        private async void ListenForMessagesAsync()
         {
             var listener = new TcpListener(IPAddress.Any, _listenPort);
             listener.Start();
+
+            // var client = await listener.AcceptTcpClientAsync();
+            // var reader = new StreamReader(client.GetStream());
 
             while (true)
             {
@@ -37,16 +98,17 @@ namespace Dyconit.Overlord
                 var message = await reader.ReadToEndAsync().ConfigureAwait(false);
 
                 // Parse message and act accordingly
-                ParseMessage(message);
-
+                ParseMessageAsync(message);
 
                 reader.Close();
                 client.Close();
             }
         }
 
-        private void ParseMessage(string message)
+        private async void ParseMessageAsync(string message)
         {
+            await Task.Run(() =>
+            {
             // Check if message is a newAdminEvent
             var json = JObject.Parse(message);
             var adminClientPort = json["adminClientPort"]?.ToObject<int>();
@@ -75,7 +137,8 @@ namespace Dyconit.Overlord
                     {
                         _dyconitCollections.Add(dyconitCollection, new Dictionary<string, object>
                         {
-                            { "ports", new List<int>() },
+                            // add a ports list containing the port and the last time we got a heartbeat from it
+                            { "ports", new List<Tuple<int, DateTime>>() },
                             { "bounds", new Dictionary<string, int>() }
                         });
                         Console.WriteLine($"--- Added dyconit collection '{dyconitCollection}' to the dyconit collections.");
@@ -88,7 +151,7 @@ namespace Dyconit.Overlord
                     var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollection];
 
                     // Add the admin client port to the dyconit collection
-                    ((List<int>)dyconitCollectionData["ports"]).Add(adminClientPort.Value);
+                    ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, DateTime.Now));
 
                     Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollection}'.");
 
@@ -120,12 +183,12 @@ namespace Dyconit.Overlord
                     foreach (var collection in _dyconitCollections)
                     {
                         Console.WriteLine($"---- Collection: {collection.Key}");
-                        Console.WriteLine($"---- Ports: {string.Join(", ", ((List<int>)collection.Value["ports"]))}");
+                        Console.WriteLine($"---- Ports and heartbeat time: {string.Join(", ", ((List<Tuple<int, DateTime>>)collection.Value["ports"]))}");
                         Console.WriteLine($"---- Bounds: {string.Join(", ", ((Dictionary<string, int>)collection.Value["bounds"]))}");
                     }
 
                     // If there are more than one admin clients in the dyconit collection, send the bounds to the other admin clients
-                    if (((List<int>)dyconitCollectionData["ports"]).Count > 1)
+                    if (((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).Count > 1)
                     {
                         Console.WriteLine($"--- Sending newNodeEvent to other admin clients in dyconit collection '{dyconitCollection}'.");
 
@@ -137,21 +200,41 @@ namespace Dyconit.Overlord
                         };
 
                         // Send the message to the other admin clients
-                        foreach (var port in ((List<int>)dyconitCollectionData["ports"]))
+                        foreach (var port in ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]))
                         {
-                            if (port != adminClientPort)
+                            if (port.Item1 != adminClientPort)
                             {
-                                SendMessageOverTcp(newMessage.ToString(), port);
+                                SendMessageOverTcp(newMessage.ToString(), port.Item1);
                                 // Send the existing ports to the new admin client
                                 newMessage = new JObject
                                 {
                                     { "eventType", "newNodeEvent" },
-                                    { "port", port }
+                                    { "port", port.Item1 }
                                 };
                                 SendMessageOverTcp(newMessage.ToString(), adminClientPort.Value);
                             }
                         }
+                    }
 
+                    break;
+                case "heartbeatResponse":
+
+                    Console.WriteLine($"-- Received heartbeatResponse message. Message: {message}");
+
+                    // update the heartbeat time of the admin client
+                    var heartbeatTime = DateTime.Now;
+                    foreach (var collection in _dyconitCollections)
+                    {
+                        foreach (var port in ((List<Tuple<int, DateTime>>)collection.Value["ports"]))
+                        {
+                            if (port.Item1 == adminClientPort)
+                            {
+                                // remove the tuple and add a new one with the new heartbeat time
+                                ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Remove(port);
+                                ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, heartbeatTime));
+                                Console.WriteLine($"--- Updated heartbeat time of admin client listening on port '{adminClientPort}' in dyconit collection '{collection.Key}'.");
+                            }
+                        }
                     }
 
                     break;
@@ -160,6 +243,7 @@ namespace Dyconit.Overlord
                     Console.WriteLine($"Unknown message received with eventType '{eventType}': {message}");
                     break;
             }
+        });
         }
 
         private void SendMessageOverTcp(string message, int port)

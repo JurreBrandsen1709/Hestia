@@ -211,6 +211,23 @@ namespace Dyconit.Overlord
 
                         break;
 
+                    case "heartbeatEvent":
+                        var heartbeatPort = Convert.ToInt32(json["port"]);
+                        Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received heartbeat from port {heartbeatPort}");
+
+                        // Send a heartbeat response to the requesting node
+                        var heartbeatResponse = new JObject
+                        {
+                            { "eventType", "heartbeatResponse" },
+                            { "port", _listenPort },
+                            { "collection", _collection }
+                        };
+
+                        SendMessageOverTcp(heartbeatResponse.ToString(), 6666);
+
+                        break;
+
+
 
 
                     default:
