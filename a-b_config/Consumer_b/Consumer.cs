@@ -54,6 +54,7 @@ class Consumer
 
                     // PrintStoredMessages();
                     _storedMessages = await DyconitLogger.BoundStaleness(consumedTime, _storedMessages);
+                    _storedMessages = await DyconitLogger.BoundNumericalError(_storedMessages);
                     // Console.WriteLine("------------------------------------------");
                     // PrintStoredMessages();
 
@@ -130,7 +131,7 @@ class Consumer
             { "collection", collection },
             { "Staleness", 5000 },
             { "OrderError", 42 },
-            { "NumericalError", 8 }
+            { "NumericalError", 30 }
         };
     }
 

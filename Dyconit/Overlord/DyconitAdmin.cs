@@ -25,7 +25,7 @@ namespace Dyconit.Overlord
         private readonly int _orderError;
         private readonly int _numericalError;
         private List<string> _receivedData;
-        private List<string> _localData;
+        private List<string> _localData = new List<string>();
         private TaskCompletionSource<bool> _stalenessEventReceived;
         private readonly Dictionary<string, object> _localCollection;
         private bool _optimisticMode = false;
@@ -116,7 +116,7 @@ namespace Dyconit.Overlord
                         }
                         else
                         {
-                            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Invalid 'data' format for completedStalenessEvent: {data}");
+                            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Invalid 'data' format for syncResponse: {data}");
                             return;
                         }
 
@@ -129,7 +129,7 @@ namespace Dyconit.Overlord
                         // Call the method to process the completed staleness event
                         UpdateLocalData(_localData);
 
-                        Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local data with completedStalenessEvent from port {senderPort}");
+                        Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local data with syncResponse from port {senderPort}");
 
                         // update the last time since pull for the sender port
                         var ltsp = _localCollection["ltsp"] as List<Tuple<int, DateTime>>;
@@ -241,7 +241,7 @@ namespace Dyconit.Overlord
         {
             if (_receivedData != null && _receivedData.Any())
             {
-                var combinedData = _receivedData.Concat(_localData).Distinct().ToList(); // distinct is nog een probleem.
+                var combinedData = _receivedData.Concat(localData).Distinct().ToList(); // distinct is nog een probleem.
                 _localData = combinedData;
             }
             else
@@ -286,7 +286,7 @@ namespace Dyconit.Overlord
             if (_optimisticMode)
             {
                 // Call the async mode that will send a sync request to the ports that exceeded the staleness bound
-                await WaitForResponse(portsStalenessExceeded);
+                await WaitForResponseAsync(portsStalenessExceeded);
 
                 return _localData;
             }
@@ -300,7 +300,7 @@ namespace Dyconit.Overlord
             return _localData;
         }
 
-        private async Task WaitForResponse(List<int> portsStalenessExceeded)
+        private async Task WaitForResponseAsync(List<int> portsStalenessExceeded)
         {
             // If there are ports that exceeded, send a sync request to those ports
             var message = new Dictionary<string, object>
@@ -331,6 +331,42 @@ namespace Dyconit.Overlord
             }
         }
 
+        private void WaitForResponse(List<int> portsStalenessExceeded)
+        {
+            // If there are ports that exceeded, send a sync request to those ports
+            var message = new Dictionary<string, object>
+            {
+                { "eventType", "syncRequest" },
+                { "port", _listenPort }
+            };
+
+            var json = JsonConvert.SerializeObject(message);
+
+            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Sending sync request to ports {string.Join(", ", portsStalenessExceeded)}");
+
+            foreach (var port in portsStalenessExceeded.ToList())
+            {
+                SendMessageOverTcp(json, port).Wait();
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Sent sync request to port {port}");
+            }
+
+            // Wait for all sync responses to be received
+            var completionSource = new TaskCompletionSource<object>();
+
+            while (true)
+            {
+                if (_syncResponses.Count == portsStalenessExceeded.Count)
+                {
+                    completionSource.SetResult(null);
+                    break;
+                }
+
+                Thread.Sleep(100);
+            }
+
+            completionSource.Task.Wait();
+        }
+
 
         private async Task SendMessageOverTcp(string message, int port)
         {
@@ -354,14 +390,43 @@ namespace Dyconit.Overlord
             }
         }
 
-        public void BoundNumericalError(int numericalError)
+       public async Task<List<string>> BoundNumericalError(List<string> localData)
         {
-            // send message to dyconit overlord with numericalError
+
+            // generate a random throughput between 100 and 1000
+            Random rnd = new Random();
+            int throughput = rnd.Next(100, 1000);
+
+            List<int> ports = _localCollection["ports"] as List<int>;
+            int res = calculateNumericalOrderError(throughput, _numericalError);
+
+
+            if (res > _numericalError)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Numerical error result exceeds the bound. Sending sync request to ports {string.Join(", ", ports)}");
+                WaitForResponse(ports);
+            }
+
+            // Update the local data
+            UpdateLocalData(localData);
+
+            // Return the local data
+            return _localData;
+
         }
 
         public void BoundOrderError(int orderError)
         {
             // send message to dyconit overlord with orderError
+        }
+
+        private int calculateNumericalOrderError(int throughput, int numericalError)
+        {
+            int numberOfNodes = ((List<int>)_localCollection["ports"]).Count() + 1;
+            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Number of nodes is {numberOfNodes}");
+
+            return  (2 * (int)Math.Pow((numberOfNodes - 1), 2) * throughput) / numericalError;
+
         }
     }
 }
