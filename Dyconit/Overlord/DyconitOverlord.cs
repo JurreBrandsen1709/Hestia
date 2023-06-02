@@ -32,7 +32,8 @@ namespace Dyconit.Overlord
             // Send a heartbeat response to the requesting node
             var heartbeatEvent = new JObject
             {
-                { "eventType", "heartbeatEvent" }
+                { "eventType", "heartbeatEvent" },
+                { "port", _listenPort}
             };
 
 
@@ -77,9 +78,36 @@ namespace Dyconit.Overlord
                         if (adminClientPort.Item2.AddSeconds(10) < DateTime.Now)
                         {
                             adminClientPorts.Remove(adminClientPort);
+
+                            // notify all other nodes that this node has been removed
+                            await RemoveNodeAtAdmins(adminClientPort.Item1);
+
                             Console.WriteLine($"- Removed node {adminClientPort.Item1} from collection {dyconitCollection.Key}");
                         }
                     }
+                }
+            }
+        }
+
+        private async Task RemoveNodeAtAdmins(int adminClientPort)
+        {
+            // Send a heartbeat response to the requesting node
+            var removeNodeEvent = new JObject
+            {
+                { "eventType", "removeNodeEvent" },
+                { "adminClientPort", adminClientPort }
+            };
+
+            // Send heartbeat to all admin clients
+            foreach (var dyconitCollectionData in _dyconitCollections.ToList())
+            {
+                var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData.Value["ports"];
+
+                foreach (var otherAdminClientPort in adminClientPorts.ToList())
+                {
+                    Console.WriteLine($"--- Sending removeNodeEvent to {otherAdminClientPort.Item1}");
+                    // send heartbeat to this node
+                    await SendMessageOverTcp(removeNodeEvent.ToString(), otherAdminClientPort.Item1);
                 }
             }
         }
@@ -219,9 +247,6 @@ namespace Dyconit.Overlord
 
                     break;
                 case "heartbeatResponse":
-
-                    Console.WriteLine($"-- Received heartbeatResponse message. Message: {message}");
-
                     // update the heartbeat time of the admin client
                     var heartbeatTime = DateTime.Now;
                     foreach (var collection in _dyconitCollections.ToList())
@@ -233,7 +258,6 @@ namespace Dyconit.Overlord
                                 // remove the tuple and add a new one with the new heartbeat time
                                 ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Remove(port);
                                 ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, heartbeatTime));
-                                Console.WriteLine($"--- Updated heartbeat time of admin client listening on port '{adminClientPort}' in dyconit collection '{collection.Key}'.");
                             }
                         }
                     }
@@ -247,24 +271,19 @@ namespace Dyconit.Overlord
         });
         }
 
-        private void SendMessageOverTcp(string message, int port)
+        private async Task SendMessageOverTcp(string message, int port)
         {
             try
             {
-                // Create a TCP client and connect to the server
                 using (var client = new TcpClient())
                 {
                     client.Connect("localhost", port);
 
-                    // Get a stream object for reading and writing
                     using (var stream = client.GetStream())
                     using (var writer = new StreamWriter(stream))
                     {
-                        // Write a message to the server
-                        writer.WriteLine(message);
-
-                        // Flush the stream to ensure that the message is sent immediately
-                        writer.Flush();
+                        await writer.WriteLineAsync(message);
+                        await writer.FlushAsync();
                     }
                 }
             }
@@ -279,7 +298,12 @@ namespace Dyconit.Overlord
                     {
                         if (adminClient.Item1 == port)
                         {
+
+
                             ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Remove(adminClient);
+                            // notify all other nodes that this node has been removed
+                            await RemoveNodeAtAdmins(port);
+
                             Console.WriteLine($"--- Removed admin client listening on port '{port}' from dyconit collection '{collection.Key}'.");
                         }
                     }

@@ -28,7 +28,7 @@ namespace Dyconit.Overlord
         private List<string> _localData;
         private TaskCompletionSource<bool> _stalenessEventReceived;
         private readonly Dictionary<string, object> _localCollection;
-        private bool _optimisticMode = true;
+        private bool _optimisticMode = false;
         private HashSet<int> _syncResponses = new HashSet<int>();
 
         public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, object> conit)
@@ -163,7 +163,7 @@ namespace Dyconit.Overlord
 
                         Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received removeNodeEvent");
 
-                        var removeNodePort = Convert.ToInt32(json["port"]);
+                        var removeNodePort = Convert.ToInt32(json["adminClientPort"]);
 
                         // Remove the node from the local collection
                         var ports2 = _localCollection["ports"] as List<int>;
