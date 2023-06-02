@@ -219,7 +219,7 @@ namespace Dyconit.Overlord
                         var heartbeatResponse = new JObject
                         {
                             { "eventType", "heartbeatResponse" },
-                            { "port", _listenPort },
+                            { "adminClientPort", _listenPort },
                             { "collection", _collection }
                         };
 
