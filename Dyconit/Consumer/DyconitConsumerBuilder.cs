@@ -1,5 +1,6 @@
 using Confluent.Kafka;
 using Dyconit.Overlord;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
@@ -16,19 +17,25 @@ namespace Dyconit.Consumer
         private readonly DyconitAdmin _adminClient;
         private readonly Dictionary<string, object> _conits;
 
+        private double _previousAppOffset = 0.0;
+
+        private bool _isFirstCall = true;
+
         private readonly int _adminPort;
 
-        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort) : base(config)
+        // todo geef de admin mee, zodat deze de statisitieken kan verwerken
+        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort, DyconitAdmin dyconitAdmin) : base(config)
         {
             _type = type;
             _adminPort = adminPort;
+            _adminClient = dyconitAdmin;
             // _adminClient = new DyconitAdmin(config.BootstrapServers, type, _adminPort);
             _conits = Conits;
 
-            // SetStatisticsHandler((_, json) =>
-            // {
-            //     _adminClient.ProcessStatistics(json, config);
-            // });
+            SetStatisticsHandler((_, json) =>
+            {
+                _adminClient.ProcessConsumerStatistics(json, config);
+            });
 
             // Send message to overlord, notifying the following:
             // - I am a producer
@@ -37,7 +44,6 @@ namespace Dyconit.Consumer
             SendMessageToOverlord();
 
         }
-
         private void SendMessageToOverlord()
         {
             try

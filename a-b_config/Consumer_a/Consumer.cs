@@ -12,10 +12,16 @@ using Dyconit.Consumer;
 class Consumer
 {
     private static List<string> _storedMessages;
+    private static List<ConsumeResult<Null, string>> _listOfConsumedMessages;
     static async Task Main()
     {
         _storedMessages = new List<string>();
         var configuration = GetConsumerConfiguration();
+        // SetStatisticsHandler((_, json) =>
+        //     {
+        //         _adminClient.ProcessConsumerStatistics(json, config);
+        //     });
+        _listOfConsumedMessages = new List<ConsumeResult<Null, string>>();
 
         var adminPort = FindPort();
 
@@ -36,7 +42,7 @@ class Consumer
             cts.Cancel();
         };
 
-        using (var consumer = CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
+        using (var consumer = CreateDyconitConsumer(configuration, conitConfiguration, adminPort, DyconitLogger))
         {
             consumer.Subscribe(topic);
             try
@@ -46,11 +52,14 @@ class Consumer
                 while (true)
                 {
                     var consumeResult = consumer.Consume(cts.Token);
+                    _listOfConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
                     var consumedTime = DateTime.Now;
 
                     Random rnd = new Random();
-                    int waitTime = rnd.Next(0, 3000);
+                    int waitTime = rnd.Next(0, 100);
                     await Task.Delay(waitTime);
+
+
 
                     // PrintStoredMessages();
                     _storedMessages = await DyconitLogger.BoundStaleness(consumedTime, _storedMessages);
@@ -60,17 +69,19 @@ class Consumer
 
                     var inputMessage = consumeResult.Message.Value;
 
+
                     Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
 
                     if (ShouldStoreMessage(i))
                     {
-                        _storedMessages.Add(consumeResult.Message.Value);
+                        _storedMessages.Add(inputMessage);
                     }
                     else
                     {
-                        CommitStoredMessages(consumer, _storedMessages);
+                        CommitStoredMessages(consumer);
                         Console.WriteLine("Committed messages");
                     }
+                    i++;
                 }
             }
             catch (OperationCanceledException)
@@ -102,6 +113,7 @@ class Consumer
             GroupId = "kafka-dotnet-getting-started",
             EnableAutoCommit = false,
             AutoOffsetReset = AutoOffsetReset.Earliest,
+            StatisticsIntervalMs = 5000,
         };
     }
 
@@ -144,9 +156,9 @@ class Consumer
         }
     }
 
-    static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort)
+    static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort, DyconitAdmin DyconitLogger)
     {
-        return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build();
+        return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort, DyconitLogger).Build();
     }
 
     static double GetMessageWeight(ConsumeResult<Null, string> result)
@@ -169,11 +181,14 @@ class Consumer
         return i % 10 != 0;
     }
 
-    static void CommitStoredMessages(IConsumer<Null, string> consumer, List<string> storedMessages)
+    static void CommitStoredMessages(IConsumer<Null, string> consumer)
     {
-        foreach (var storedMessage in storedMessages)
-        {
-            consumer.Commit();
-        }
+
+       foreach (ConsumeResult<Null, string> storedMessage in _listOfConsumedMessages)
+       {
+            consumer.Commit(storedMessage);
+
+       }
     }
+
 }

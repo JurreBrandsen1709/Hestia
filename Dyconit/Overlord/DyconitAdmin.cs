@@ -30,6 +30,8 @@ namespace Dyconit.Overlord
         private readonly Dictionary<string, object> _localCollection;
         private bool _optimisticMode = false;
         private HashSet<int> _syncResponses = new HashSet<int>();
+        private double _previousAppOffset = 0.0;
+        private bool _isFirstCall = true;
 
         public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, object> conit)
         {
@@ -53,11 +55,57 @@ namespace Dyconit.Overlord
 
             _adminClientConfig = new AdminClientConfig
             {
-                BootstrapServers = bootstrapServers
+                BootstrapServers = bootstrapServers,
             };
+
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
 
             ListenForMessagesAsync();
+        }
+
+        public void ProcessConsumerStatistics(string json, ClientConfig config)
+        {
+            try
+            {
+                var statistics = JObject.Parse(json);
+
+                // Save the app_offset for the first time.
+                // Compare the app_offset with the previous app_offset.
+                // Calculate the throughput.
+
+                var inputTopic = statistics?["topics"]?["input_topic"];
+                var partition = inputTopic?["partitions"]?["0"];
+                var appOffset = partition?["app_offset"];
+
+                if (appOffset != null && double.TryParse(appOffset.ToString(), out double currentOffsetValue))
+                {
+
+                    if (_isFirstCall)
+                    {
+                        _isFirstCall = false;
+                    } else {
+                        // Calculate throughput
+                        var offsetDifference = currentOffsetValue - _previousAppOffset;
+
+                        Console.WriteLine($"currentOffsetValue: {currentOffsetValue}, _previousAppOffset: {_previousAppOffset}, offsetDifference: {offsetDifference}");
+
+                        var throughput = offsetDifference / config.StatisticsIntervalMs * 1000;
+                        Console.WriteLine($"Throughput: {throughput} messages/s");
+                    }
+
+
+                    // Update the previous app_offset
+                    _previousAppOffset = currentOffsetValue;
+                }
+                else
+                {
+                    Console.WriteLine("Unable to retrieve app_offset or it has an invalid value.");
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                Console.WriteLine($"Error parsing JSON: {ex.Message}");
+            }
         }
 
         private async void ListenForMessagesAsync()
