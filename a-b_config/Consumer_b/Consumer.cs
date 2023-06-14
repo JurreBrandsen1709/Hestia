@@ -14,6 +14,7 @@ class Consumer
     private static List<string> _storedMessages;
     private static List<ConsumeResult<Null, string>> _uncommittedConsumedMessages;
     private static List<ConsumeResult<Null, string>> _uncommittedConsumedMessagesTest;
+    private static long _lastCommittedOffset = -1;
     static async Task Main()
     {
         _storedMessages = new List<string>();
@@ -27,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "input_topic";
+        const string topic = "input_topicccc";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -36,7 +37,6 @@ class Consumer
 
         PrintConitConfiguration(conitConfiguration);
 
-        int i = 1;
         CancellationTokenSource cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
         {
@@ -49,41 +49,45 @@ class Consumer
             consumer.Subscribe(topic);
             try
             {
-
-
                 while (true)
                 {
+                    if (_lastCommittedOffset > 0)
+                    {
+                        Console.WriteLine($"Assigning topic {topic} with offset {_lastCommittedOffset}");
+                        consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
+                    }
                     var consumeResult = consumer.Consume(cts.Token);
+
+                    // if we consume a message that is older than the last committed offset, we ignore it.
+                    if (consumeResult.Offset < _lastCommittedOffset)
+                    {
+                        Console.WriteLine($"Ignoring message with offset {consumeResult.Offset}");
+                        continue;
+                    }
+
                     _uncommittedConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
                     _uncommittedConsumedMessagesTest.Add(consumeResult);
                     var consumedTime = DateTime.Now;
 
                     Random rnd = new Random();
-                    int waitTime = rnd.Next(0, 1);
+                    int waitTime = rnd.Next(0, 200);
                     await Task.Delay(waitTime);
 
                     // PrintStoredMessages();
                     SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
+
+                    Console.WriteLine($"result: {result.Data.Count} {result.changed}");
+
                     _uncommittedConsumedMessages = result.Data;
 
 
                     if (result.changed == true)
                     {
+                        Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
+
                         CommitStoredMessages(consumer);
                         Console.WriteLine("Committed messages");
 
-                        // print the content of _uncommittedConsumedMessagesTest and _uncommittedConsumedMessages
-                        Console.WriteLine("uncommittedConsumedMessagesTest:");
-                        foreach (var item in _uncommittedConsumedMessagesTest)
-                        {
-                            Console.WriteLine(item.Message.Value);
-                        }
-                        Console.WriteLine("-----------------------------");
-                        Console.WriteLine("uncommittedConsumedMessages:");
-                        foreach (var item in _uncommittedConsumedMessages)
-                        {
-                            Console.WriteLine(item.Message.Value);
-                        }
 
                     }
                     else
@@ -139,10 +143,10 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "tryout",
+            GroupId = "tryout-2",
             EnableAutoCommit = false,
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            StatisticsIntervalMs = 1000,
+            StatisticsIntervalMs = 5000,
         };
     }
 
@@ -217,6 +221,9 @@ class Consumer
        {
             consumer.Commit(storedMessage);
        }
+
+        _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset.Value;
+
        // Clear the list of stored messages
          _uncommittedConsumedMessages.Clear();
     }

@@ -28,7 +28,7 @@ class Producer {
         var adminPort = FindPort();
 
 
-        const string topic = "input_topic";
+        const string topic = "input_topicccc";
 
         // Add what collection the conits are in.
         string collection = "Transactions";
@@ -56,7 +56,7 @@ class Producer {
             var numProduced = 0;
             Random rnd = new Random();
 
-            for (int i = 0; i<100000; i++)
+            for (int i = 0; i<100; i++)
             {
 
 
@@ -67,7 +67,7 @@ class Producer {
                 // for (int i = 0; i < 5; i++) {
 
                     // create a random length payload string
-                    var payload = new string('x', rnd.Next(1, 10));
+                    var payload = new string(i.ToString());
 
                     var message = new DyconitMessage<Null, string>
                     {
@@ -76,7 +76,7 @@ class Producer {
                     };
 
                     // add random wait time to simulate real world
-                    System.Threading.Thread.Sleep(rnd.Next(1, 1000));
+                    // System.Threading.Thread.Sleep(rnd.Next(1, 1000));
 
                     var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
                     Console.WriteLine($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {numProduced}");

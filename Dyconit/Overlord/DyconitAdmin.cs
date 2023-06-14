@@ -70,12 +70,14 @@ namespace Dyconit.Overlord
             {
                 var statistics = JObject.Parse(json);
 
+
                 // Save the app_offset for the first time.
                 // Compare the app_offset with the previous app_offset.
                 // Calculate the throughput.
 
 
                 var inputTopic = statistics?["topics"]?["input_topic"];
+                // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received statistics: {statistics}");
                 var partition = inputTopic?["partitions"]?["0"];
                 var appOffset = partition?["app_offset"];
                 // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} inputTopic: {inputTopic}, partition: {partition}, appOffset: {appOffset}");
@@ -298,7 +300,7 @@ namespace Dyconit.Overlord
 
                         case "heartbeatEvent":
                             var heartbeatPort = Convert.ToInt32(json["port"]);
-                            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received heartbeat from port {heartbeatPort}");
+                            // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received heartbeat from port {heartbeatPort}");
 
                             // Send a heartbeat response to the requesting node
                             var heartbeatResponse = new JObject

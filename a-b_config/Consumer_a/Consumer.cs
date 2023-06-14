@@ -14,6 +14,7 @@ class Consumer
     private static List<string> _storedMessages;
     private static List<ConsumeResult<Null, string>> _uncommittedConsumedMessages;
     private static List<ConsumeResult<Null, string>> _uncommittedConsumedMessagesTest;
+    private static long _lastCommittedOffset = -1;
     static async Task Main()
     {
         _storedMessages = new List<string>();
@@ -27,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "input_topic";
+        const string topic = "input_topicccc";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -36,7 +37,6 @@ class Consumer
 
         PrintConitConfiguration(conitConfiguration);
 
-        int i = 1;
         CancellationTokenSource cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
         {
@@ -49,11 +49,22 @@ class Consumer
             consumer.Subscribe(topic);
             try
             {
-
-
                 while (true)
                 {
+                    if (_lastCommittedOffset > 0)
+                    {
+                        Console.WriteLine($"Assigning topic {topic} with offset {_lastCommittedOffset}");
+                        consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
+                    }
                     var consumeResult = consumer.Consume(cts.Token);
+
+                    // if we consume a message that is older than the last committed offset, we ignore it.
+                    if (consumeResult.Offset < _lastCommittedOffset)
+                    {
+                        Console.WriteLine($"Ignoring message with offset {consumeResult.Offset}");
+                        continue;
+                    }
+
                     _uncommittedConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
                     _uncommittedConsumedMessagesTest.Add(consumeResult);
                     var consumedTime = DateTime.Now;
@@ -132,10 +143,10 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "tryout",
+            GroupId = "tryout-1",
             EnableAutoCommit = false,
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            StatisticsIntervalMs = 500,
+            StatisticsIntervalMs = 5000,
         };
     }
 
@@ -211,14 +222,20 @@ class Consumer
             consumer.Commit(storedMessage);
        }
 
-        // print the committed messages from consumer.committed
-        foreach (var committed in consumer.Committed(TimeSpan.FromSeconds(10))) {
-            Console.WriteLine($"committed: {committed.Offset.Value}");
+       // Retrieve the committed offsets for the assigned partitions
+        var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
+
+        // Process the committed offsets
+        foreach (var committedOffset in committedOffsets)
+        {
+            // Console.WriteLine($"Partition: {committedOffset.Partition}, Committed Offset: {committedOffset.Offset}");
+            _lastCommittedOffset = committedOffset.Offset;
         }
 
 
        // Clear the list of stored messages
          _uncommittedConsumedMessages.Clear();
+         _uncommittedConsumedMessagesTest.Clear();
     }
 
 }
