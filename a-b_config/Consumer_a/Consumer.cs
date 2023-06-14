@@ -12,7 +12,8 @@ using Dyconit.Consumer;
 class Consumer
 {
     private static List<string> _storedMessages;
-    private static List<ConsumeResult<Null, string>> _listOfConsumedMessages;
+    private static List<ConsumeResult<Null, string>> _uncommittedConsumedMessages;
+    private static List<ConsumeResult<Null, string>> _uncommittedConsumedMessagesTest;
     static async Task Main()
     {
         _storedMessages = new List<string>();
@@ -21,7 +22,8 @@ class Consumer
         //     {
         //         _adminClient.ProcessConsumerStatistics(json, config);
         //     });
-        _listOfConsumedMessages = new List<ConsumeResult<Null, string>>();
+        _uncommittedConsumedMessages = new List<ConsumeResult<Null, string>>();
+        _uncommittedConsumedMessagesTest = new List<ConsumeResult<Null, string>>();
 
         var adminPort = FindPort();
 
@@ -52,18 +54,38 @@ class Consumer
                 while (true)
                 {
                     var consumeResult = consumer.Consume(cts.Token);
-                    _listOfConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
+                    _uncommittedConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
+                    _uncommittedConsumedMessagesTest.Add(consumeResult);
                     var consumedTime = DateTime.Now;
 
                     Random rnd = new Random();
-                    int waitTime = rnd.Next(0, 100);
+                    int waitTime = rnd.Next(0, 2000);
                     await Task.Delay(waitTime);
 
-
-
                     // PrintStoredMessages();
-                    _storedMessages = await DyconitLogger.BoundStaleness(consumedTime, _storedMessages);
-                    _storedMessages = await DyconitLogger.BoundNumericalError(_storedMessages);
+                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
+
+                    Console.WriteLine($"result: {result.Data.Count} {result.changed}");
+
+                    _uncommittedConsumedMessages = result.Data;
+
+
+                    if (result.changed == true)
+                    {
+                        Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
+
+                        CommitStoredMessages(consumer);
+                        Console.WriteLine("Committed messages");
+
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("No messages to commit");
+                    }
+
+                    // _uncommittedConsumedMessages = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
+                    // _uncommittedConsumedMessages = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
                     // Console.WriteLine("------------------------------------------");
                     // PrintStoredMessages();
 
@@ -72,16 +94,16 @@ class Consumer
 
                     Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
 
-                    if (ShouldStoreMessage(i))
-                    {
-                        _storedMessages.Add(inputMessage);
-                    }
-                    else
-                    {
-                        CommitStoredMessages(consumer);
-                        Console.WriteLine("Committed messages");
-                    }
-                    i++;
+                    // if (ShouldStoreMessage(i))
+                    // {
+                    //     _storedMessages.Add(inputMessage);
+                    // }
+                    // else
+                    // {
+                    //     CommitStoredMessages(consumer);
+                    //     Console.WriteLine("Committed messages");
+                    // }
+                    // i++;
                 }
             }
             catch (OperationCanceledException)
@@ -110,10 +132,10 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "kafka-dotnet-getting-started",
+            GroupId = "tryout",
             EnableAutoCommit = false,
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            StatisticsIntervalMs = 5000,
+            StatisticsIntervalMs = 500,
         };
     }
 
@@ -175,20 +197,28 @@ class Consumer
         return weight;
     }
 
-    static bool ShouldStoreMessage(int i)
-    {
-        // Replace with your actual condition
-        return i % 10 != 0;
-    }
+    // static bool ShouldStoreMessage(int i)
+    // {
+    //     // Replace with your actual condition
+    //     return i % 10 != 0;
+    // }
 
     static void CommitStoredMessages(IConsumer<Null, string> consumer)
     {
 
-       foreach (ConsumeResult<Null, string> storedMessage in _listOfConsumedMessages)
+       foreach (ConsumeResult<Null, string> storedMessage in _uncommittedConsumedMessages)
        {
             consumer.Commit(storedMessage);
-
        }
+
+        // print the committed messages from consumer.committed
+        foreach (var committed in consumer.Committed(TimeSpan.FromSeconds(10))) {
+            Console.WriteLine($"committed: {committed.Offset.Value}");
+        }
+
+
+       // Clear the list of stored messages
+         _uncommittedConsumedMessages.Clear();
     }
 
 }
