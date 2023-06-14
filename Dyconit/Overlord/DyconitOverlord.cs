@@ -264,6 +264,16 @@ namespace Dyconit.Overlord
 
                     break;
 
+                case "throughput":
+
+                    var throughput = json["throughput"]?.ToObject<double>();
+                    var adminPort = json["adminPort"]?.ToObject<int>();
+
+                    Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, Throughput: {throughput}.");
+
+
+                    break;
+
                 default:
                     Console.WriteLine($"Unknown message received with eventType '{eventType}': {message}");
                     break;

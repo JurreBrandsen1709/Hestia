@@ -28,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "input_topicccc";
+        const string topic = "d";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -65,7 +65,7 @@ class Consumer
                         continue;
                     }
 
-                    _uncommittedConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
+                    _uncommittedConsumedMessages.Add(consumeResult);
                     _uncommittedConsumedMessagesTest.Add(consumeResult);
                     var consumedTime = DateTime.Now;
 
@@ -75,11 +75,23 @@ class Consumer
 
                     // PrintStoredMessages();
                     SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
-
-                    Console.WriteLine($"result: {result.Data.Count} {result.changed}");
-
                     _uncommittedConsumedMessages = result.Data;
+                    Console.WriteLine($"result: {result.Data.Count} {result.changed}");
+                    if (result.changed == true)
+                    {
+                        Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
 
+                        CommitStoredMessages(consumer);
+                        Console.WriteLine("Committed messages");
+                    }
+                    else
+                    {
+                        Console.WriteLine("No messages to commit");
+                    }
+
+                    result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
+                    _uncommittedConsumedMessages = result.Data;
+                    Console.WriteLine($"result: {result.Data.Count} {result.changed}");
 
                     if (result.changed == true)
                     {
@@ -87,13 +99,17 @@ class Consumer
 
                         CommitStoredMessages(consumer);
                         Console.WriteLine("Committed messages");
-
-
                     }
                     else
                     {
                         Console.WriteLine("No messages to commit");
                     }
+
+
+
+
+
+
 
                     // _uncommittedConsumedMessages = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
                     // _uncommittedConsumedMessages = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);

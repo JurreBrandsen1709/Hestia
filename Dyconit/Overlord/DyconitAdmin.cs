@@ -24,15 +24,16 @@ namespace Dyconit.Overlord
         private readonly string _collection;
         private readonly int _staleness;
         private readonly int _orderError;
-        private readonly int _numericalError;
+        private readonly double _numericalError;
         private List<ConsumeResult<Null, string>> _receivedData;
         private List<ConsumeResult<Null, string>>_localData = new List<ConsumeResult<Null, string>>();
         private TaskCompletionSource<bool> _stalenessEventReceived;
         private readonly Dictionary<string, object> _localCollection;
         private bool _optimisticMode = true;
         private HashSet<int> _syncResponses = new HashSet<int>();
-        private double _previousAppOffset = 0.0;
+        private long _previousOffset = 0;
         private bool _isFirstCall = true;
+        private double _throughput = 0.0;
 
         public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, object> conit)
         {
@@ -42,7 +43,7 @@ namespace Dyconit.Overlord
             _collection = conit.ContainsKey("collection") ? conit["collection"].ToString() : null;
             _staleness = conit.ContainsKey("Staleness") ? Convert.ToInt32(conit["Staleness"]) : 0;
             _orderError = conit.ContainsKey("OrderError") ? Convert.ToInt32(conit["OrderError"]) : 0;
-            _numericalError = conit.ContainsKey("NumericalError") ? Convert.ToInt32(conit["NumericalError"]) : 0;
+            _numericalError = conit.ContainsKey("NumericalError") ? Convert.ToDouble(conit["NumericalError"]) : 0.0;
 
             // Initialize local collection. The Dyconit overlord will update this collection with the latest data.
             _localCollection = new Dictionary<string, object>
@@ -62,73 +63,63 @@ namespace Dyconit.Overlord
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
 
             ListenForMessagesAsync();
+            calculateThroughputAysnc();
         }
 
-        public void ProcessConsumerStatistics(string json, ClientConfig config)
+        private async Task calculateThroughputAysnc()
         {
-            try
+            while (true)
             {
-                var statistics = JObject.Parse(json);
+                // send it to the dyconit overlord every 5 seconds
+                await Task.Delay(5000);
 
-
-                // Save the app_offset for the first time.
-                // Compare the app_offset with the previous app_offset.
-                // Calculate the throughput.
-
-
-                var inputTopic = statistics?["topics"]?["input_topic"];
-                // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received statistics: {statistics}");
-                var partition = inputTopic?["partitions"]?["0"];
-                var appOffset = partition?["app_offset"];
-                // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} inputTopic: {inputTopic}, partition: {partition}, appOffset: {appOffset}");
-
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received appOffset: {appOffset}");
-
-                if (appOffset != null && double.TryParse(appOffset.ToString(), out double currentOffsetValue))
-                {
-
-                    if (_isFirstCall)
-                    {
-                        _isFirstCall = false;
-                    } else {
-                        // Calculate throughput
-                        var offsetDifference = currentOffsetValue - _previousAppOffset;
-
-                        Console.WriteLine($"currentOffsetValue: {currentOffsetValue}, _previousAppOffset: {_previousAppOffset}, offsetDifference: {offsetDifference}");
-
-                        var throughput = offsetDifference / config.StatisticsIntervalMs * 1000;
-
-                        var throughputMessage = new JObject
-                        {
-                            { "eventType", "throughput" },
-                            { "throughput", throughput },
-                            { "port", _listenPort }
-                        };
-
-                    }
-
-
-                    // Update the previous app_offset
-                    _previousAppOffset = currentOffsetValue;
-                }
-                else
-                {
-                    Console.WriteLine("Unable to retrieve app_offset or it has an invalid value.");
-                }
+                // calculate Throughput
+                await CalculateThroughput();
             }
-            catch (JsonReaderException ex)
+        }
+
+        private async Task CalculateThroughput()
+        {
+            // get current offset or 0 if no messages have been received
+            long currentOffset = _localData.Count > 0 ? _localData.Last().Offset : 0;
+
+            if (_isFirstCall)
             {
-                Console.WriteLine($"Error parsing JSON: {ex.Message}");
+                _isFirstCall = false;
             }
+            else
+            {
+
+                long offsetDifference = currentOffset - _previousOffset;
+
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Current offset: {currentOffset}, Previous offset: {_previousOffset}, Offset difference: {offsetDifference}");
+
+                // check if the offsetDifference is negative
+                if (offsetDifference <= 0)
+                {
+                    return;
+                }
+
+                double throughput = offsetDifference / 5.0;
+
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Throughput: {throughput} messages per second");
+
+                var throughputMessage = new JObject
+                {
+                    { "eventType", "throughput" },
+                    { "throughput", throughput },
+                    { "port", _listenPort }
+                };
+
+                SendMessageOverTcp(throughputMessage.ToString(), 6666);
+            }
+            _previousOffset = currentOffset;
         }
 
         private async void ListenForMessagesAsync()
         {
             var listener = new TcpListener(IPAddress.Any, _listenPort);
             listener.Start();
-
-            // var client = await listener.AcceptTcpClientAsync();
-            // var reader = new StreamReader(client.GetStream());
 
             while (true)
             {
@@ -514,42 +505,37 @@ namespace Dyconit.Overlord
             }
         }
 
-    //    public async Task<List<string>> BoundNumericalError(List<string> localData)
-    //     {
-
-    //         // generate a random throughput between 100 and 1000
-    //         Random rnd = new Random();
-    //         int throughput = rnd.Next(100, 1000);
-
-    //         List<int> ports = _localCollection["ports"] as List<int>;
-    //         int res = calculateNumericalOrderError(throughput, _numericalError);
+       public async Task<SyncResult> BoundNumericalError(List<ConsumeResult<Null, string>> localData)
+        {
+            List<int> ports = _localCollection["ports"] as List<int>;
+            double res = calculateNumericalOrderError();
 
 
-    //         if (res > _numericalError)
-    //         {
-    //             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Numerical error result exceeds the bound. Sending sync request to ports {string.Join(", ", ports)}");
-    //             WaitForResponse(ports);
-    //         }
+            if (res > _numericalError)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Numerical error result exceeds the bound. Sending sync request to ports {string.Join(", ", ports)}");
+                WaitForResponse(ports);
+            }
 
-    //         // Update the local data
-    //         UpdateLocalData(localData);
+            // Update the local data
+            SyncResult result = UpdateLocalData(localData);
 
-    //         // Return the local data
-    //         return _localData;
+            // Return the local data
+            return result;
 
-    //     }
+        }
 
         public void BoundOrderError(int orderError)
         {
             // send message to dyconit overlord with orderError
         }
 
-        private int calculateNumericalOrderError(int throughput, int numericalError)
+        private double calculateNumericalOrderError()
         {
             int numberOfNodes = ((List<int>)_localCollection["ports"]).Count() + 1;
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Number of nodes is {numberOfNodes}");
 
-            return  (2 * (int)Math.Pow((numberOfNodes - 1), 2) * throughput) / numericalError;
+            return  (2 * (int)Math.Pow((numberOfNodes - 1), 2) * _throughput) / _numericalError;
 
         }
     }

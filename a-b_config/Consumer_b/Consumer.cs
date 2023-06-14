@@ -28,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "input_topicccc";
+        const string topic = "d";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -69,9 +69,9 @@ class Consumer
                     _uncommittedConsumedMessagesTest.Add(consumeResult);
                     var consumedTime = DateTime.Now;
 
-                    Random rnd = new Random();
-                    int waitTime = rnd.Next(0, 200);
-                    await Task.Delay(waitTime);
+                    // Random rnd = new Random();
+                    // int waitTime = rnd.Next(0, 200);
+                    // await Task.Delay(waitTime);
 
                     // PrintStoredMessages();
                     SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
