@@ -28,7 +28,7 @@ class Producer {
         var adminPort = FindPort();
 
 
-        const string topic = "z";
+        const string topic = "qqqqqq";
 
         // Add what collection the conits are in.
         string collection = "Transactions";
@@ -56,7 +56,7 @@ class Producer {
             var numProduced = 0;
             Random rnd = new Random();
 
-            for (int i = 0; i<100000; i++)
+            for (int i = 0; i<3000; i++)
             {
 
 

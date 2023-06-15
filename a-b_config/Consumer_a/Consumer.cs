@@ -28,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "z";
+        const string topic = "qqqqqq";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -43,6 +43,8 @@ class Consumer
             e.Cancel = true; // prevent the process from terminating.
             cts.Cancel();
         };
+
+        bool commit = false;
 
         using (var consumer = CreateDyconitConsumer(configuration, conitConfiguration, adminPort, DyconitLogger))
         {
@@ -77,19 +79,23 @@ class Consumer
                     int waitTime = rnd.Next(0, 2000);
                     await Task.Delay(waitTime);
 
-                    foreach (var message in _uncommittedConsumedMessages)
-                    {
-                        Console.WriteLine($"...............offsets '{message.Offset}'");
-                    }
+                    // foreach (var message in _uncommittedConsumedMessages)
+                    // {
+                    //     Console.WriteLine($"...............offsets '{message.Offset}'");
+                    // }
 
                     // PrintStoredMessages();
+                    Console.WriteLine("bounding staleness");
                     SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
                     _uncommittedConsumedMessages = result.Data;
+                    commit = result.changed;
 
-                    foreach (var message in _uncommittedConsumedMessages)
-                    {
-                        Console.WriteLine($"_____________offsets '{message.Offset}'");
-                    }
+                    Console.WriteLine($"+++++++++++result from staleness: {commit}");
+
+                    // foreach (var message in _uncommittedConsumedMessages)
+                    // {
+                    //     Console.WriteLine($"_____________offsets '{message.Offset}'");
+                    // }
 
 
                     Console.WriteLine($"========result offset: {_uncommittedConsumedMessages.Last().Offset}");
@@ -97,21 +103,25 @@ class Consumer
                     {
                         _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset+1;
                     }
-                    Console.WriteLine($"result: {result.Data.Count} {result.changed}");
-                    if (result.changed == true)
-                    {
-                        Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
+                    // Console.WriteLine($"result: {result.Data.Count} {result.changed}");
+                    // if (result.changed == true)
+                    // {
+                    //     Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
 
-                        CommitStoredMessages(consumer);
-                        Console.WriteLine("Committed messages");
-                    }
-                    else
-                    {
-                        Console.WriteLine("No messages to commit");
-                    }
+                    //     CommitStoredMessages(consumer);
+                    //     Console.WriteLine("Committed messages");
+                    // }
+                    // else
+                    // {
+                    //     Console.WriteLine("No messages to commit");
+                    // }
 
+                    Console.WriteLine("bounding numerical error");
                     result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
                     _uncommittedConsumedMessages = result.Data;
+                    Console.WriteLine($"+++++++++++result from BoundNumericalError: {result.changed}");
+                    commit = commit || result.changed;
+
                     Console.WriteLine($"+++++++++++result offset: {_uncommittedConsumedMessages.Last().Offset}");
                     if (_uncommittedConsumedMessages.Last().Offset >= _lastCommittedOffset)
                     {
@@ -121,7 +131,7 @@ class Consumer
 
                     // _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset;
 
-                    if (result.changed == true)
+                    if (commit == true)
                     {
                         Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
 
@@ -225,12 +235,6 @@ class Consumer
         return weight;
     }
 
-    // static bool ShouldStoreMessage(int i)
-    // {
-    //     // Replace with your actual condition
-    //     return i % 10 != 0;
-    // }
-
     static void CommitStoredMessages(IConsumer<Null, string> consumer)
 {
     foreach (ConsumeResult<Null, string> storedMessage in _uncommittedConsumedMessages)
@@ -244,7 +248,6 @@ class Consumer
     // Process the committed offsets
     foreach (var committedOffset in committedOffsets)
     {
-        // Console.WriteLine($"Partition: {committedOffset.Partition}, Committed Offset: {committedOffset.Offset}");
         _lastCommittedOffset = committedOffset.Offset;
     }
 

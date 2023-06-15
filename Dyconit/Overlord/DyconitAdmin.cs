@@ -35,6 +35,8 @@ namespace Dyconit.Overlord
         private bool _isFirstCall = true;
         private double _throughput = 0.0;
 
+        private bool _synced = false;
+
         public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, object> conit)
         {
             _type = type;
@@ -286,7 +288,7 @@ namespace Dyconit.Overlord
                             SendMessageOverTcp(syncResponse.ToString(), syncRequestPort);
 
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Sent syncResponse to port {syncRequestPort}");
-
+                            _synced = true;
                             break;
 
                         case "heartbeatEvent":
@@ -328,16 +330,19 @@ namespace Dyconit.Overlord
         {
 
             // check if _receivedData is null
-            if(_receivedData == null)
+            if(_receivedData == null || _receivedData.Count() < localData.Count())
             {
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is null");
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is null or old");
                 Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData.Count: {localData.Count}");
                 _localData = localData;
-                return new SyncResult
+
+                SyncResult earlyResult = new SyncResult
                 {
-                    changed = false,
+                    changed = false || _synced,
                     Data = localData,
                 };
+                _synced = _synced ? false : _synced;
+                return earlyResult;
             }
 
             // Merge the received data with the local data
@@ -349,7 +354,7 @@ namespace Dyconit.Overlord
 
             SyncResult result = new SyncResult
             {
-                changed = isSame,
+                changed = isSame || _synced,
                 Data = mergedData,
             };
 
@@ -363,6 +368,8 @@ namespace Dyconit.Overlord
                 _localData = localData;
             }
 
+            _synced = _synced ? false : _synced;
+            // _receivedData.Clear();
             return result;
         }
 

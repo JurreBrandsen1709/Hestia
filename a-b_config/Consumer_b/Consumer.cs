@@ -28,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "z";
+        const string topic = "qqqqqq";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -44,6 +44,8 @@ class Consumer
             cts.Cancel();
         };
 
+        bool commit = false;
+
         using (var consumer = CreateDyconitConsumer(configuration, conitConfiguration, adminPort, DyconitLogger))
         {
             consumer.Subscribe(topic);
@@ -51,12 +53,16 @@ class Consumer
             {
                 while (true)
                 {
+                    Console.WriteLine($"lastcommittedoffset: {_lastCommittedOffset}");
                     if (_lastCommittedOffset > 0)
                     {
                         Console.WriteLine($"Assigning topic {topic} with offset {_lastCommittedOffset}");
                         consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
                     }
                     var consumeResult = consumer.Consume(cts.Token);
+                    var inputMessage = consumeResult.Message.Value;
+                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
+                    _lastCommittedOffset = consumeResult.Offset;
 
                     // if we consume a message that is older than the last committed offset, we ignore it.
                     if (consumeResult.Offset < _lastCommittedOffset)
@@ -65,56 +71,77 @@ class Consumer
                         continue;
                     }
 
-                    _uncommittedConsumedMessages.Add(consumeResult); // todo je kan dus met deze consumeResults dingen doen als je achter loopt tov een andere consumer.
+                    _uncommittedConsumedMessages.Add(consumeResult);
                     _uncommittedConsumedMessagesTest.Add(consumeResult);
                     var consumedTime = DateTime.Now;
 
                     // Random rnd = new Random();
-                    // int waitTime = rnd.Next(0, 200);
+                    // int waitTime = rnd.Next(0, 2000);
                     // await Task.Delay(waitTime);
 
-                    // PrintStoredMessages();
-                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
+                    // foreach (var message in _uncommittedConsumedMessages)
+                    // {
+                    //     Console.WriteLine($"...............offsets '{message.Offset}'");
+                    // }
 
+                    // PrintStoredMessages();
+                    Console.WriteLine("bounding staleness");
+                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
+                    _uncommittedConsumedMessages = result.Data;
+                    commit = result.changed;
+
+                    Console.WriteLine($"+++++++++++result from staleness: {commit}");
+
+                    // foreach (var message in _uncommittedConsumedMessages)
+                    // {
+                    //     Console.WriteLine($"_____________offsets '{message.Offset}'");
+                    // }
+
+
+                    Console.WriteLine($"========result offset: {_uncommittedConsumedMessages.Last().Offset}");
+                    if (_uncommittedConsumedMessages.Last().Offset >= _lastCommittedOffset)
+                    {
+                        _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset+1;
+                    }
+                    // Console.WriteLine($"result: {result.Data.Count} {result.changed}");
+                    // if (result.changed == true)
+                    // {
+                    //     Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
+
+                    //     CommitStoredMessages(consumer);
+                    //     Console.WriteLine("Committed messages");
+                    // }
+                    // else
+                    // {
+                    //     Console.WriteLine("No messages to commit");
+                    // }
+
+                    Console.WriteLine("bounding numerical error");
+                    result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
+                    _uncommittedConsumedMessages = result.Data;
+                    Console.WriteLine($"+++++++++++result from BoundNumericalError: {result.changed}");
+                    commit = commit || result.changed;
+
+                    Console.WriteLine($"+++++++++++result offset: {_uncommittedConsumedMessages.Last().Offset}");
+                    if (_uncommittedConsumedMessages.Last().Offset >= _lastCommittedOffset)
+                    {
+                        _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset+1;
+                    }
                     Console.WriteLine($"result: {result.Data.Count} {result.changed}");
 
-                    _uncommittedConsumedMessages = result.Data;
+                    // _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset;
 
-
-                    if (result.changed == true)
+                    if (commit == true)
                     {
                         Console.WriteLine($"Received messages: {_uncommittedConsumedMessages.Count}, local messages: {_uncommittedConsumedMessagesTest.Count}");
 
                         CommitStoredMessages(consumer);
                         Console.WriteLine("Committed messages");
-
-
                     }
                     else
                     {
                         Console.WriteLine("No messages to commit");
                     }
-
-                    // _uncommittedConsumedMessages = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
-                    // _uncommittedConsumedMessages = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
-                    // Console.WriteLine("------------------------------------------");
-                    // PrintStoredMessages();
-
-                    var inputMessage = consumeResult.Message.Value;
-
-
-                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
-
-                    // if (ShouldStoreMessage(i))
-                    // {
-                    //     _storedMessages.Add(inputMessage);
-                    // }
-                    // else
-                    // {
-                    //     CommitStoredMessages(consumer);
-                    //     Console.WriteLine("Committed messages");
-                    // }
-                    // i++;
                 }
             }
             catch (OperationCanceledException)
@@ -208,24 +235,26 @@ class Consumer
         return weight;
     }
 
-    // static bool ShouldStoreMessage(int i)
-    // {
-    //     // Replace with your actual condition
-    //     return i % 10 != 0;
-    // }
-
     static void CommitStoredMessages(IConsumer<Null, string> consumer)
+{
+    foreach (ConsumeResult<Null, string> storedMessage in _uncommittedConsumedMessages)
     {
-
-       foreach (ConsumeResult<Null, string> storedMessage in _uncommittedConsumedMessages)
-       {
-            consumer.Commit(storedMessage);
-       }
-
-        _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset.Value;
-
-       // Clear the list of stored messages
-         _uncommittedConsumedMessages.Clear();
+        consumer.Commit(storedMessage);
     }
+
+    // Retrieve the committed offsets for the assigned partitions
+    var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
+
+    // Process the committed offsets
+    foreach (var committedOffset in committedOffsets)
+    {
+        _lastCommittedOffset = committedOffset.Offset;
+    }
+
+    // Clear the list of stored messages
+    _uncommittedConsumedMessages.Clear();
+    _uncommittedConsumedMessagesTest.Clear();
+}
+
 
 }
