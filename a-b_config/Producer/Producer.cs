@@ -28,7 +28,7 @@ class Producer {
         var adminPort = FindPort();
 
 
-        const string topic = "d";
+        const string topic = "z";
 
         // Add what collection the conits are in.
         string collection = "Transactions";

@@ -28,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "d";
+        const string topic = "z";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
@@ -51,12 +51,16 @@ class Consumer
             {
                 while (true)
                 {
+                    Console.WriteLine($"lastcommittedoffset: {_lastCommittedOffset}");
                     if (_lastCommittedOffset > 0)
                     {
                         Console.WriteLine($"Assigning topic {topic} with offset {_lastCommittedOffset}");
                         consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
                     }
                     var consumeResult = consumer.Consume(cts.Token);
+                    var inputMessage = consumeResult.Message.Value;
+                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
+                    _lastCommittedOffset = consumeResult.Offset;
 
                     // if we consume a message that is older than the last committed offset, we ignore it.
                     if (consumeResult.Offset < _lastCommittedOffset)
@@ -73,9 +77,26 @@ class Consumer
                     int waitTime = rnd.Next(0, 2000);
                     await Task.Delay(waitTime);
 
+                    foreach (var message in _uncommittedConsumedMessages)
+                    {
+                        Console.WriteLine($"...............offsets '{message.Offset}'");
+                    }
+
                     // PrintStoredMessages();
                     SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
                     _uncommittedConsumedMessages = result.Data;
+
+                    foreach (var message in _uncommittedConsumedMessages)
+                    {
+                        Console.WriteLine($"_____________offsets '{message.Offset}'");
+                    }
+
+
+                    Console.WriteLine($"========result offset: {_uncommittedConsumedMessages.Last().Offset}");
+                    if (_uncommittedConsumedMessages.Last().Offset >= _lastCommittedOffset)
+                    {
+                        _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset+1;
+                    }
                     Console.WriteLine($"result: {result.Data.Count} {result.changed}");
                     if (result.changed == true)
                     {
@@ -91,7 +112,14 @@ class Consumer
 
                     result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
                     _uncommittedConsumedMessages = result.Data;
+                    Console.WriteLine($"+++++++++++result offset: {_uncommittedConsumedMessages.Last().Offset}");
+                    if (_uncommittedConsumedMessages.Last().Offset >= _lastCommittedOffset)
+                    {
+                        _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset+1;
+                    }
                     Console.WriteLine($"result: {result.Data.Count} {result.changed}");
+
+                    // _lastCommittedOffset = _uncommittedConsumedMessages.Last().Offset;
 
                     if (result.changed == true)
                     {
@@ -104,33 +132,6 @@ class Consumer
                     {
                         Console.WriteLine("No messages to commit");
                     }
-
-
-
-
-
-
-
-                    // _uncommittedConsumedMessages = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages);
-                    // _uncommittedConsumedMessages = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages);
-                    // Console.WriteLine("------------------------------------------");
-                    // PrintStoredMessages();
-
-                    var inputMessage = consumeResult.Message.Value;
-
-
-                    Console.WriteLine($"Consumed message with value '{inputMessage}', weight '{GetMessageWeight(consumeResult)}'");
-
-                    // if (ShouldStoreMessage(i))
-                    // {
-                    //     _storedMessages.Add(inputMessage);
-                    // }
-                    // else
-                    // {
-                    //     CommitStoredMessages(consumer);
-                    //     Console.WriteLine("Committed messages");
-                    // }
-                    // i++;
                 }
             }
             catch (OperationCanceledException)
@@ -231,27 +232,26 @@ class Consumer
     // }
 
     static void CommitStoredMessages(IConsumer<Null, string> consumer)
+{
+    foreach (ConsumeResult<Null, string> storedMessage in _uncommittedConsumedMessages)
     {
-
-       foreach (ConsumeResult<Null, string> storedMessage in _uncommittedConsumedMessages)
-       {
-            consumer.Commit(storedMessage);
-       }
-
-       // Retrieve the committed offsets for the assigned partitions
-        var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
-
-        // Process the committed offsets
-        foreach (var committedOffset in committedOffsets)
-        {
-            // Console.WriteLine($"Partition: {committedOffset.Partition}, Committed Offset: {committedOffset.Offset}");
-            _lastCommittedOffset = committedOffset.Offset;
-        }
-
-
-       // Clear the list of stored messages
-         _uncommittedConsumedMessages.Clear();
-         _uncommittedConsumedMessagesTest.Clear();
+        consumer.Commit(storedMessage);
     }
+
+    // Retrieve the committed offsets for the assigned partitions
+    var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
+
+    // Process the committed offsets
+    foreach (var committedOffset in committedOffsets)
+    {
+        // Console.WriteLine($"Partition: {committedOffset.Partition}, Committed Offset: {committedOffset.Offset}");
+        _lastCommittedOffset = committedOffset.Offset;
+    }
+
+    // Clear the list of stored messages
+    _uncommittedConsumedMessages.Clear();
+    _uncommittedConsumedMessagesTest.Clear();
+}
+
 
 }

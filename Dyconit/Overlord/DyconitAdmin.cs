@@ -341,7 +341,8 @@ namespace Dyconit.Overlord
             }
 
             // Merge the received data with the local data
-            var mergedData = localData.Union(_receivedData, new ConsumeResultComparer()).ToList();
+            var mergedData = _receivedData.Union(localData, new ConsumeResultComparer()).ToList();
+
             bool isSame = mergedData.Count() != localData.Count && mergedData.Count() == _receivedData.Count;
 
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData.Count: {localData.Count}, _receivedData.Count: {_receivedData.Count}, mergedData.Count: {mergedData.Count}");

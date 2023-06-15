@@ -28,7 +28,7 @@ class Consumer
 
         var adminPort = FindPort();
 
-        const string topic = "d";
+        const string topic = "z";
         string collection = "Transactions_consumer";
 
         Dictionary<string, object> conitConfiguration = GetConitConfiguration(collection);
