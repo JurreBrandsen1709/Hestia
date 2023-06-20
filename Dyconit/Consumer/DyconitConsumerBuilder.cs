@@ -15,7 +15,7 @@ namespace Dyconit.Consumer
         private Action<string, double>? _statisticsHandler;
         private readonly int _type;
         private readonly DyconitAdmin _adminClient;
-        private readonly Dictionary<string, Dictionary<string, object>> _conits;
+        private readonly Dictionary<string, object> _conits;
 
         private double _previousAppOffset = 0.0;
 
@@ -23,7 +23,7 @@ namespace Dyconit.Consumer
 
         private readonly int _adminPort;
 
-        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, Dictionary<string, object>> Conits, int type, int adminPort, DyconitAdmin dyconitAdmin) : base(config)
+        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort, DyconitAdmin dyconitAdmin) : base(config)
         {
             _type = type;
             _adminPort = adminPort;

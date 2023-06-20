@@ -205,7 +205,7 @@ namespace Dyconit.Overlord
                             }).ToList();
 
                             // Call the method to process the completed staleness event
-                            UpdateLocalData(_localData);
+                            UpdateLocalData(_localData, collectionName);
 
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local data with syncResponse from port {senderPort}");
 
@@ -333,11 +333,16 @@ namespace Dyconit.Overlord
             });
         }
 
-        private SyncResult UpdateLocalData(List<ConsumeResult<Null, string>> localData)
+        private SyncResult UpdateLocalData(List<ConsumeResult<Null, string>> localData, string collectionName)
         {
+            // Filter localData to keep only the items with matching topic
+            if (_receivedData != null){
+                _receivedData = _receivedData.Where(item => item.Topic == collectionName).ToList();
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData.Count: {_receivedData.Count()}");
+            }
 
-            // check if _receivedData is null
-            if(_receivedData == null || _receivedData.Count() < localData.Count())
+            // check if the topic of the _receivedData is the same as the topic of localData
+            if(_receivedData == null || _receivedData.Count() < localData.Count() || _receivedData.First().Topic != localData.First().Topic)
             {
                 Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is null or old");
                 Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData.Count: {localData.Count}");
@@ -392,7 +397,6 @@ namespace Dyconit.Overlord
             }
 
             _synced = _synced ? false : _synced;
-            // _receivedData.Clear();
             return result;
         }
 
@@ -401,7 +405,7 @@ namespace Dyconit.Overlord
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} BoundStaleness called for collection {collectionName}");
 
             // Check if we have received new data from an other node since the last time we checked
-            SyncResult result = UpdateLocalData(localData);
+            SyncResult result = UpdateLocalData(localData, collectionName);
 
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local data with local data");
 
@@ -442,7 +446,7 @@ namespace Dyconit.Overlord
             WaitForResponse(portsStalenessExceeded, collectionName);
 
             // Update the local data
-            UpdateLocalData(localData);
+            UpdateLocalData(localData, collectionName);
 
             // Return the local data
             return result;
@@ -554,7 +558,7 @@ namespace Dyconit.Overlord
             }
 
             // Update the local data
-            SyncResult result = UpdateLocalData(localData);
+            SyncResult result = UpdateLocalData(localData, collectionName);
 
             // Return the local data
             return result;
@@ -588,7 +592,7 @@ namespace Dyconit.Overlord
     {
         public bool Equals(ConsumeResult<Null, string> x, ConsumeResult<Null, string> y)
         {
-            return x.Offset == y.Offset;
+            return x.Offset == y.Offset && x.Topic == y.Topic;
         }
 
         public int GetHashCode(ConsumeResult<Null, string> obj)

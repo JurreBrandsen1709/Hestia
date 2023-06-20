@@ -67,6 +67,7 @@ namespace Dyconit.Overlord
                 foreach (var dyconitCollection in _dyconitCollections.ToList())
                 {
                     var dyconitCollectionData = dyconitCollection.Value;
+                    var dyconitCollectionName = dyconitCollection.Key;
                     var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
 
                     foreach (var adminClientPort in adminClientPorts.ToList())
@@ -80,7 +81,7 @@ namespace Dyconit.Overlord
                             adminClientPorts.Remove(adminClientPort);
 
                             // notify all other nodes that this node has been removed
-                            await RemoveNodeAtAdmins(adminClientPort.Item1);
+                            await RemoveNodeAtAdmins(adminClientPort.Item1, dyconitCollectionName);
 
                             Console.WriteLine($"- Removed node {adminClientPort.Item1} from collection {dyconitCollection.Key}");
                         }
@@ -89,13 +90,14 @@ namespace Dyconit.Overlord
             }
         }
 
-        private async Task RemoveNodeAtAdmins(int adminClientPort)
+        private async Task RemoveNodeAtAdmins(int adminClientPort, string dyconitCollectionName)
         {
             // Send a heartbeat response to the requesting node
             var removeNodeEvent = new JObject
             {
                 { "eventType", "removeNodeEvent" },
-                { "adminClientPort", adminClientPort }
+                { "adminClientPort", adminClientPort },
+                { "collection", dyconitCollectionName }
             };
 
             // Send heartbeat to all admin clients
@@ -140,13 +142,10 @@ namespace Dyconit.Overlord
             {
             // Check if message is a newAdminEvent
             var json = JObject.Parse(message);
-
-            // Console.WriteLine($"- Received message: {message}");
-
             var adminClientPort = json["adminClientPort"]?.ToObject<int>();
-            var conits = json["conits"]?.ToObject<Dictionary<string, object>>();
-            var eventType = json["eventType"]?.ToString();
+            var dyconitCollection = json["conits"]?["collection"]?.ToString();
 
+            var eventType = json["eventType"]?.ToString();
             if (eventType == null)
             {
                 Console.WriteLine($"Invalid message received: missing eventType. Message: {message}");
@@ -163,63 +162,49 @@ namespace Dyconit.Overlord
                     }
                     Console.WriteLine($"-- Received newAdminEvent message. Admin client listening on port {adminClientPort}.");
 
-                    // iterate over all dyconit collections
-                    foreach (var dyconitCollection in conits)
-                    {
-
-                        var dyconitCollectionName = dyconitCollection.Key.ToString();
-                        var collectionData = dyconitCollection.Value.ToString();
-                        var collectionDataObject = JObject.Parse(collectionData);
-
                     // Check if we already have a dyconit collection in the dyconitCollections dictionary
                     // If not, create a new one
-                    if (!_dyconitCollections.ContainsKey(dyconitCollectionName))
+                    if (!_dyconitCollections.ContainsKey(dyconitCollection))
                     {
-                        _dyconitCollections.Add(dyconitCollectionName, new Dictionary<string, object>
+                        _dyconitCollections.Add(dyconitCollection, new Dictionary<string, object>
                         {
                             // add a ports list containing the port and the last time we got a heartbeat from it
                             { "ports", new List<Tuple<int, DateTime>>() },
                             { "bounds", new Dictionary<string, int>() }
                         });
-                        Console.WriteLine($"--- Added dyconit collection '{dyconitCollectionName}' to the dyconit collections.");
+                        Console.WriteLine($"--- Added dyconit collection '{dyconitCollection}' to the dyconit collections.");
                     }
                     else
                     {
-                        Console.WriteLine($"--- Dyconit collection '{dyconitCollectionName}' already exists.");
+                        Console.WriteLine($"--- Dyconit collection '{dyconitCollection}' already exists.");
                     }
 
-                    var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollectionName];
+                    var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollection];
 
                     // Add the admin client port to the dyconit collection
                     ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, DateTime.Now));
 
-                    Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollectionName}'.");
+                    Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollection}'.");
+
+                    // Add the bounds to the dyconit collection
+                    var conits = json["conits"];
 
                     // Check if bounds is still empty
                     if (((Dictionary<string, int>)dyconitCollectionData["bounds"]).Count == 0)
                     {
-                        // Extract the individual properties
-                        var staleness = collectionDataObject["Staleness"]?.ToObject<int>();
-                        var orderError = collectionDataObject["OrderError"]?.ToObject<int>();
-                        var numericalError = collectionDataObject["NumericalError"]?.ToObject<int>();
+                        var staleness = conits["Staleness"]?.ToObject<int>();
+                        var orderError = conits["OrderError"]?.ToObject<int>();
+                        var numericalError = conits["NumericalError"]?.ToObject<int>();
 
-                        if (staleness != null && orderError != null && numericalError != null)
-                        {
+                        ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("Staleness", staleness.Value);
+                        ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("OrderError", orderError.Value);
+                        ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("NumericalError", numericalError.Value);
 
-                            ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("Staleness", staleness.Value);
-                            ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("OrderError", orderError.Value);
-                            ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("NumericalError", numericalError.Value);
-
-                            Console.WriteLine($"--- Added bounds to dyconit collection '{dyconitCollectionName}'.");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"--- Invalid bounds received for dyconit collection '{dyconitCollectionName}'.");
-                        }
+                        Console.WriteLine($"--- Added bounds to dyconit collection '{dyconitCollection}'.");
                     }
                     else
                     {
-                        Console.WriteLine($"--- Bounds for dyconit collection '{dyconitCollectionName}' already exist.");
+                        Console.WriteLine($"--- Bounds for dyconit collection '{dyconitCollection}' already exist.");
                     }
                     Console.WriteLine($"--- Bounds: {string.Join(", ", ((Dictionary<string, int>)dyconitCollectionData["bounds"]))}");
 
@@ -236,14 +221,14 @@ namespace Dyconit.Overlord
                     // If there are more than one admin clients in the dyconit collection, send the bounds to the other admin clients
                     if (((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).Count > 1)
                     {
-                        Console.WriteLine($"--- Sending newNodeEvent to other admin clients in dyconit collection '{dyconitCollectionName}'.");
+                        Console.WriteLine($"--- Sending newNodeEvent to other admin clients in dyconit collection '{dyconitCollection}'.");
 
                         // Create a new message
                         var newMessage = new JObject
                         {
                             { "eventType", "newNodeEvent" },
                             { "port", adminClientPort },
-                            {"collection", dyconitCollectionName }
+                            { "collection", dyconitCollection }
                         };
 
                         // Send the message to the other admin clients
@@ -257,12 +242,11 @@ namespace Dyconit.Overlord
                                 {
                                     { "eventType", "newNodeEvent" },
                                     { "port", port.Item1 },
-                                    {"collection", dyconitCollectionName }
+                                    { "collection", dyconitCollection }
                                 };
                                 SendMessageOverTcp(newMessage.ToString(), adminClientPort.Value);
                             }
                         }
-                    }
                     }
 
                     break;
@@ -332,7 +316,7 @@ namespace Dyconit.Overlord
 
                             ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Remove(adminClient);
                             // notify all other nodes that this node has been removed
-                            await RemoveNodeAtAdmins(port);
+                            await RemoveNodeAtAdmins(port, collection.Key);
 
                             Console.WriteLine($"--- Removed admin client listening on port '{port}' from dyconit collection '{collection.Key}'.");
                         }

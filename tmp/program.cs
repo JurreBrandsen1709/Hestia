@@ -1,132 +1,82 @@
-
 using Confluent.Kafka;
 using System;
-using System.Text;
-using System.Text.Json.Serialization;
 using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-public class ConsumeResultWrapper<TKey, TValue>
-{
-    public ConsumeResultWrapper()
-    {
-    }
-
-    public ConsumeResultWrapper(ConsumeResult<TKey, TValue> result)
-    {
-        Topic = result.Topic;
-        Partition = result.Partition.Value;
-        Offset = result.Offset.Value;
-        Message = new MessageWrapper<TKey, TValue>(result.Message);
-        IsPartitionEOF = result.IsPartitionEOF;
-    }
-
-    public string Topic { get; set; }
-    public int Partition { get; set; }
-    public long Offset { get; set; }
-    public MessageWrapper<TKey, TValue> Message { get; set; }
-    public bool IsPartitionEOF { get; set; }
-}
-
-public class MessageWrapper<TKey, TValue>
-{
-    public MessageWrapper()
-    {
-    }
-
-    public MessageWrapper(Message<TKey, TValue> message)
-    {
-        Key = message.Key;
-        Value = message.Value;
-        Timestamp = message.Timestamp;
-        Headers = message.Headers?.Select(header => new HeaderWrapper(header.Key, header.GetValueBytes())).ToList();
-    }
-
-    public TKey Key { get; set; }
-    public TValue Value { get; set; }
-    public Timestamp Timestamp { get; set; }
-    public List<HeaderWrapper> Headers { get; set; }
-}
-
-public class HeaderWrapper
-{
-    public HeaderWrapper()
-    {
-    }
-
-    public HeaderWrapper(string key, byte[] value)
-    {
-        Key = key;
-        Value = value;
-    }
-
-    public string Key { get; set; }
-    public byte[] Value { get; set; }
-}
+using System.Threading;
 
 class Program
 {
     static void Main()
     {
-        // Sample data
-        List<ConsumeResult<Null, string>> _localData = new List<ConsumeResult<Null, string>>()
+        var producerConfig = new ProducerConfig
         {
-            new ConsumeResult<Null, string>
-            {
-                Message = new Message<Null, string>
-                {
-                    Headers = new Headers
-                    {
-                        new Header("Weight", new byte[0])
-                    },
-                    Value = "x"
-                }
-            }
+            BootstrapServers = "localhost:9092"
         };
 
-        // Serialization
-        JArray jArray = new JArray(_localData.Select(cr =>
+        var consumerConfig = new ConsumerConfig
         {
-            var wrapper = new ConsumeResultWrapper<Null, string>(cr);
-            JObject jObject = JObject.FromObject(wrapper);
-            return jObject;
-        }));
-        string json = jArray.ToString();
+            BootstrapServers = "localhost:9092",
+            GroupId = "my-group",
+            AutoOffsetReset = AutoOffsetReset.Earliest,
+            EnableAutoCommit = false
+        };
 
-        // Deserialization
-        JArray deserializedArray = JArray.Parse(json);
-        List<ConsumeResultWrapper<Null, string>> deserializedList = deserializedArray.Select(jObject =>
-        {
-            var wrapper = jObject.ToObject<ConsumeResultWrapper<Null, string>>();
-            wrapper.Message = new MessageWrapper<Null, string>
-            {
-                Key = wrapper.Message.Key,
-                Value = wrapper.Message.Value,
-                Timestamp = wrapper.Message.Timestamp,
-                Headers = wrapper.Message.Headers?.Select(header => new HeaderWrapper(header.Key, header.Value)).ToList()
-            };
-            return wrapper;
-        }).ToList();
+        var topics = new List<string> { "topic1", "topic2" };
 
-        // Accessing deserialized data
-        foreach (var resultWrapper in deserializedList)
+        // Start a producer thread to continuously produce messages to the topics
+        var producerThread = new Thread(() => ProduceMessages(producerConfig, topics));
+        producerThread.Start();
+
+        // Start a consumer thread for each topic to consume messages
+        var consumerThreads = new List<Thread>();
+        foreach (var topic in topics)
         {
-            Console.WriteLine($"Topic: {resultWrapper.Topic}");
-            Console.WriteLine($"Partition: {resultWrapper.Partition}");
-            Console.WriteLine($"Offset: {resultWrapper.Offset}");
-            Console.WriteLine($"Key: {resultWrapper.Message.Key}");
-            Console.WriteLine($"Value: {resultWrapper.Message.Value}");
-            Console.WriteLine($"Timestamp: {resultWrapper.Message.Timestamp}");
-            Console.WriteLine($"IsPartitionEOF: {resultWrapper.IsPartitionEOF}");
-            Console.WriteLine("Headers:");
-            foreach (var header in resultWrapper.Message.Headers)
+            var consumerThread = new Thread(() => ConsumeMessages(consumerConfig, topic));
+            consumerThread.Start();
+            consumerThreads.Add(consumerThread);
+        }
+
+        // Wait for the producer and consumer threads to complete
+        producerThread.Join();
+        foreach (var consumerThread in consumerThreads)
+        {
+            consumerThread.Join();
+        }
+    }
+
+    static void ProduceMessages(ProducerConfig config, List<string> topics)
+    {
+        using (var producer = new ProducerBuilder<Null, string>(config).Build())
+        {
+            var rnd = new Random();
+            var counter = 1;
+
+            while (true)
             {
-                Console.WriteLine($"  Key: {header.Key}");
-                Console.WriteLine($"  Value: {BitConverter.ToString(header.Value)}");
+                var topic = topics[rnd.Next(0, topics.Count)];
+                var message = $"Message {counter} - Topic: {topic}";
+
+                var deliveryReport = producer.ProduceAsync(topic, new Message<Null, string> { Value = message }).Result;
+                Console.WriteLine($"Produced message: {message} | Partition: {deliveryReport.Partition} | Offset: {deliveryReport.Offset}");
+
+                counter++;
+
+                Thread.Sleep(1000);
             }
-            Console.WriteLine();
+        }
+    }
+
+    static void ConsumeMessages(ConsumerConfig config, string topic)
+    {
+        using (var consumer = new ConsumerBuilder<Null, string>(config).Build())
+        {
+            consumer.Subscribe(topic);
+
+            while (true)
+            {
+                var consumeResult = consumer.Consume();
+
+                Console.WriteLine($"Consumed message: {consumeResult.Message.Value} | Partition: {consumeResult.Partition} | Offset: {consumeResult.Offset}");
+            }
         }
     }
 }

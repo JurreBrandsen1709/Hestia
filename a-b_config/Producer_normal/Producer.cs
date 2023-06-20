@@ -67,7 +67,7 @@ class Producer {
                 // for (int i = 0; i < 5; i++) {
 
                     // create a random length payload string
-                    var payload = new string(i.ToString());
+                    var payload = new string(i.ToString() + " " + topic);
 
                     var message = new DyconitMessage<Null, string>
                     {

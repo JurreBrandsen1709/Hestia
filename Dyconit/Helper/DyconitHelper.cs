@@ -28,11 +28,11 @@ namespace Dyconit.Helper
             return adminClientPort;
         }
 
-        public static Dictionary<string, object> GetConitConfiguration(int staleness, int orderError, int numericalError)
+        public static Dictionary<string, object> GetConitConfiguration(string collection, int staleness, int orderError, int numericalError)
         {
             return new Dictionary<string, object>
             {
-                // { "collection", collection },
+                { "collection", collection },
                 { "Staleness", staleness },
                 { "OrderError", orderError },
                 { "NumericalError", numericalError }
@@ -48,7 +48,7 @@ namespace Dyconit.Helper
             }
         }
 
-        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, Dictionary<string, object>> conitConfiguration, int adminPort, DyconitAdmin dyconitLogger)
+        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort, DyconitAdmin dyconitLogger)
         {
             return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort, dyconitLogger).Build();
         }
