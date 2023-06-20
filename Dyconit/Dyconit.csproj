@@ -20,6 +20,7 @@
       <Folder Include="Overlord" />
       <Folder Include="Producer" />
       <Folder Include="Message" />
+      <Folder Include="Helper" />
     </ItemGroup>
 
   <ItemGroup>

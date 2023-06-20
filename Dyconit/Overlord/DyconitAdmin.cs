@@ -28,7 +28,9 @@ namespace Dyconit.Overlord
         private List<ConsumeResult<Null, string>> _receivedData;
         private List<ConsumeResult<Null, string>>_localData = new List<ConsumeResult<Null, string>>();
         private TaskCompletionSource<bool> _stalenessEventReceived;
-        private readonly Dictionary<string, object> _localCollection;
+        // private readonly Dictionary<string, object> _localCollections;
+
+        private Dictionary<string, Dictionary<string, object>> _localCollections;
         private bool _optimisticMode = true;
         private HashSet<int> _syncResponses = new HashSet<int>();
         private long _previousOffset = 0;
@@ -37,25 +39,37 @@ namespace Dyconit.Overlord
 
         private bool _synced = false;
 
-        public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, object> conit)
+        public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, Dictionary<string, object>> conitCollection)
         {
             _type = type;
             _listenPort = listenPort;
-            _conit = conit;
-            _collection = conit.ContainsKey("collection") ? conit["collection"].ToString() : null;
-            _staleness = conit.ContainsKey("Staleness") ? Convert.ToInt32(conit["Staleness"]) : 0;
-            _orderError = conit.ContainsKey("OrderError") ? Convert.ToInt32(conit["OrderError"]) : 0;
-            _numericalError = conit.ContainsKey("NumericalError") ? Convert.ToDouble(conit["NumericalError"]) : 0.0;
+            _localCollections = conitCollection;
 
-            // Initialize local collection. The Dyconit overlord will update this collection with the latest data.
-            _localCollection = new Dictionary<string, object>
+            // Initialize local data for each collection
+            foreach (var collection in _localCollections)
             {
-                { "Staleness", _staleness },
-                { "OrderError", _orderError },
-                { "NumericalError", _numericalError },
-                { "ports", new List<int> { } },
-                { "ltsp", new List<Tuple<int, DateTime>> {}} // Last time since pull for each port
-            };
+                collection.Value.Add("ports", new List<int> { });
+                collection.Value.Add("ltsp", new List<Tuple<int, DateTime>> { }); // Last time since pull for each port
+            }
+
+            // print local collections
+            foreach (var collection in _localCollections)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Local collection: {collection.Key}");
+                foreach (var kvp in collection.Value)
+                {
+                    Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Key = {kvp.Key}, Value = {kvp.Value}");
+                }
+            }
+
+            // _localCollections = new Dictionary<string, object>
+            // {
+            //     { "Staleness", _staleness },
+            //     { "OrderError", _orderError },
+            //     { "NumericalError", _numericalError },
+            //     { "ports", new List<int> { } },
+            //     { "ltsp", new List<Tuple<int, DateTime>> {}} // Last time since pull for each port
+            // };
 
             _adminClientConfig = new AdminClientConfig
             {
@@ -141,13 +155,21 @@ namespace Dyconit.Overlord
         {
             await Task.Run(() =>
             {
+                    JObject json = JObject.Parse(message);
                 try
                 {
-                    JObject json = JObject.Parse(message);
 
-                    // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received message: {message}");
-
+                    // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Message received: {message}");
                     var eventType = json["eventType"]?.ToString();
+                    var collectionName = json["collection"]?.ToString();
+
+                    var collection = default(Dictionary<string, object>); // Replace CollectionType with the actual type of 'collection'
+
+                    if (!string.IsNullOrEmpty(collectionName) && _localCollections.ContainsKey(collectionName))
+                    {
+                        collection = _localCollections[collectionName];
+                    }
+
                     if (eventType == null)
                     {
                         Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Invalid message received: missing eventType. Message: {message}");
@@ -156,8 +178,10 @@ namespace Dyconit.Overlord
 
                     switch (eventType)
                     {
+
                         case "syncResponse":
-                            // JArray dataArray = (JArray)json["data"];
+
+                            // retrieve the collection from the _localCollections dictionary
                             var data = Convert.ToString(json["data"]);
                             var timestamp = json["timestamp"];
                             var senderPort = Convert.ToInt32(json["port"]);
@@ -180,35 +204,13 @@ namespace Dyconit.Overlord
                                 IsPartitionEOF = dw.IsPartitionEOF
                             }).ToList();
 
-                            // // Verify deserialized data
-                            // Console.WriteLine("Deserialized Data:");
-
-                            // // Accessing deserialized data
-                            // foreach (var resultWrapper in deserializedList)
-                            // {
-                            //     Console.WriteLine($"Topic: {resultWrapper.Topic}");
-                            //     Console.WriteLine($"Partition: {resultWrapper.Partition}");
-                            //     Console.WriteLine($"Offset: {resultWrapper.Offset}");
-                            //     Console.WriteLine($"Key: {resultWrapper.Message.Key}");
-                            //     Console.WriteLine($"Value: {resultWrapper.Message.Value}");
-                            //     Console.WriteLine($"Timestamp: {resultWrapper.Message.Timestamp}");
-                            //     Console.WriteLine($"IsPartitionEOF: {resultWrapper.IsPartitionEOF}");
-                            //     Console.WriteLine("Headers:");
-                            //     foreach (var header in resultWrapper.Message.Headers)
-                            //     {
-                            //         Console.WriteLine($"  Key: {header.Key}");
-                            //         Console.WriteLine($"  Value: {BitConverter.ToDouble(header.Value)}");
-                            //     }
-                            //     Console.WriteLine();
-                            // }
-
                             // Call the method to process the completed staleness event
                             UpdateLocalData(_localData);
 
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local data with syncResponse from port {senderPort}");
 
                             // update the last time since pull for the sender port
-                            var ltsp = _localCollection["ltsp"] as List<Tuple<int, DateTime>>;
+                            var ltsp = collection["ltsp"] as List<Tuple<int, DateTime>>;
                             var index = ltsp.FindIndex(x => x.Item1 == senderPort);
                             ltsp[index] = new Tuple<int, DateTime>(senderPort, DateTime.Now);
 
@@ -220,18 +222,18 @@ namespace Dyconit.Overlord
                         case "newNodeEvent":
 
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received newNodeEvent");
-
                             var newNodePort = Convert.ToInt32(json["port"]);
 
+
                             // Add the new node to the local collection
-                            var ports = _localCollection["ports"] as List<int>;
+                            var ports = collection["ports"] as List<int>;
                             ports.Add(newNodePort);
-                            _localCollection["ports"] = ports;
+                            collection["ports"] = ports;
 
                             // Add the new node to the last time since pull list
-                            var ltsp2 = _localCollection["ltsp"] as List<Tuple<int, DateTime>>;
+                            var ltsp2 = collection["ltsp"] as List<Tuple<int, DateTime>>;
                             ltsp2.Add(new Tuple<int, DateTime>(newNodePort, DateTime.Now));
-                            _localCollection["ltsp"] = ltsp2;
+                            collection["ltsp"] = ltsp2;
 
                             break;
 
@@ -242,24 +244,24 @@ namespace Dyconit.Overlord
                             var removeNodePort = Convert.ToInt32(json["adminClientPort"]);
 
                             // Remove the node from the local collection
-                            var ports2 = _localCollection["ports"] as List<int>;
+                            var ports2 = collection["ports"] as List<int>;
                             ports2.Remove(removeNodePort);
-                            _localCollection["ports"] = ports2;
+                            collection["ports"] = ports2;
 
                             break;
 
                         case "updateConitEvent":
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received updateConitEvent");
-
-
                             var newStaleness = Convert.ToInt32(json["Staleness"]);
                             var newOrderError = Convert.ToInt32(json["OrderError"]);
                             var newNumericalError = Convert.ToInt32(json["NumericalError"]);
 
                             // Update the local collection
-                            _localCollection["Staleness"] = newStaleness;
-                            _localCollection["OrderError"] = newOrderError;
-                            _localCollection["NumericalError"] = newNumericalError;
+                            collection["Staleness"] = newStaleness;
+                            collection["OrderError"] = newOrderError;
+                            collection["NumericalError"] = newNumericalError;
+
+                            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local collection with new staleness values: Staleness: {newStaleness}, OrderError: {newOrderError}, NumericalError: {newNumericalError}");
 
                             break;
 
@@ -282,7 +284,8 @@ namespace Dyconit.Overlord
                             {
                                 { "eventType", "syncResponse" },
                                 { "port", _listenPort },
-                                { "data", consumeResultWrapped }
+                                { "data", consumeResultWrapped },
+                                { "collection", collectionName}
                             };
 
                             SendMessageOverTcp(syncResponse.ToString(), syncRequestPort);
@@ -292,23 +295,17 @@ namespace Dyconit.Overlord
                             break;
 
                         case "heartbeatEvent":
-                            var heartbeatPort = Convert.ToInt32(json["port"]);
-                            // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received heartbeat from port {heartbeatPort}");
+                            // var heartbeatPort = Convert.ToInt32(json["port"]);
 
                             // Send a heartbeat response to the requesting node
                             var heartbeatResponse = new JObject
                             {
                                 { "eventType", "heartbeatResponse" },
-                                { "adminClientPort", _listenPort },
-                                { "collection", _collection }
+                                { "adminClientPort", _listenPort }
                             };
 
                             SendMessageOverTcp(heartbeatResponse.ToString(), 6666);
-
                             break;
-
-
-
 
                         default:
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Unknown message received with eventType '{eventType}': {message}");
@@ -322,6 +319,16 @@ namespace Dyconit.Overlord
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error occurred while parsing message: {ex.Message}");
+                    if (json != null)
+                    {
+                        Console.WriteLine("The JSON object that caused the exception:");
+                        Console.WriteLine(json.ToString());
+                        Console.WriteLine("The following keys were found in the JSON object:");
+                        foreach (var key in json.Properties())
+                        {
+                            Console.WriteLine(key.Name);
+                        }
+                    }
                 }
             });
         }
@@ -348,6 +355,22 @@ namespace Dyconit.Overlord
             // Merge the received data with the local data
             var mergedData = _receivedData.Union(localData, new ConsumeResultComparer()).ToList();
 
+            // print the content of localData, _receivedData and mergedData
+            foreach (var item in localData)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData: {item.Message.Value}");
+            }
+            Console.WriteLine("--------------------------------------------------");
+            foreach (var item in _receivedData)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData: {item.Message.Value}");
+            }
+            Console.WriteLine("--------------------------------------------------");
+            foreach (var item in mergedData)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} mergedData: {item.Message.Value}");
+            }
+
             bool isSame = mergedData.Count() != localData.Count && mergedData.Count() == _receivedData.Count;
 
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData.Count: {localData.Count}, _receivedData.Count: {_receivedData.Count}, mergedData.Count: {mergedData.Count}");
@@ -373,8 +396,9 @@ namespace Dyconit.Overlord
             return result;
         }
 
-        public async Task<SyncResult> BoundStaleness(DateTime consumedTime, List<ConsumeResult<Null, string>> localData)
+        public async Task<SyncResult> BoundStaleness(DateTime consumedTime, List<ConsumeResult<Null, string>> localData, Dictionary<string, object> collection, string collectionName)
         {
+            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} BoundStaleness called for collection {collectionName}");
 
             // Check if we have received new data from an other node since the last time we checked
             SyncResult result = UpdateLocalData(localData);
@@ -382,11 +406,11 @@ namespace Dyconit.Overlord
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Updated local data with local data");
 
             // Retrieve the current staleness bound from the local collection
-            var staleness = Convert.ToInt32(_localCollection["Staleness"]);
+            var staleness = Convert.ToInt32(collection["Staleness"]);
 
             // Go through all of the ports in the local collection and check if they have a last time since pull that is older than the staleness bound
-            var ports = _localCollection["ports"] as List<int>;
-            var ltsp = _localCollection["ltsp"] as List<Tuple<int, DateTime>>;
+            var ports = collection["ports"] as List<int>;
+            var ltsp = collection["ltsp"] as List<Tuple<int, DateTime>>;
             var portsStalenessExceeded = new List<int>();
 
             foreach (var port in ports)
@@ -396,6 +420,7 @@ namespace Dyconit.Overlord
 
                 if (timeDifference.TotalMilliseconds > staleness)
                 {
+                    Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Port {port} exceeded the staleness bound {timeDifference.TotalMilliseconds} > {staleness}");
                     portsStalenessExceeded.Add(port);
                 }
             }
@@ -409,12 +434,12 @@ namespace Dyconit.Overlord
             if (_optimisticMode)
             {
                 // Call the async mode that will send a sync request to the ports that exceeded the staleness bound
-                await WaitForResponseAsync(portsStalenessExceeded);
+                await WaitForResponseAsync(portsStalenessExceeded, collectionName);
 
                 return result;
             }
 
-            WaitForResponse(portsStalenessExceeded);
+            WaitForResponse(portsStalenessExceeded, collectionName);
 
             // Update the local data
             UpdateLocalData(localData);
@@ -423,13 +448,14 @@ namespace Dyconit.Overlord
             return result;
         }
 
-        private async Task WaitForResponseAsync(List<int> portsStalenessExceeded)
+        private async Task WaitForResponseAsync(List<int> portsStalenessExceeded, string collectionName)
         {
             // If there are ports that exceeded, send a sync request to those ports
             var message = new Dictionary<string, object>
             {
                 { "eventType", "syncRequest" },
-                { "port", _listenPort }
+                { "port", _listenPort },
+                { "collection", collectionName }
             };
 
             var json = JsonConvert.SerializeObject(message);
@@ -454,13 +480,14 @@ namespace Dyconit.Overlord
             }
         }
 
-        private void WaitForResponse(List<int> portsStalenessExceeded)
+        private void WaitForResponse(List<int> portsStalenessExceeded, string collectionName)
         {
             // If there are ports that exceeded, send a sync request to those ports
             var message = new Dictionary<string, object>
             {
                 { "eventType", "syncRequest" },
-                { "port", _listenPort }
+                { "port", _listenPort },
+                { "collection", collectionName }
             };
 
             var json = JsonConvert.SerializeObject(message);
@@ -513,16 +540,17 @@ namespace Dyconit.Overlord
             }
         }
 
-       public async Task<SyncResult> BoundNumericalError(List<ConsumeResult<Null, string>> localData)
+       public async Task<SyncResult> BoundNumericalError(List<ConsumeResult<Null, string>> localData, Dictionary<string, object> collection, string collectionName)
         {
-            List<int> ports = _localCollection["ports"] as List<int>;
-            double res = calculateNumericalOrderError();
+            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} BoundNumericalError called for collection {collectionName}");
+            List<int> ports = collection["ports"] as List<int>;
+            double res = calculateNumericalOrderError(collection);
 
 
             if (res > _numericalError)
             {
                 Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Numerical error result exceeds the bound. Sending sync request to ports {string.Join(", ", ports)}");
-                WaitForResponse(ports);
+                WaitForResponse(ports, collectionName);
             }
 
             // Update the local data
@@ -538,9 +566,9 @@ namespace Dyconit.Overlord
             // send message to dyconit overlord with orderError
         }
 
-        private double calculateNumericalOrderError()
+        private double calculateNumericalOrderError(Dictionary<string, object> collection)
         {
-            int numberOfNodes = ((List<int>)_localCollection["ports"]).Count() + 1;
+            int numberOfNodes = ((List<int>)collection["ports"]).Count() + 1;
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Number of nodes is {numberOfNodes}");
 
             return  (2 * (int)Math.Pow((numberOfNodes - 1), 2) * _throughput) / _numericalError;
