@@ -93,9 +93,21 @@ class Consumer
                     _uncommittedConsumedMessages[topic] = result.Data;
                     commit = result.changed;
 
-                    if (_uncommittedConsumedMessages[topic].Last().Offset >= _lastCommittedOffset)
+                    if (_uncommittedConsumedMessages[topic].Count > 0)
                     {
-                        _lastCommittedOffset = _uncommittedConsumedMessages[topic].Last().Offset+1;
+                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                    }
+
+                    Console.WriteLine($"[{adminPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} bounding numerical error");
+                    result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], collectionConfiguration, topic);
+                    _uncommittedConsumedMessages[topic] = result.Data;
+                    commit = commit || result.changed;
+
+                    if (_uncommittedConsumedMessages[topic].Count > 0)
+                    {
+                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
 
                     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} result: {_uncommittedConsumedMessages.Count} {commit}");
@@ -133,7 +145,7 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "test-consumer-group-2",
+            GroupId = "test-consumer-group-1",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,
             EnablePartitionEof = true,

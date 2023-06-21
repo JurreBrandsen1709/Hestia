@@ -22,10 +22,67 @@ namespace Dyconit.Overlord
         {
             _dyconitCollections = new Dictionary<string, Dictionary<string, object>>();
             Console.WriteLine("- Dyconit overlord started.");
+            parsePolicies();
             ListenForMessagesAsync();
             SendHeartbeatAsync();
             KeepTrackOfNodesAsync();
         }
+
+        private void parsePolicies()
+        {
+            string policiesFolderPath = "..\\Policies";
+
+            if (Directory.Exists(policiesFolderPath))
+            {
+                Console.WriteLine("Policies folder found.");
+
+                string[] policyFiles = Directory.GetFiles(policiesFolderPath, "*policy*.json");
+
+                Console.WriteLine($"Found {policyFiles.Length} policy files.");
+
+                foreach (string policyFile in policyFiles)
+                {
+                    string jsonContent = File.ReadAllText(policyFile);
+                    JObject policyJson = JObject.Parse(jsonContent);
+
+
+                    JArray collections = policyJson["collections"] as JArray;
+                    JToken thresholds = policyJson["thresholds"];
+                    JArray rules = policyJson["rules"] as JArray;
+
+                    // add some checks to see if collections, thresholds and rules are not null
+                    if (collections == null || thresholds == null || rules == null)
+                    {
+                        Console.WriteLine("Policy file is not valid.");
+                        continue;
+                    }
+
+                    foreach (string collection in collections)
+                    {
+                        if (_dyconitCollections.ContainsKey(collection))
+                        {
+                            Dictionary<string, object> dyconitCollectionData = _dyconitCollections[collection];
+                            dyconitCollectionData["thresholds"] = thresholds;
+                            dyconitCollectionData["rules"] = rules;
+                        }
+                        else
+                        {
+                            _dyconitCollections.Add(collection, new Dictionary<string, object>
+                            {
+                                { "thresholds", thresholds },
+                                { "rules", rules }
+                            });
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Policies folder does not exist.");
+            }
+        }
+
+
 
         private async void SendHeartbeatAsync()
         {
@@ -45,12 +102,14 @@ namespace Dyconit.Overlord
                 foreach (var dyconitCollection in _dyconitCollections.ToList())
                 {
                     var dyconitCollectionData = dyconitCollection.Value;
-                    var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
+                    if (dyconitCollectionData.ContainsKey("ports")) {
+                        var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
 
-                    foreach (var adminClientPort in adminClientPorts.ToList())
-                    {
-                        // send heartbeat to this node
-                        SendMessageOverTcp(heartbeatEvent.ToString(), adminClientPort.Item1);
+                        foreach (var adminClientPort in adminClientPorts.ToList())
+                        {
+                            // send heartbeat to this node
+                            SendMessageOverTcp(heartbeatEvent.ToString(), adminClientPort.Item1);
+                        }
                     }
                 }
             }
@@ -68,22 +127,24 @@ namespace Dyconit.Overlord
                 {
                     var dyconitCollectionData = dyconitCollection.Value;
                     var dyconitCollectionName = dyconitCollection.Key;
-                    var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
+                    if (dyconitCollectionData.ContainsKey("ports")) {
+                        var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
 
-                    foreach (var adminClientPort in adminClientPorts.ToList())
-                    {
-
-                        Console.WriteLine($" --- {adminClientPort.Item1} - {adminClientPort.Item2.AddSeconds(10)}");
-                        // check if we have received a heartbeat from this node
-                        // if not, remove it from the list
-                        if (adminClientPort.Item2.AddSeconds(10) < DateTime.Now)
+                        foreach (var adminClientPort in adminClientPorts.ToList())
                         {
-                            adminClientPorts.Remove(adminClientPort);
 
-                            // notify all other nodes that this node has been removed
-                            await RemoveNodeAtAdmins(adminClientPort.Item1, dyconitCollectionName);
+                            Console.WriteLine($" --- {adminClientPort.Item1} - {adminClientPort.Item2.AddSeconds(10)}");
+                            // check if we have received a heartbeat from this node
+                            // if not, remove it from the list
+                            if (adminClientPort.Item2.AddSeconds(10) < DateTime.Now)
+                            {
+                                adminClientPorts.Remove(adminClientPort);
 
-                            Console.WriteLine($"- Removed node {adminClientPort.Item1} from collection {dyconitCollection.Key}");
+                                // notify all other nodes that this node has been removed
+                                await RemoveNodeAtAdmins(adminClientPort.Item1, dyconitCollectionName);
+
+                                Console.WriteLine($"- Removed node {adminClientPort.Item1} from collection {dyconitCollection.Key}");
+                            }
                         }
                     }
                 }
@@ -177,6 +238,18 @@ namespace Dyconit.Overlord
                     else
                     {
                         Console.WriteLine($"--- Dyconit collection '{dyconitCollection}' already exists.");
+
+                        // check if we already have ports and bounds for this dyconit collection
+                        var dyconitCollectionDat = (Dictionary<string, object>)_dyconitCollections[dyconitCollection];
+
+                        if (!dyconitCollectionDat.ContainsKey("ports"))
+                        {
+                            dyconitCollectionDat.Add("ports", new List<Tuple<int, DateTime>>());
+                        }
+                        if (!dyconitCollectionDat.ContainsKey("bounds"))
+                        {
+                            dyconitCollectionDat.Add("bounds", new Dictionary<string, int>());
+                        }
                     }
 
                     var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollection];
@@ -269,20 +342,108 @@ namespace Dyconit.Overlord
                     break;
 
                 case "throughput":
-
                     var throughput = json["throughput"]?.ToObject<double>();
                     var adminPort = json["adminPort"]?.ToObject<int>();
 
                     Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, Throughput: {throughput}.");
 
+                    List<string> collections = GetCollectionsForAdminPort(adminPort);
+
+                    foreach (var collection in collections)
+                    {
+                        if (_dyconitCollections[collection].ContainsKey("thresholds") && _dyconitCollections[collection].ContainsKey("rules"))
+                        {
+                            var throughputThreshold = (int)((JToken)_dyconitCollections[collection]["thresholds"])["throughput"];
+                            var rules = (JArray)_dyconitCollections[collection]["rules"];
+
+                            foreach (var rule in rules)
+                            {
+                                var condition = rule["condition"].ToString();
+                                var actions = rule["actions"];
+
+                                var isConditionMet = EvaluateCondition(condition, throughput.Value, throughputThreshold);
+                                if (isConditionMet)
+                                {
+                                    foreach (var action in actions)
+                                    {
+                                        var type = action["type"].ToString();
+                                        var value = (double)action["value"];
+
+                                        var bounds = (Dictionary<string, int>)_dyconitCollections[collection]["bounds"];
+                                        var newBounds = new Dictionary<string, int>();
+
+                                        foreach (var bound in bounds)
+                                        {
+                                            int newValue = type == "multiply" ? (int)(bound.Value * value) : (int)(bound.Value - value);
+                                            newBounds[bound.Key] = newValue;
+                                        }
+
+                                        _dyconitCollections[collection]["bounds"] = newBounds;
+
+                                        var newMessage = new JObject
+                                        {
+                                            { "eventType", "updateConitEvent" },
+                                            { "staleness", newBounds["Staleness"] },
+                                            { "orderError", newBounds["OrderError"] },
+                                            { "numericalError", newBounds["NumericalError"] },
+                                            { "collection", collection }
+                                        };
+
+                                        foreach (var port in ((List<Tuple<int, DateTime>>)_dyconitCollections[collection]["ports"]).ToList())
+                                        {
+                                            SendMessageOverTcp(newMessage.ToString(), port.Item1);
+                                        }
+
+                                        Console.WriteLine($"--- Changed bounds of dyconit collection '{collection}' to: {string.Join(", ", newBounds)}.");
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     break;
+
 
                 default:
                     Console.WriteLine($"Unknown message received with eventType '{eventType}': {message}");
                     break;
             }
         });
+        }
+
+        bool EvaluateCondition(string condition, double throughput, int threshold)
+        {
+            // Assuming the condition format is "{variable} {operator} {threshold}"
+            var parts = condition.Split(' ');
+            var operatorSymbol = parts[1];
+
+            switch (operatorSymbol)
+            {
+                case ">=":
+                    return throughput >= threshold;
+                case "<":
+                    return throughput < threshold;
+                // Add more cases for other operators as needed
+                default:
+                    throw new NotSupportedException($"Operator '{operatorSymbol}' is not supported.");
+            }
+        }
+
+        private List<string> GetCollectionsForAdminPort(int? adminPort)
+        {
+            // go through all dyconit collections and check if the admin port is in the collection. Return the collections where the admin port is in
+            List<string> collections = new List<string>();
+            foreach (var collection in _dyconitCollections.ToList())
+            {
+                foreach (var port in ((List<Tuple<int, DateTime>>)collection.Value["ports"]).ToList())
+                {
+                    if (port.Item1 == adminPort)
+                    {
+                        collections.Add(collection.Key);
+                    }
+                }
+            }
+            return collections;
         }
 
         private async Task SendMessageOverTcp(string message, int port)

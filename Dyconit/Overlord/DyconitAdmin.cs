@@ -124,7 +124,7 @@ namespace Dyconit.Overlord
                 {
                     { "eventType", "throughput" },
                     { "throughput", throughput },
-                    { "port", _listenPort }
+                    { "adminPort", _listenPort }
                 };
 
                 SendMessageOverTcp(throughputMessage.ToString(), 6666);
@@ -252,9 +252,9 @@ namespace Dyconit.Overlord
 
                         case "updateConitEvent":
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Received updateConitEvent");
-                            var newStaleness = Convert.ToInt32(json["Staleness"]);
-                            var newOrderError = Convert.ToInt32(json["OrderError"]);
-                            var newNumericalError = Convert.ToInt32(json["NumericalError"]);
+                            var newStaleness = Convert.ToInt32(json["staleness"]);
+                            var newOrderError = Convert.ToInt32(json["orderError"]);
+                            var newNumericalError = Convert.ToInt32(json["numericalError"]);
 
                             // Update the local collection
                             collection["Staleness"] = newStaleness;
@@ -376,25 +376,25 @@ namespace Dyconit.Overlord
                 Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} mergedData: {item.Message.Value}");
             }
 
-            bool isSame = mergedData.Count() != localData.Count && mergedData.Count() == _receivedData.Count;
+            bool isNotSame = mergedData.Count() != localData.Count();// && mergedData.Count() == _receivedData.Count();
 
             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData.Count: {localData.Count}, _receivedData.Count: {_receivedData.Count}, mergedData.Count: {mergedData.Count}");
 
             SyncResult result = new SyncResult
             {
-                changed = isSame || _synced,
+                changed = isNotSame || _synced,
                 Data = mergedData,
             };
 
-            if (!isSame)
-            {
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is not null and is different from local data");
+            // if (isNotSame)
+            // {
+                // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is not null and is different from local data");
                 _localData = mergedData;
-            }
-            else {
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is not null and is the same as local data");
-                _localData = localData;
-            }
+            // }
+            // else {
+            //     Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is not null and is the same as local data");
+            //     _localData = localData;
+            // }
 
             _synced = _synced ? false : _synced;
             return result;
