@@ -14,7 +14,7 @@ namespace Dyconit.Consumer
     {
         private Action<string, double>? _statisticsHandler;
         private readonly int _type;
-        private readonly DyconitAdmin _adminClient;
+
         private readonly Dictionary<string, object> _conits;
 
         private double _previousAppOffset = 0.0;
@@ -27,7 +27,6 @@ namespace Dyconit.Consumer
         {
             _type = type;
             _adminPort = adminPort;
-            _adminClient = dyconitAdmin;
             _conits = Conits;
             SendMessageToOverlord();
 

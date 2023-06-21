@@ -344,17 +344,24 @@ namespace Dyconit.Overlord
                 case "throughput":
                     var throughput = json["throughput"]?.ToObject<double>();
                     var adminPort = json["adminPort"]?.ToObject<int>();
+                    var topic = json["topic"]?.ToString();
 
-                    Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, Throughput: {throughput}.");
-
-                    List<string> collections = GetCollectionsForAdminPort(adminPort);
-
-                    foreach (var collection in collections)
+                    if (throughput <= 0)
                     {
-                        if (_dyconitCollections[collection].ContainsKey("thresholds") && _dyconitCollections[collection].ContainsKey("rules"))
+                        Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, topic {topic}, Throughput: {throughput}. Ignoring message.");
+                        break;
+                    }
+
+                    Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, topic {topic}, Throughput: {throughput}.");
+
+                    // List<string> collections = GetCollectionsForAdminPort(adminPort);
+
+                    // foreach (var collection in collections)
+                    // {
+                        if (_dyconitCollections[topic].ContainsKey("thresholds") && _dyconitCollections[topic].ContainsKey("rules"))
                         {
-                            var throughputThreshold = (int)((JToken)_dyconitCollections[collection]["thresholds"])["throughput"];
-                            var rules = (JArray)_dyconitCollections[collection]["rules"];
+                            var throughputThreshold = (int)((JToken)_dyconitCollections[topic]["thresholds"])["throughput"];
+                            var rules = (JArray)_dyconitCollections[topic]["rules"];
 
                             foreach (var rule in rules)
                             {
@@ -369,7 +376,7 @@ namespace Dyconit.Overlord
                                         var type = action["type"].ToString();
                                         var value = (double)action["value"];
 
-                                        var bounds = (Dictionary<string, int>)_dyconitCollections[collection]["bounds"];
+                                        var bounds = (Dictionary<string, int>)_dyconitCollections[topic]["bounds"];
                                         var newBounds = new Dictionary<string, int>();
 
                                         foreach (var bound in bounds)
@@ -379,7 +386,7 @@ namespace Dyconit.Overlord
                                             newBounds[bound.Key] = newValue;
                                         }
 
-                                        _dyconitCollections[collection]["bounds"] = newBounds;
+                                        _dyconitCollections[topic]["bounds"] = newBounds;
 
                                         var newMessage = new JObject
                                         {
@@ -387,19 +394,19 @@ namespace Dyconit.Overlord
                                             { "staleness", newBounds["Staleness"] },
                                             { "orderError", newBounds["OrderError"] },
                                             { "numericalError", newBounds["NumericalError"] },
-                                            { "collection", collection }
+                                            { "collection", topic }
                                         };
 
-                                        foreach (var port in ((List<Tuple<int, DateTime>>)_dyconitCollections[collection]["ports"]).ToList())
+                                        foreach (var port in ((List<Tuple<int, DateTime>>)_dyconitCollections[topic]["ports"]).ToList())
                                         {
                                             SendMessageOverTcp(newMessage.ToString(), port.Item1);
                                         }
 
-                                        Console.WriteLine($"--- Changed bounds of dyconit collection '{collection}' to: {string.Join(", ", newBounds)}.");
+                                        Console.WriteLine($"--- Changed bounds of dyconit collection '{topic}' to: {string.Join(", ", newBounds)}.");
                                     }
                                 }
                             }
-                        }
+                        // }
                     }
 
                     break;
@@ -430,22 +437,22 @@ namespace Dyconit.Overlord
             }
         }
 
-        private List<string> GetCollectionsForAdminPort(int? adminPort)
-        {
-            // go through all dyconit collections and check if the admin port is in the collection. Return the collections where the admin port is in
-            List<string> collections = new List<string>();
-            foreach (var collection in _dyconitCollections.ToList())
-            {
-                foreach (var port in ((List<Tuple<int, DateTime>>)collection.Value["ports"]).ToList())
-                {
-                    if (port.Item1 == adminPort)
-                    {
-                        collections.Add(collection.Key);
-                    }
-                }
-            }
-            return collections;
-        }
+        // private List<string> GetCollectionsForAdminPort(int? adminPort)
+        // {
+        //     // go through all dyconit collections and check if the admin port is in the collection. Return the collections where the admin port is in
+        //     List<string> collections = new List<string>();
+        //     foreach (var collection in _dyconitCollections.ToList())
+        //     {
+        //         foreach (var port in ((List<Tuple<int, DateTime>>)collection.Value["ports"]).ToList())
+        //         {
+        //             if (port.Item1 == adminPort)
+        //             {
+        //                 collections.Add(collection.Key);
+        //             }
+        //         }
+        //     }
+        //     return collections;
+        // }
 
         private async Task SendMessageOverTcp(string message, int port)
         {

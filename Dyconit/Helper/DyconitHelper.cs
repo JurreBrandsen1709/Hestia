@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using Confluent.Kafka;
 using Dyconit.Consumer;
 using Dyconit.Overlord;
@@ -84,6 +85,28 @@ namespace Dyconit.Helper
             }
 
             return lastCommittedOffset;
+        }
+
+        public static async Task SendMessageOverTcp(string message, int port, int _listenPort)
+        {
+            try
+            {
+                using (var client = new TcpClient())
+                {
+                    client.Connect("localhost", port);
+
+                    using (var stream = client.GetStream())
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        await writer.WriteLineAsync(message);
+                        await writer.FlushAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Failed to send message over TCP: {ex.Message}");
+            }
         }
     }
 }

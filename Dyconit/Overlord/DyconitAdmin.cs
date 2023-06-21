@@ -1,22 +1,15 @@
 using Confluent.Kafka;
-using Confluent.Kafka.Admin;
-using Dyconit.Message;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Dyconit.Overlord
 {
     public class DyconitAdmin
     {
         private readonly AdminClientConfig _adminClientConfig;
-        private readonly IAdminClient _adminClient;
+        public readonly IAdminClient _adminClient;
         private readonly int _throughputThreshold;
         private readonly int _type;
         private readonly int _listenPort;
@@ -28,16 +21,14 @@ namespace Dyconit.Overlord
         private List<ConsumeResult<Null, string>> _receivedData;
         private List<ConsumeResult<Null, string>>_localData = new List<ConsumeResult<Null, string>>();
         private TaskCompletionSource<bool> _stalenessEventReceived;
-        // private readonly Dictionary<string, object> _localCollections;
-
         private Dictionary<string, Dictionary<string, object>> _localCollections;
         private bool _optimisticMode = true;
         private HashSet<int> _syncResponses = new HashSet<int>();
         private long _previousOffset = 0;
         private bool _isFirstCall = true;
         private double _throughput = 0.0;
-
         private bool _synced = false;
+        public IConsumer<Null, string> _consumer;
 
         public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, Dictionary<string, object>> conitCollection)
         {
@@ -52,25 +43,6 @@ namespace Dyconit.Overlord
                 collection.Value.Add("ltsp", new List<Tuple<int, DateTime>> { }); // Last time since pull for each port
             }
 
-            // print local collections
-            foreach (var collection in _localCollections)
-            {
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Local collection: {collection.Key}");
-                foreach (var kvp in collection.Value)
-                {
-                    Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Key = {kvp.Key}, Value = {kvp.Value}");
-                }
-            }
-
-            // _localCollections = new Dictionary<string, object>
-            // {
-            //     { "Staleness", _staleness },
-            //     { "OrderError", _orderError },
-            //     { "NumericalError", _numericalError },
-            //     { "ports", new List<int> { } },
-            //     { "ltsp", new List<Tuple<int, DateTime>> {}} // Last time since pull for each port
-            // };
-
             _adminClientConfig = new AdminClientConfig
             {
                 BootstrapServers = bootstrapServers,
@@ -78,59 +50,10 @@ namespace Dyconit.Overlord
 
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
 
+
             ListenForMessagesAsync();
-            calculateThroughputAysnc();
         }
 
-        private async Task calculateThroughputAysnc()
-        {
-            while (true)
-            {
-                // send it to the dyconit overlord every 5 seconds
-                await Task.Delay(5000);
-
-                // calculate Throughput
-                await CalculateThroughput();
-            }
-        }
-
-        private async Task CalculateThroughput()
-        {
-            // get current offset or 0 if no messages have been received
-            long currentOffset = _localData.Count > 0 ? _localData.Last().Offset : 0;
-
-            if (_isFirstCall)
-            {
-                _isFirstCall = false;
-            }
-            else
-            {
-
-                long offsetDifference = currentOffset - _previousOffset;
-
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Current offset: {currentOffset}, Previous offset: {_previousOffset}, Offset difference: {offsetDifference}");
-
-                // check if the offsetDifference is negative
-                if (offsetDifference <= 0)
-                {
-                    return;
-                }
-
-                double throughput = offsetDifference / 5.0;
-
-                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Throughput: {throughput} messages per second");
-
-                var throughputMessage = new JObject
-                {
-                    { "eventType", "throughput" },
-                    { "throughput", throughput },
-                    { "adminPort", _listenPort }
-                };
-
-                SendMessageOverTcp(throughputMessage.ToString(), 6666);
-            }
-            _previousOffset = currentOffset;
-        }
 
         private async void ListenForMessagesAsync()
         {
@@ -144,14 +67,15 @@ namespace Dyconit.Overlord
                 var message = await reader.ReadToEndAsync().ConfigureAwait(false);
 
                 // Parse message and act accordingly
-                ParseMessageAsync(message);
+                await ParseMessageAsync(message);
 
                 reader.Close();
                 client.Close();
             }
         }
 
-        private async void ParseMessageAsync(string message)
+
+        private async Task ParseMessageAsync(string message)
         {
             await Task.Run(() =>
             {
@@ -386,16 +310,7 @@ namespace Dyconit.Overlord
                 Data = mergedData,
             };
 
-            // if (isNotSame)
-            // {
-                // Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is not null and is different from local data");
-                _localData = mergedData;
-            // }
-            // else {
-            //     Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData is not null and is the same as local data");
-            //     _localData = localData;
-            // }
-
+            _localData = mergedData;
             _synced = _synced ? false : _synced;
             return result;
         }
