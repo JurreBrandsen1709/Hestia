@@ -375,6 +375,7 @@ namespace Dyconit.Overlord
                                         foreach (var bound in bounds)
                                         {
                                             int newValue = type == "multiply" ? (int)(bound.Value * value) : (int)(bound.Value - value);
+                                            newValue = Math.Max(1, newValue); // Ensure value is not less than 1
                                             newBounds[bound.Key] = newValue;
                                         }
 
