@@ -1,0 +1,283 @@
+// // todo there must be a way to let the dyconits subscribe to each other so they can send messages.
+// // todo create a collection of dyconits where we know what these bounds are and which port the admin clients are listening on.
+// // todo We must know whether it is a producer or consumer or both.
+
+// using Confluent.Kafka;
+// using Confluent.Kafka.Admin;
+// using Newtonsoft.Json.Linq;
+// using System;
+// using System.IO;
+// using System.Net;
+// using System.Net.Sockets;
+// using System.Threading.Tasks;
+
+// namespace Dyconit.Overlord
+// {
+//     public class DyconitOverlord
+//     {
+//         private readonly int _listenPort = 6666;
+
+//         private JObject _dyconitCollections;
+
+//         public DyconitOverlord()
+//         {
+//             _dyconitCollections = new JObject();
+//             Console.WriteLine("- Dyconit overlord started.");
+//             parsePolicies();
+//             ListenForMessagesAsync();
+//             SendHeartbeatAsync();
+//             KeepTrackOfNodesAsync();
+//         }
+
+//         private void parsePolicies()
+//         {
+//             string policiesFolderPath = "..\\Policies";
+
+//             if (Directory.Exists(policiesFolderPath))
+//             {
+//                 Console.WriteLine("Policies folder found.");
+
+//                 string[] policyFiles = Directory.GetFiles(policiesFolderPath, "*policy*.json");
+
+//                 Console.WriteLine($"Found {policyFiles.Length} policy files.");
+
+//                 foreach (string policyFile in policyFiles)
+//                 {
+//                     string jsonContent = File.ReadAllText(policyFile);
+//                     JObject policyJson = JObject.Parse(jsonContent);
+
+
+//                     JArray collections = policyJson["collections"] as JArray;
+//                     JToken thresholds = policyJson["thresholds"];
+//                     JArray rules = policyJson["rules"] as JArray;
+
+//                     // add some checks to see if collections, thresholds and rules are not null
+//                     if (collections == null || thresholds == null || rules == null)
+//                     {
+//                         Console.WriteLine("Policy file is not valid.");
+//                         continue;
+//                     }
+
+//                     foreach (string collection in collections)
+//                     {
+//                         if (_dyconitCollections.ContainsKey(collection))
+//                         {
+//                             JObject dyconitCollectionData = (JObject)_dyconitCollections[collection];
+//                             dyconitCollectionData["thresholds"] = thresholds;
+//                             dyconitCollectionData["rules"] = rules;
+//                         }
+//                         else
+//                         {
+//                             _dyconitCollections.Add(collection, new JObject(
+//                                 new JProperty("thresholds", thresholds),
+//                                 new JProperty("rules", rules)
+//                             ));
+//                         }
+//                     }
+//                 }
+//             }
+//             else
+//             {
+//                 Console.WriteLine("Policies folder does not exist.");
+//             }
+//         }
+
+//         private async void SendHeartbeatAsync()
+//         {
+//             // Send a heartbeat response to the requesting node
+//             var heartbeatEvent = new JObject(
+//                 new JProperty("eventType", "heartbeatEvent"),
+//                 new JProperty("port", _listenPort)
+//             );
+
+//             while (true)
+//             {
+//                 await Task.Delay(1000).ConfigureAwait(false);
+
+//                 // Send heartbeat to all admin clients
+//                 foreach (var dyconitCollection in _dyconitCollections)
+//                 {
+//                     var dyconitCollectionData = (JObject)dyconitCollection.Value;
+//                     if (dyconitCollectionData.ContainsKey("ports"))
+//                     {
+//                         var adminClientPorts = dyconitCollectionData["ports"].ToObject<JArray>();
+
+//                         foreach (var adminClientPort in adminClientPorts)
+//                         {
+//                             // send heartbeat to this node
+//                             SendMessageOverTcp(heartbeatEvent.ToString(), adminClientPort.Value<int>());
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+
+//         // Every second send a heartbeat event to the DyconitCollection nodes that this overlord is responsible for.
+//         private async void KeepTrackOfNodesAsync()
+//         {
+//             while (true)
+//             {
+//                 await Task.Delay(1000).ConfigureAwait(false);
+
+//                 foreach (var dyconitCollection in _dyconitCollections)
+//                 {
+//                     var dyconitCollectionData = (JObject)dyconitCollection.Value;
+//                     if (dyconitCollectionData.ContainsKey("nodes"))
+//                     {
+//                         var nodes = dyconitCollectionData["nodes"].ToObject<JArray>();
+
+//                         foreach (var node in nodes)
+//                         {
+//                             var nodeAddress = node.Value<int>();
+
+//                             // send a request to this node to check its status
+//                             string response = SendMessageOverTcp("status", nodeAddress);
+//                             Console.WriteLine($"Status response from {nodeAddress}: {response}");
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+
+//         private async void ListenForMessagesAsync()
+//         {
+//             TcpListener server = null;
+//             try
+//             {
+//                 Int32 port = _listenPort;
+//                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+//                 server = new TcpListener(localAddr, port);
+//                 server.Start();
+
+//                 Byte[] bytes = new Byte[256];
+//                 String data = null;
+
+//                 while (true)
+//                 {
+//                     Console.Write("Waiting for a connection... ");
+
+//                     TcpClient client = await server.AcceptTcpClientAsync().ConfigureAwait(false);
+//                     Console.WriteLine("Connected!");
+
+//                     data = null;
+
+//                     NetworkStream stream = client.GetStream();
+
+//                     int i;
+//                     while ((i = await stream.ReadAsync(bytes, 0, bytes.Length).ConfigureAwait(false)) != 0)
+//                     {
+//                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+//                         Console.WriteLine($"Received: {data}");
+
+//                         // Handle received message
+//                         HandleReceivedMessage(data, stream);
+//                     }
+
+//                     client.Close();
+//                 }
+//             }
+//             catch (SocketException e)
+//             {
+//                 Console.WriteLine($"SocketException: {e}");
+//                 server.Stop();
+//             }
+//         }
+
+//         private void HandleReceivedMessage(string message, NetworkStream stream)
+//         {
+//             // Parse the received message
+//             JObject receivedMessage = JObject.Parse(message);
+
+//             string eventType = receivedMessage["eventType"].Value<string>();
+
+//             if (eventType == "registerEvent")
+//             {
+//                 // Register the DyconitCollection node
+//                 string collection = receivedMessage["collection"].Value<string>();
+//                 string nodeAddress = receivedMessage["nodeAddress"].Value<string>();
+//                 int adminClientPort = receivedMessage["adminClientPort"].Value<int>();
+
+//                 if (_dyconitCollections.ContainsKey(collection))
+//                 {
+//                     var dyconitCollectionData = (JObject)_dyconitCollections[collection];
+
+//                     // Add node address to existing collection data
+//                     JArray nodes = dyconitCollectionData["nodes"].ToObject<JArray>();
+//                     nodes.Add(nodeAddress);
+//                     dyconitCollectionData["nodes"] = nodes;
+
+//                     // Add admin client port to existing collection data
+//                     JArray ports = dyconitCollectionData["ports"].ToObject<JArray>();
+//                     ports.Add(adminClientPort);
+//                     dyconitCollectionData["ports"] = ports;
+//                 }
+//                 else
+//                 {
+//                     // Create new collection data
+//                     var collectionData = new JObject(
+//                         new JProperty("nodes", new JArray(nodeAddress)),
+//                         new JProperty("ports", new JArray(adminClientPort))
+//                     );
+
+//                     _dyconitCollections.Add(collection, collectionData);
+//                 }
+
+//                 Console.WriteLine($"Registered node {nodeAddress} for collection {collection}.");
+//             }
+//             else if (eventType == "unregisterEvent")
+//             {
+//                 // Unregister the DyconitCollection node
+//                 string collection = receivedMessage["collection"].Value<string>();
+//                 string nodeAddress = receivedMessage["nodeAddress"].Value<string>();
+//                 int adminClientPort = receivedMessage["adminClientPort"].Value<int>();
+
+//                 if (_dyconitCollections.ContainsKey(collection))
+//                 {
+//                     var dyconitCollectionData = (JObject)_dyconitCollections[collection];
+
+//                     // Remove node address from existing collection data
+//                     JArray nodes = dyconitCollectionData["nodes"].ToObject<JArray>();
+//                     nodes.Remove(nodeAddress);
+//                     dyconitCollectionData["nodes"] = nodes;
+
+//                     // Remove admin client port from existing collection data
+//                     JArray ports = dyconitCollectionData["ports"].ToObject<JArray>();
+//                     ports.Remove(adminClientPort);
+//                     dyconitCollectionData["ports"] = ports;
+
+//                     Console.WriteLine($"Unregistered node {nodeAddress} for collection {collection}.");
+//                 }
+//             }
+//         }
+
+//         private string SendMessageOverTcp(string message, int port)
+//         {
+//             using (TcpClient client = new TcpClient("localhost", port))
+//             {
+//                 using (NetworkStream stream = client.GetStream())
+//                 {
+//                     // Send message
+//                     byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+//                     stream.Write(data, 0, data.Length);
+//                     Console.WriteLine($"Sent: {message}");
+
+//                     // Receive response
+//                     data = new byte[256];
+//                     string responseData = string.Empty;
+//                     using (MemoryStream ms = new MemoryStream())
+//                     {
+//                         int numBytesRead;
+//                         while ((numBytesRead = stream.Read(data, 0, data.Length)) > 0)
+//                         {
+//                             ms.Write(data, 0, numBytesRead);
+//                         }
+//                         responseData = System.Text.Encoding.ASCII.GetString(ms.ToArray());
+//                         Console.WriteLine($"Received: {responseData}");
+//                     }
+
+//                     return responseData;
+//                 }
+//             }
+//         }
+//     }
+// }

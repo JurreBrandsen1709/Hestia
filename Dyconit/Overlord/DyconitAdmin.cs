@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Dyconit.Overlord
 {
@@ -28,6 +29,7 @@ namespace Dyconit.Overlord
         private bool _isFirstCall = true;
         private double _throughput = 0.0;
         private bool _synced = false;
+        private Dictionary<string, int> _syncCounters = new Dictionary<string, int>();
         public IConsumer<Null, string> _consumer;
 
         public DyconitAdmin(string bootstrapServers, int type, int listenPort, Dictionary<string, Dictionary<string, object>> conitCollection)
@@ -50,13 +52,12 @@ namespace Dyconit.Overlord
 
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
 
-
             ListenForMessagesAsync();
         }
 
-
         private async void ListenForMessagesAsync()
         {
+            _ = SendSyncCountAsync();
             var listener = new TcpListener(IPAddress.Any, _listenPort);
             listener.Start();
 
@@ -71,6 +72,56 @@ namespace Dyconit.Overlord
 
                 reader.Close();
                 client.Close();
+
+            }
+        }
+
+        private async Task SendSyncCountAsync()
+        {
+            while (true)
+            {
+                await Task.Delay(10000); // Delay for 30 seconds
+
+                // print the sync counters
+                foreach (var counter in _syncCounters)
+                {
+                    Console.WriteLine($"*************************** Sync counter for {counter.Key}: {counter.Value}");
+                }
+
+                // check if there are any sync counters that are greater than 0
+                if (_syncCounters.Any(c => c.Value < 0))
+                {
+                    Console.WriteLine($"*************************** Sync counter is less than 0");
+                    continue;
+                }
+
+                try
+                {
+                    using (var client = new TcpClient())
+                    {
+                        await client.ConnectAsync("localhost", 6666); // Connect to port 6666
+
+                        using (var stream = client.GetStream())
+                        using (var writer = new StreamWriter(stream, Encoding.ASCII, leaveOpen: true))
+                        {
+                            var data = JsonConvert.SerializeObject(_syncCounters);
+                            var overheadMessage = new JObject
+                            {
+                                { "eventType", "overheadMessage" },
+                                { "adminPort", _listenPort },
+                                { "data", data }
+                            };
+
+                            await writer.WriteLineAsync(overheadMessage.ToString()); // Send the _syncCount as a string
+                            await writer.FlushAsync();
+                        }
+                    }
+                    _syncCounters = new Dictionary<string, int>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending sync count: {ex.Message}");
+                }
             }
         }
 
@@ -140,6 +191,15 @@ namespace Dyconit.Overlord
 
                             // Add the senderPort to the set of received sync responses
                             _syncResponses.Add(senderPort);
+
+                            // retrieve the current value of synccount for this collection
+                            if (!_syncCounters.ContainsKey(collectionName))
+                            {
+                                _syncCounters[collectionName] = 0;
+                            }
+
+                            var tmp = _syncCounters[collectionName];
+                            _syncCounters[collectionName] = tmp + 1;
 
                             break;
 
@@ -216,6 +276,17 @@ namespace Dyconit.Overlord
 
                             Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Sent syncResponse to port {syncRequestPort}");
                             _synced = true;
+
+                            if (!_syncCounters.ContainsKey(collectionName))
+                            {
+                                _syncCounters[collectionName] = 0;
+                            }
+
+                            var tmp2 = _syncCounters[collectionName];
+                            _syncCounters[collectionName] = tmp2 + 1;
+
+
+
                             break;
 
                         case "heartbeatEvent":
@@ -332,10 +403,14 @@ namespace Dyconit.Overlord
             var ltsp = collection["ltsp"] as List<Tuple<int, DateTime>>;
             var portsStalenessExceeded = new List<int>();
 
+            Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Checking staleness for ports: {string.Join(", ", ports)}");
+
             foreach (var port in ports)
             {
                 var lastTimeSincePull = ltsp.FirstOrDefault(x => x.Item1 == port).Item2;
                 var timeDifference = consumedTime - lastTimeSincePull;
+
+                Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Consumed time: {consumedTime.ToString("HH:mm:ss.fff")}, last time since pull: {lastTimeSincePull.ToString("HH:mm:ss.fff")}, time difference: {timeDifference.TotalMilliseconds}");
 
                 if (timeDifference.TotalMilliseconds > staleness)
                 {
@@ -427,6 +502,7 @@ namespace Dyconit.Overlord
                 if (_syncResponses.Count == portsStalenessExceeded.Count)
                 {
                     completionSource.SetResult(null);
+                    _syncResponses.Clear();
                     break;
                 }
 

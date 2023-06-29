@@ -15,25 +15,13 @@ namespace Dyconit.Producer
         private readonly int _type;
         private readonly DyconitAdmin _adminClient;
         private readonly Dictionary<string, object> _conits;
-
         private readonly int _adminPort;
 
         public DyconitProducerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort) : base(config)
         {
             _type = type;
             _adminPort = adminPort;
-            // _adminClient = new DyconitAdmin(config.BootstrapServers, type, _adminPort);
             _conits = Conits;
-
-            // SetStatisticsHandler((_, json) =>
-            // {
-            //     _adminClient.ProcessStatistics(json, config);
-            // });
-
-            // Send message to overlord, notifying the following:
-            // - I am a producer
-            // - my admin client is listening on port 1337
-            // - my Conit bounds are [0,1,2]
             SendMessageToOverlord();
 
         }
@@ -100,13 +88,5 @@ namespace Dyconit.Producer
             }
             return adminClientPort;
         }
-
-        // public DyconitProducerBuilder<TKey, TValue> SetStatisticsHandler(Action<string, double> handler)
-        // {
-        //     _statisticsHandler = handler;
-        //     return this;
-        // }
-
-
     }
 }

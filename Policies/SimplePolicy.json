@@ -3,7 +3,8 @@
   "collections": ["topic_priority"],
   "description": "If the threshold of the throughput is reached, we multiply the bounds by 2, otherwise we decrease the bound by half.",
   "thresholds": {
-    "throughput": 5
+    "throughput": 5,
+    "overhead_throughput": 2
   },
   "rules": [
     {
@@ -11,7 +12,7 @@
       "actions": [
         {
           "type": "multiply",
-          "value": 2
+          "value": 0.9
         }
       ]
     },
@@ -20,7 +21,7 @@
       "actions": [
         {
           "type": "multiply",
-          "value": 0.9
+          "value": 2.0
         }
       ]
     }

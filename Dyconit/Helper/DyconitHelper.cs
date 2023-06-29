@@ -49,9 +49,9 @@ namespace Dyconit.Helper
             }
         }
 
-        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort, DyconitAdmin dyconitLogger)
+        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort)
         {
-            return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort, dyconitLogger).Build();
+            return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build();
         }
 
         public static double GetMessageWeight(ConsumeResult<Null, string> result)
