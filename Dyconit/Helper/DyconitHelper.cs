@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using Confluent.Kafka;
 using Dyconit.Consumer;
 using Dyconit.Overlord;
+using Newtonsoft.Json.Linq;
 
 namespace Dyconit.Helper
 {
@@ -29,16 +30,19 @@ namespace Dyconit.Helper
             return adminClientPort;
         }
 
-        public static Dictionary<string, object> GetConitConfiguration(string collection, int staleness, int orderError, int numericalError)
+
+
+        public static JObject GetConitConfiguration(string collectionName, int staleness, int numericalError)
         {
-            return new Dictionary<string, object>
-            {
-                { "collection", collection },
-                { "Staleness", staleness },
-                { "OrderError", orderError },
-                { "NumericalError", numericalError }
-            };
+            var jsonObject = new JObject(
+                new JProperty("collectionName", collectionName),
+                new JProperty("Staleness", staleness),
+                new JProperty("NumericalError", numericalError)
+            );
+
+            return jsonObject;
         }
+
 
         public static void PrintConitConfiguration(Dictionary<string, object> conitConfiguration)
         {
@@ -49,7 +53,7 @@ namespace Dyconit.Helper
             }
         }
 
-        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, Dictionary<string, object> conitConfiguration, int adminPort)
+        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, JToken conitConfiguration, int adminPort)
         {
             return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build();
         }

@@ -15,6 +15,7 @@ class Consumer
     public static int adminPort = DyconitHelper.FindPort();
     public static DyconitAdmin _DyconitLogger;
     private static Random _random = new Random();
+    private static double _totalLocalWeight = 0.0;
 
     static async Task Main()
     {
@@ -28,7 +29,7 @@ class Consumer
 
         foreach (var topic in topics)
         {
-            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 2000 : 5000, 20, topic == "topic_priority" ? 5 : 10);
+            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 200 : 500, 20, topic == "topic_priority" ? 5 : 10);
             DyconitHelper.PrintConitConfiguration(conitConfiguration);
 
             _localCollection.Add(topic, conitConfiguration);
@@ -67,11 +68,12 @@ class Consumer
 
         using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
         {
+
             consumer.Subscribe(topic);
             // Introduce a delay to allow the consumer to retrieve the committed offset for the topic/partition.
             await Task.Delay(TimeSpan.FromSeconds(10));
 
-            // _ = CalculateThroughput(consumer, adminPort, token, topic);
+            _ = CalculateThroughput(consumer, adminPort, token, topic);
 
             try
             {
@@ -79,6 +81,9 @@ class Consumer
                 {
                     var consumeResult = consumer.Consume(token);
                     var inputMessage = consumeResult.Message.Value;
+                    _totalLocalWeight += DyconitHelper.GetMessageWeight(consumeResult);
+
+
                     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} Consumed message with value '{inputMessage}', weight '{DyconitHelper.GetMessageWeight(consumeResult)}'");
                     _lastCommittedOffset = consumeResult.Offset;
 
@@ -91,27 +96,27 @@ class Consumer
 
                     _uncommittedConsumedMessages[topic].Add(consumeResult);
 
-                    int waitTime = _random.Next(250, 1000);
+                    int waitTime = _random.Next(500, 600);
                     await Task.Delay(waitTime);
 
-                    var consumedTime = DateTime.Now;
+                    // var consumedTime = DateTime.Now;
 
-                    Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} bounding staleness");
-                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages[topic], collectionConfiguration, topic);
+                    // Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} bounding staleness");
+                    // SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages[topic], collectionConfiguration, topic);
 
-                    _uncommittedConsumedMessages[topic] = result.Data;
-                    var commit = result.changed;
+                    // _uncommittedConsumedMessages[topic] = result.Data;
+                    // var commit = result.changed;
 
-                    if (_uncommittedConsumedMessages[topic].Count > 0)
-                    {
-                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
-                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
-                    }
+                    // if (_uncommittedConsumedMessages[topic].Count > 0)
+                    // {
+                    //     var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                    //     _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                    // }
 
                     Console.WriteLine($"[{adminPort}] - {DateTime.Now:HH:mm:ss.fff} bounding numerical error");
-                    result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], collectionConfiguration, topic);
+                    SyncResult result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], collectionConfiguration, topic, _totalLocalWeight);
                     _uncommittedConsumedMessages[topic] = result.Data;
-                    commit = commit || result.changed;
+                    var commit = result.changed;
 
                     if (_uncommittedConsumedMessages[topic].Count > 0)
                     {

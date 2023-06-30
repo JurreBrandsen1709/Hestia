@@ -23,7 +23,6 @@ namespace Dyconit.Producer
             _adminPort = adminPort;
             _conits = Conits;
             SendMessageToOverlord();
-
         }
 
         private void SendMessageToOverlord()

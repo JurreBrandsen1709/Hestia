@@ -10,8 +10,15 @@ namespace Dyconit
         static void Main(string[] args)
         {
             // Create an instance of DyconitOverlord
-            var overlord = new DyconitOverlord();
+            var dyconitOverlord = new DyconitOverlord2();
+            Console.WriteLine("- Dyconit overlord started.");
+            dyconitOverlord.ParsePolicies();
+            dyconitOverlord.StartListening();
+            dyconitOverlord.SendHeartbeatAsync();
+            dyconitOverlord.KeepTrackOfNodesAsync();
 
+
+            Console.WriteLine("Press Ctrl+C to stop...");
             // Listen for console input
             while (true)
             {
@@ -22,6 +29,11 @@ namespace Dyconit
                 }
                 else if (input.ToLower() == "exit")
                 {
+                    break;
+                }
+                else if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.C && (ConsoleModifiers.Control & ConsoleModifiers.Control) != 0)
+                {
+                    dyconitOverlord.StopListening();
                     break;
                 }
                 else

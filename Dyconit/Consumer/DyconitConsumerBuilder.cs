@@ -14,7 +14,7 @@ namespace Dyconit.Consumer
     {
         private Action<string, double>? _statisticsHandler;
         private readonly int _type;
-        private readonly Dictionary<string, object> _conits;
+        private readonly JToken _conits;
 
         private double _previousAppOffset = 0.0;
 
@@ -22,7 +22,7 @@ namespace Dyconit.Consumer
 
         private readonly int _adminPort;
 
-        public DyconitConsumerBuilder(ClientConfig config, Dictionary<string, object> Conits, int type, int adminPort) : base(config)
+        public DyconitConsumerBuilder(ClientConfig config, JToken Conits, int type, int adminPort) : base(config)
         {
             _type = type;
             _adminPort = adminPort;
@@ -42,16 +42,13 @@ namespace Dyconit.Consumer
                 }
 
                 // Create message dictionary with updated values
-                var message = new Dictionary<string, object>
+                var message = new JObject
                 {
-                    {"eventType", "newAdminEvent"},
-                    { "type", messageType },
-                    { "adminClientPort", _adminPort },
-                    { "conits", _conits }
+                    new JProperty("eventType", "newAdminEvent"),
+                    new JProperty( "type", messageType),
+                    new JProperty("adminClientPort", _adminPort),
+                    new JProperty("conits", _conits)
                 };
-
-                // Serialize message to JSON
-                var json = JObject.FromObject(message).ToString();
 
                 // Create a TCP client and connect to the server
                 using (var client = new TcpClient())
@@ -64,11 +61,10 @@ namespace Dyconit.Consumer
                     using (var reader = new StreamReader(stream))
                     {
                         // Write a message to the server
-                        writer.WriteLine(json);
+                        writer.WriteLine(message.ToString());
                         writer.Flush();
                     }
                 }
-                Console.WriteLine($"{_adminPort} - Message newAdminEvent sent to Overlord");
             }
             catch (Exception ex)
             {

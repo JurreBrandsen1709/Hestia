@@ -1,6 +1,6 @@
 {
   "policy": "throughput-threshold-policy",
-  "collections": ["topic_priority"],
+  "collectionNames": ["topic_priority"],
   "description": "If the threshold of the throughput is reached, we multiply the bounds by 2, otherwise we decrease the bound by half.",
   "thresholds": {
     "throughput": 5,

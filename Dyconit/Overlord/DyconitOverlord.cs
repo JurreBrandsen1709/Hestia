@@ -200,7 +200,7 @@ namespace Dyconit.Overlord
 
 
                 var adminClientPort = json["adminClientPort"]?.ToObject<int>();
-                var dyconitCollection = json["conits"]?["collection"]?.ToString();
+                var dyconitCollectionName = json["conits"]?["collection"]?.ToString();
 
                 var eventType = json["eventType"]?.ToString();
                 if (eventType == null)
@@ -223,23 +223,23 @@ namespace Dyconit.Overlord
 
                         // Check if we already have a dyconit collection in the dyconitCollections dictionary
                         // If not, create a new one
-                        if (!_dyconitCollections.ContainsKey(dyconitCollection))
+                        if (!_dyconitCollections.ContainsKey(dyconitCollectionName))
                         {
-                            _dyconitCollections.Add(dyconitCollection, new Dictionary<string, object>
+                            _dyconitCollections.Add(dyconitCollectionName, new Dictionary<string, object>
                             {
                                 // add a ports list containing the port and the last time we got a heartbeat from it
                                 { "ports", new List<Tuple<int, DateTime>>() },
                                 { "bounds", new Dictionary<string, int>() }
                             });
-                            Console.WriteLine($"--- Added dyconit collection '{dyconitCollection}' to the dyconit collections.");
+                            Console.WriteLine($"--- Added dyconit collection '{dyconitCollectionName}' to the dyconit collections.");
                         }
 
                         else
                         {
-                            Console.WriteLine($"--- Dyconit collection '{dyconitCollection}' already exists.");
+                            Console.WriteLine($"--- Dyconit collection '{dyconitCollectionName}' already exists.");
 
                             // check if we already have ports and bounds for this dyconit collection
-                            var dyconitCollectionDat = (Dictionary<string, object>)_dyconitCollections[dyconitCollection];
+                            var dyconitCollectionDat = (Dictionary<string, object>)_dyconitCollections[dyconitCollectionName];
 
                             if (!dyconitCollectionDat.ContainsKey("ports"))
                             {
@@ -251,12 +251,12 @@ namespace Dyconit.Overlord
                             }
                         }
 
-                        var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollection];
+                        var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollectionName];
 
                         // Add the admin client port to the dyconit collection
                         ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, DateTime.Now));
 
-                        Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollection}'.");
+                        Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollectionName}'.");
 
                         // Add the bounds to the dyconit collection
                         var conits = json["conits"];
@@ -272,11 +272,11 @@ namespace Dyconit.Overlord
                             ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("OrderError", orderError.Value);
                             ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("NumericalError", numericalError.Value);
 
-                            Console.WriteLine($"--- Added bounds to dyconit collection '{dyconitCollection}'.");
+                            Console.WriteLine($"--- Added bounds to dyconit collection '{dyconitCollectionName}'.");
                         }
                         else
                         {
-                            Console.WriteLine($"--- Bounds for dyconit collection '{dyconitCollection}' already exist.");
+                            Console.WriteLine($"--- Bounds for dyconit collection '{dyconitCollectionName}' already exist.");
                         }
 
                         var ports = ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).ToList();
@@ -292,7 +292,7 @@ namespace Dyconit.Overlord
                                     {
                                         { "eventType", "newNodeEvent" },
                                         { "port", adminClientPort },
-                                        { "collection", dyconitCollection }
+                                        { "collection", dyconitCollectionName }
                                     };
 
                                     SendMessageOverTcp(messageToExistingPort.ToString(), port.Item1);
@@ -303,7 +303,7 @@ namespace Dyconit.Overlord
                                     {
                                         { "eventType", "newNodeEvent" },
                                         { "port", port.Item1 },
-                                        { "collection", dyconitCollection }
+                                        { "collection", dyconitCollectionName }
                                     };
 
                                     SendMessageOverTcp(xx.ToString(), adminClientPort.Value);
@@ -467,7 +467,6 @@ namespace Dyconit.Overlord
                         }
                         break;
 
-
                     default:
                         Console.WriteLine($"Unknown message received with eventType '{eventType}': {message}");
                         break;
@@ -483,32 +482,22 @@ namespace Dyconit.Overlord
 
             switch (operatorSymbol)
             {
-                case ">=":
-                    return throughput >= threshold;
+                case ">":
+                    return throughput > threshold;
                 case "<":
                     return throughput < threshold;
-                // Add more cases for other operators as needed
+                case ">=":
+                    return throughput >= threshold;
+                case "<=":
+                    return throughput <= threshold;
+                case "==":
+                    return throughput == threshold;
+                case "!=":
+                    return throughput != threshold;
                 default:
-                    throw new NotSupportedException($"Operator '{operatorSymbol}' is not supported.");
+                    return false;
             }
         }
-
-        // private List<string> GetCollectionsForAdminPort(int? adminPort)
-        // {
-        //     // go through all dyconit collections and check if the admin port is in the collection. Return the collections where the admin port is in
-        //     List<string> collections = new List<string>();
-        //     foreach (var collection in _dyconitCollections.ToList())
-        //     {
-        //         foreach (var port in ((List<Tuple<int, DateTime>>)collection.Value["ports"]).ToList())
-        //         {
-        //             if (port.Item1 == adminPort)
-        //             {
-        //                 collections.Add(collection.Key);
-        //             }
-        //         }
-        //     }
-        //     return collections;
-        // }
 
         private async Task SendMessageOverTcp(string message, int port)
         {
