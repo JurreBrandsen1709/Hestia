@@ -12,14 +12,8 @@ namespace Dyconit.Consumer
 {
     public class DyconitConsumerBuilder<TKey, TValue> : ConsumerBuilder<TKey, TValue>
     {
-        private Action<string, double>? _statisticsHandler;
         private readonly int _type;
         private readonly JToken _conits;
-
-        private double _previousAppOffset = 0.0;
-
-        private bool _isFirstCall = true;
-
         private readonly int _adminPort;
 
         public DyconitConsumerBuilder(ClientConfig config, JToken Conits, int type, int adminPort) : base(config)

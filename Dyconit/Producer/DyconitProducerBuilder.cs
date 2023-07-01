@@ -11,9 +11,7 @@ namespace Dyconit.Producer
 {
     public class DyconitProducerBuilder<TKey, TValue> : ProducerBuilder<TKey, TValue>
     {
-        private Action<string, double>? _statisticsHandler;
         private readonly int _type;
-        private readonly DyconitAdmin _adminClient;
         private readonly Dictionary<string, object> _conits;
         private readonly int _adminPort;
 

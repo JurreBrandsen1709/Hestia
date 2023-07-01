@@ -15,21 +15,12 @@ namespace Dyconit.Overlord
 
         public DyconitOverlord()
         {
+            DyconitHelper.ConfigureLogging();
             _dyconitCollections = new RootObject
             {
                 Collections = new List<Collection>()
             };
 
-            ConfigureLogging();
-        }
-
-        private void ConfigureLogging()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .WriteTo.File("log.txt")
-                .CreateLogger();
         }
 
         public void ParsePolicies()
@@ -152,7 +143,7 @@ namespace Dyconit.Overlord
         {
             var json = JObject.Parse(message);
             var eventType = json.Value<string>("eventType");
-            var adminClientPort = json.Value<int?>("adminPort");
+            var adminClientPort = json.Value<int?>("port");
 
             Log.Debug($"- Message received: {message}");
             Log.Debug($"- Event type: {eventType}");
@@ -293,7 +284,7 @@ namespace Dyconit.Overlord
                 {
                     ["eventType"] = "updateConitEvent",
                     ["collectionName"] = collection.Name,
-                    ["adminClientPort"] = adminClientPort,
+                    ["port"] = adminClientPort,
                     ["bounds"] = new JObject
                     {
                         ["Staleness"] = node.Bounds.Staleness ?? 1,

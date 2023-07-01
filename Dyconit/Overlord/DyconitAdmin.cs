@@ -15,13 +15,13 @@ namespace Dyconit.Overlord
         private readonly int _listenPort;
         private readonly AdminClientConfig _adminClientConfig;
         private RootObject _dyconitCollections;
-        private List<ConsumeResult<Null, string>> ?_localData;
+        private List<ConsumeResult<Null, string>> ?_localData = new List<ConsumeResult<Null, string>>();
         private List<ConsumeResult<Null, string>> ?_receivedData;
         private bool _synced;
 
         public DyconitAdmin(string bootstrapServers, int adminPort, JObject conitCollection)
         {
-            ConfigureLogging();
+            DyconitHelper.ConfigureLogging();
 
             _listenPort = adminPort;
             _adminClientConfig = new AdminClientConfig
@@ -34,17 +34,7 @@ namespace Dyconit.Overlord
             Log.Information("Created DyconitAdmin with bootstrap servers {BootstrapServers} and admin port {AdminPort}", bootstrapServers, adminPort);
             Log.Debug("DyconitCollections: {DyconitCollections}", JsonConvert.SerializeObject(_dyconitCollections, Formatting.Indented));
 
-
             ListenForMessagesAsync();
-        }
-
-        private void ConfigureLogging()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .WriteTo.File("log.txt")
-                .CreateLogger();
         }
 
         private async void ListenForMessagesAsync()
@@ -133,7 +123,15 @@ namespace Dyconit.Overlord
 
             Log.Debug("Received data: {ReceivedData}", JsonConvert.SerializeObject(_receivedData, Formatting.Indented));
 
-            UpdateLocalData(_localData, collectionName);
+            if (_localData != null)
+            {
+                UpdateLocalData(_localData, collectionName);
+            }
+            else
+            {
+                Log.Error("Local data is null");
+            }
+
 
             // update the last time since pull for the sender port and collection combination
             var collection = _dyconitCollections.Collections
@@ -274,7 +272,7 @@ namespace Dyconit.Overlord
             var heartbeatResponse = new JObject
             {
                 ["eventType"] = "heartbeatResponse",
-                ["adminPort"] = _listenPort
+                ["port"] = _listenPort
             };
 
             var heartbeatResponseString = heartbeatResponse.ToString();
@@ -293,7 +291,7 @@ namespace Dyconit.Overlord
                 ?.FirstOrDefault(c => c.Name == collectionName);
 
             // get the node based on the port
-            var nodePort = messageObject["port"]?.ToObject<int>();
+            var nodePort = messageObject["adminClientPort"]?.ToObject<int>();
             var node = collection?.Nodes
                 ?.FirstOrDefault(n => n.Port == nodePort);
 
@@ -312,7 +310,7 @@ namespace Dyconit.Overlord
         {
             Log.Information("Handling removeNodeEvent: {MessageObject}", messageObject);
 
-            var removeNodePort = messageObject["port"]?.ToObject<int>();
+            var removeNodePort = messageObject["adminClientPort"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
 
             // remove the node from the collection
@@ -362,7 +360,7 @@ namespace Dyconit.Overlord
             var message = new JObject
             {
                 ["eventType"] = "overheadMessage",
-                ["adminPort"] = _listenPort,
+                ["port"] = _listenPort,
                 ["data"] = new JObject()
             };
 
@@ -460,6 +458,7 @@ namespace Dyconit.Overlord
                 Log.Error(ex, "Failed to send message over TCP");
             }
         }
+
         public async Task<SyncResult> BoundStaleness(DateTime consumedTime, List<ConsumeResult<Null, string>> localData, string collectionName)
         {
             Log.Information("Bounding staleness for collection {CollectionName} and port {Port}", collectionName, _listenPort);

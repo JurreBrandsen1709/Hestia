@@ -8,6 +8,7 @@ using Dyconit.Consumer;
 using Dyconit.Overlord;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace Dyconit.Helper
 {
@@ -181,6 +182,15 @@ namespace Dyconit.Helper
                 }
             }
             return adminClientPort;
+        }
+
+        static public void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("log.txt")
+                .CreateLogger();
         }
 
         public static JObject GetConitConfiguration(string collectionName, int staleness, int numericalError)

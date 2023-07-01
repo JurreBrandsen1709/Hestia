@@ -5,7 +5,7 @@ namespace Dyconit.Message;
 
 public class DyconitMessage<TKey, TValue>
 {
-    public TValue Value;
+    public TValue ?Value;
     public double Weight;
 
     public static implicit operator Message<TKey, TValue>(DyconitMessage<TKey, TValue> message)
@@ -15,7 +15,7 @@ public class DyconitMessage<TKey, TValue>
 
         return new Message<TKey, TValue>
         {
-            Value = message.Value,
+            Value = message.Value!,
             Headers = headers
         };
     }
