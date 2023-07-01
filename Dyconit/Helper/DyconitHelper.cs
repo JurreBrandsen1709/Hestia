@@ -6,10 +6,163 @@ using System.Net.Sockets;
 using Confluent.Kafka;
 using Dyconit.Consumer;
 using Dyconit.Overlord;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Dyconit.Helper
 {
+    public class Bounds
+    {
+        public int ?Staleness { get; set; }
+        public int ?NumericalError { get; set; }
+
+        internal void UpdateBounds(int? staleness, int? numericalError)
+        {
+            if (staleness != null)
+            {
+                Staleness = staleness;
+            }
+            if (numericalError != null)
+            {
+                NumericalError = numericalError;
+            }
+        }
+    }
+
+    public class Node
+    {
+        public int ?Port { get; set; }
+        public int ?SyncCount { get; set; }
+        public DateTime ?LastHeartbeatTime { get; set; }
+        public DateTime ?LastTimeSincePull { get; set; }
+        public Bounds ?Bounds { get; set; }
+    }
+
+    public class Thresholds
+    {
+        public int ?Throughput { get; set; }
+        [JsonProperty("overhead_throughput")]
+        public int ?OverheadThroughput { get; set; }
+    }
+
+    public class PolicyAction
+    {
+        public string ?Type { get; set; }
+        public double ?Value { get; set; }
+    }
+
+    public class Rule
+    {
+        public string ?Condition { get; set; }
+        public List<PolicyAction> ?PolicyActions { get; set; }
+    }
+
+    public class Collection
+    {
+        public string ?Name { get; set; }
+        public List<Node> ?Nodes { get; set; }
+        public Thresholds ?Thresholds { get; set; }
+        public List<Rule> ?Rules { get; set; }
+    }
+
+    public class RootObject
+    {
+        public List<Collection> ?Collections { get; set; }
+    }
+
+        public class SyncResult
+    {
+        public bool changed { get; set; }
+        public List<ConsumeResult<Null, string>> ?Data { get; set; }
+
+    }
+
+    // Custom comparer to compare ConsumeResult based on timestamps
+    class ConsumeResultComparer : IEqualityComparer<ConsumeResult<Null, string>?>
+    {
+        public bool Equals(ConsumeResult<Null, string>? x, ConsumeResult<Null, string>? y)
+        {
+            if (x == null && y == null)
+                return true;
+            if (x == null || y == null)
+                return false;
+
+            return x.Offset == y.Offset && x.Topic == y.Topic;
+        }
+
+        public int GetHashCode(ConsumeResult<Null, string>? obj)
+        {
+            return obj?.Offset.GetHashCode() ?? 0;
+        }
+    }
+
+    public class ConsumeResultWrapper<TKey, TValue>
+    {
+        public ConsumeResultWrapper()
+        {
+            Topic = null!;
+            Message = null!;
+        }
+
+        public ConsumeResultWrapper(ConsumeResult<TKey, TValue> result)
+        {
+            Topic = result.Topic!;
+            Partition = result.Partition!.Value;
+            Offset = result.Offset!.Value;
+            Message = new MessageWrapper<TKey, TValue>(result.Message!);
+            IsPartitionEOF = result.IsPartitionEOF;
+        }
+
+        public string? Topic { get; set; }
+        public int Partition { get; set; }
+        public long Offset { get; set; }
+        public MessageWrapper<TKey, TValue>? Message { get; set; }
+        public bool IsPartitionEOF { get; set; }
+    }
+
+
+    public class MessageWrapper<TKey, TValue>
+    {
+        public MessageWrapper()
+        {
+            Key = default!;
+            Value = default!;
+            Headers = new List<HeaderWrapper>();
+        }
+
+        public MessageWrapper(Message<TKey, TValue> message)
+        {
+            Key = message.Key!;
+            Value = message.Value!;
+            Timestamp = message.Timestamp;
+            Headers = message.Headers?.Select(header => new HeaderWrapper(header.Key, header.GetValueBytes())).ToList() ?? new List<HeaderWrapper>();
+        }
+
+        public TKey? Key { get; set; }
+        public TValue? Value { get; set; }
+        public Timestamp Timestamp { get; set; }
+        public List<HeaderWrapper> Headers { get; set; }
+    }
+
+
+    public class HeaderWrapper
+    {
+        public HeaderWrapper()
+        {
+            Key = null!;
+            Value = null!;
+        }
+
+        public HeaderWrapper(string key, byte[] value)
+        {
+            Key = key;
+            Value = value;
+        }
+
+        public string Key { get; set; }
+        public byte[] Value { get; set; }
+    }
+
     public class DyconitHelper
     {
         public static int FindPort()
@@ -30,8 +183,6 @@ namespace Dyconit.Helper
             return adminClientPort;
         }
 
-
-
         public static JObject GetConitConfiguration(string collectionName, int staleness, int numericalError)
         {
             var jsonObject = new JObject(
@@ -42,7 +193,6 @@ namespace Dyconit.Helper
 
             return jsonObject;
         }
-
 
         public static void PrintConitConfiguration(Dictionary<string, object> conitConfiguration)
         {

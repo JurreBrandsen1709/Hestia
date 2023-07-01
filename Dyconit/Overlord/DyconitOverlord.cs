@@ -1,480 +1,316 @@
-using Confluent.Kafka;
-using Confluent.Kafka.Admin;
+using Dyconit.Helper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
+using Serilog;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
 namespace Dyconit.Overlord
 {
     public class DyconitOverlord
     {
         private readonly int _listenPort = 6666;
-
-        private Dictionary<string, Dictionary<string, object>> _dyconitCollections;
+        private RootObject _dyconitCollections;
+        private CancellationTokenSource? _cancellationTokenSource;
 
         public DyconitOverlord()
         {
-            _dyconitCollections = new Dictionary<string, Dictionary<string, object>>();
-            Console.WriteLine("- Dyconit overlord started.");
-            parsePolicies();
-            ListenForMessagesAsync();
-            SendHeartbeatAsync();
-            KeepTrackOfNodesAsync();
+            _dyconitCollections = new RootObject
+            {
+                Collections = new List<Collection>()
+            };
+
+            ConfigureLogging();
         }
 
-        private void parsePolicies()
+        private void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("log.txt")
+                .CreateLogger();
+        }
+
+        public void ParsePolicies()
         {
             string policiesFolderPath = "..\\Policies";
 
             if (Directory.Exists(policiesFolderPath))
             {
-                Console.WriteLine("Policies folder found.");
+                Log.Debug("Policies folder found.");
 
                 string[] policyFiles = Directory.GetFiles(policiesFolderPath, "*policy*.json");
 
-                Console.WriteLine($"Found {policyFiles.Length} policy files.");
+                Log.Debug($"Found {policyFiles.Length} policy files.");
 
                 foreach (string policyFile in policyFiles)
                 {
                     string jsonContent = File.ReadAllText(policyFile);
                     JObject policyJson = JObject.Parse(jsonContent);
-
-
-                    JArray collections = policyJson["collections"] as JArray;
-                    JToken thresholds = policyJson["thresholds"];
-                    JArray rules = policyJson["rules"] as JArray;
+                    JArray ?collectionNames = policyJson["collectionNames"] as JArray;
+                    JToken ?thresholds = policyJson["thresholds"];
+                    JArray ?rules = policyJson["rules"] as JArray;
 
                     // add some checks to see if collections, thresholds and rules are not null
-                    if (collections == null || thresholds == null || rules == null)
+                    if (collectionNames == null || thresholds == null || rules == null)
                     {
-                        Console.WriteLine("Policy file is not valid.");
+                        Log.Debug("Policy file is not valid.");
                         continue;
                     }
 
-                    foreach (string collection in collections)
+                    foreach (string ?collectionName in collectionNames)
                     {
-                        if (_dyconitCollections.ContainsKey(collection))
+                        Collection ?collection = new Collection
                         {
-                            Dictionary<string, object> dyconitCollectionData = _dyconitCollections[collection];
-                            dyconitCollectionData["thresholds"] = thresholds;
-                            dyconitCollectionData["rules"] = rules;
-                        }
-                        else
-                        {
-                            _dyconitCollections.Add(collection, new Dictionary<string, object>
+                            Name = collectionName,
+                            Thresholds = thresholds != null ? new Thresholds
                             {
-                                { "thresholds", thresholds },
-                                { "rules", rules }
-                            });
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("Policies folder does not exist.");
-            }
-        }
-        private async void SendHeartbeatAsync()
-        {
-            // Send a heartbeat response to the requesting node
-            var heartbeatEvent = new JObject
-            {
-                { "eventType", "heartbeatEvent" },
-                { "port", _listenPort}
-            };
+                                Throughput = thresholds.Value<int>("throughput"),
+                                OverheadThroughput = thresholds.Value<int>("overhead_throughput")
+                            } : null,
+                            Rules = new List<Rule>()
+                        };
 
-
-            while (true)
-            {
-                await Task.Delay(1000).ConfigureAwait(false);
-
-                // Send heartbeat to all admin clients
-                foreach (var dyconitCollection in _dyconitCollections.ToList())
-                {
-                    var dyconitCollectionData = dyconitCollection.Value;
-                    if (dyconitCollectionData.ContainsKey("ports")) {
-                        var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
-
-                        foreach (var adminClientPort in adminClientPorts.ToList())
+                        foreach (JObject rule in rules ?? new JArray())
                         {
-                            // send heartbeat to this node
-                            SendMessageOverTcp(heartbeatEvent.ToString(), adminClientPort.Item1);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Every 5 seconds, check if we have received a heartbeat from all nodes
-        private async void KeepTrackOfNodesAsync()
-        {
-            while (true)
-            {
-                await Task.Delay(5000).ConfigureAwait(false);
-
-                // Check if we have received a heartbeat from all nodes
-                foreach (var dyconitCollection in _dyconitCollections.ToList())
-                {
-                    var dyconitCollectionData = dyconitCollection.Value;
-                    var dyconitCollectionName = dyconitCollection.Key;
-                    if (dyconitCollectionData.ContainsKey("ports")) {
-                        var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData["ports"];
-
-                        foreach (var adminClientPort in adminClientPorts.ToList())
-                        {
-                            // check if we have received a heartbeat from this node
-                            // if not, remove it from the list
-                            if (adminClientPort.Item2.AddSeconds(10) < DateTime.Now)
+                            Rule? newRule = new Rule
                             {
-                                adminClientPorts.Remove(adminClientPort);
+                                Condition = rule.Value<string>("condition"),
+                                PolicyActions = new List<PolicyAction>()
+                            };
 
-                                // notify all other nodes that this node has been removed
-                                await RemoveNodeAtAdmins(adminClientPort.Item1, dyconitCollectionName);
+                            foreach (JObject action in rule.Value<JArray>("actions") ?? new JArray())
+                            {
+                                PolicyAction? newAction = new PolicyAction
+                                {
+                                    Type = action.Value<string>("type"),
+                                    Value = action.Value<double>("value")
+                                };
 
-                                Console.WriteLine($"- Removed node {adminClientPort.Item1} from collection {dyconitCollection.Key}");
+                                newRule.PolicyActions?.Add(newAction);
                             }
+
+                            collection.Rules?.Add(newRule);
                         }
+
+                        _dyconitCollections.Collections?.Add(collection);
+
+                        Log.Debug($"Added policy for collection {collectionName}.");
                     }
                 }
             }
         }
 
-
-        private async Task RemoveNodeAtAdmins(int adminClientPort, string dyconitCollectionName)
+        public void StartListening()
         {
-            // Send a heartbeat response to the requesting node
-            var removeNodeEvent = new JObject
-            {
-                { "eventType", "removeNodeEvent" },
-                { "adminClientPort", adminClientPort },
-                { "collection", dyconitCollectionName }
-            };
-
-            // Send heartbeat to all admin clients
-            foreach (var dyconitCollectionData in _dyconitCollections.ToList())
-            {
-                var adminClientPorts = (List<Tuple<int, DateTime>>)dyconitCollectionData.Value["ports"];
-
-                foreach (var otherAdminClientPort in adminClientPorts.ToList())
-                {
-                    Console.WriteLine($"--- Sending removeNodeEvent to {otherAdminClientPort.Item1}");
-                    // send heartbeat to this node
-                    await SendMessageOverTcp(removeNodeEvent.ToString(), otherAdminClientPort.Item1);
-                }
-            }
+            _cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = _cancellationTokenSource.Token;
+            Log.Debug("- Dyconit overlord started listening.");
+            Task.Run(() => ListenForMessagesAsync());
         }
 
-        private async void ListenForMessagesAsync()
+        public void StopListening()
+        {
+            Log.Debug("- Dyconit overlord stopped.");
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null!;
+        }
+
+        private async Task ListenForMessagesAsync()
         {
             var listener = new TcpListener(IPAddress.Any, _listenPort);
             listener.Start();
 
-            // var client = await listener.AcceptTcpClientAsync();
-            // var reader = new StreamReader(client.GetStream());
-
             while (true)
             {
                 var client = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
-                var reader = new StreamReader(client.GetStream());
-                var message = await reader.ReadToEndAsync().ConfigureAwait(false);
-
-                // Parse message and act accordingly
-                ParseMessageAsync(message);
-
-                reader.Close();
-                client.Close();
+                _ = ProcessMessageAsync(client);
             }
         }
 
-        private async void ParseMessageAsync(string message)
+        private async Task ProcessMessageAsync(TcpClient client)
         {
-            await Task.Run(() =>
+            try
             {
-                // Console.WriteLine($"Received message: {message}");
-                // Check if message is a newAdminEvent
-                var json = JObject.Parse(message);
-
-
-                var adminClientPort = json["adminClientPort"]?.ToObject<int>();
-                var dyconitCollectionName = json["conits"]?["collection"]?.ToString();
-
-                var eventType = json["eventType"]?.ToString();
-                if (eventType == null)
+                using (client)
+                using (var reader = new StreamReader(client.GetStream()))
                 {
-                    Console.WriteLine($"Invalid message received: missing eventType. Message: {message}");
-                    return;
+                    var message = await reader.ReadToEndAsync().ConfigureAwait(false);
+                    await ParseMessageAsync(message).ConfigureAwait(false);
                 }
-
-                switch (eventType)
-                {
-                    case "newAdminEvent":
-
-                        if (adminClientPort == null)
-                        {
-                            Console.WriteLine($"-- Invalid newAdminEvent message received: missing adminClientPort. Message: {message}");
-                            break;
-                        }
-
-                        Console.WriteLine($"-- Received newAdminEvent message. Admin client listening on port {adminClientPort}.");
-
-                        // Check if we already have a dyconit collection in the dyconitCollections dictionary
-                        // If not, create a new one
-                        if (!_dyconitCollections.ContainsKey(dyconitCollectionName))
-                        {
-                            _dyconitCollections.Add(dyconitCollectionName, new Dictionary<string, object>
-                            {
-                                // add a ports list containing the port and the last time we got a heartbeat from it
-                                { "ports", new List<Tuple<int, DateTime>>() },
-                                { "bounds", new Dictionary<string, int>() }
-                            });
-                            Console.WriteLine($"--- Added dyconit collection '{dyconitCollectionName}' to the dyconit collections.");
-                        }
-
-                        else
-                        {
-                            Console.WriteLine($"--- Dyconit collection '{dyconitCollectionName}' already exists.");
-
-                            // check if we already have ports and bounds for this dyconit collection
-                            var dyconitCollectionDat = (Dictionary<string, object>)_dyconitCollections[dyconitCollectionName];
-
-                            if (!dyconitCollectionDat.ContainsKey("ports"))
-                            {
-                                dyconitCollectionDat.Add("ports", new List<Tuple<int, DateTime>>());
-                            }
-                            if (!dyconitCollectionDat.ContainsKey("bounds"))
-                            {
-                                dyconitCollectionDat.Add("bounds", new Dictionary<string, int>());
-                            }
-                        }
-
-                        var dyconitCollectionData = (Dictionary<string, object>)_dyconitCollections[dyconitCollectionName];
-
-                        // Add the admin client port to the dyconit collection
-                        ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, DateTime.Now));
-
-                        Console.WriteLine($"--- Added new admin client listening on port '{adminClientPort}' to dyconit collection '{dyconitCollectionName}'.");
-
-                        // Add the bounds to the dyconit collection
-                        var conits = json["conits"];
-
-                        // Check if bounds is still empty
-                        if (((Dictionary<string, int>)dyconitCollectionData["bounds"]).Count == 0)
-                        {
-                            var staleness = conits["Staleness"]?.ToObject<int>();
-                            var orderError = conits["OrderError"]?.ToObject<int>();
-                            var numericalError = conits["NumericalError"]?.ToObject<int>();
-
-                            ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("Staleness", staleness.Value);
-                            ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("OrderError", orderError.Value);
-                            ((Dictionary<string, int>)dyconitCollectionData["bounds"]).Add("NumericalError", numericalError.Value);
-
-                            Console.WriteLine($"--- Added bounds to dyconit collection '{dyconitCollectionName}'.");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"--- Bounds for dyconit collection '{dyconitCollectionName}' already exist.");
-                        }
-
-                        var ports = ((List<Tuple<int, DateTime>>)dyconitCollectionData["ports"]).ToList();
-                        if (ports.Count > 1)
-                        {
-
-                            // Send the NewAdminEvent to existing ports
-                            foreach (var port in ports)
-                            {
-                                if (port.Item1 != adminClientPort)
-                                {
-                                    var messageToExistingPort = new JObject
-                                    {
-                                        { "eventType", "newNodeEvent" },
-                                        { "port", adminClientPort },
-                                        { "collection", dyconitCollectionName }
-                                    };
-
-                                    SendMessageOverTcp(messageToExistingPort.ToString(), port.Item1);
-
-                                    // Send the existing ports to the new admin client
-
-                                    var xx = new JObject
-                                    {
-                                        { "eventType", "newNodeEvent" },
-                                        { "port", port.Item1 },
-                                        { "collection", dyconitCollectionName }
-                                    };
-
-                                    SendMessageOverTcp(xx.ToString(), adminClientPort.Value);
-                                }
-                            }
-                        }
-
-
-
-
-                        break;
-                    case "heartbeatResponse":
-                        // update the heartbeat time of the admin client
-                        var heartbeatTime = DateTime.Now;
-                        foreach (var collection in _dyconitCollections.ToList())
-                        {
-                            foreach (var port in ((List<Tuple<int, DateTime>>)collection.Value["ports"]).ToList())
-                            {
-                                if (port.Item1 == adminClientPort)
-                                {
-                                    // remove the tuple and add a new one with the new heartbeat time
-                                    ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Remove(port);
-                                    ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Add(new Tuple<int, DateTime>(adminClientPort.Value, heartbeatTime));
-                                }
-                            }
-                        }
-
-                        break;
-
-                    case "throughput":
-                        var throughput = json["throughput"]?.ToObject<double>();
-                        var adminPort = json["adminPort"]?.ToObject<int>();
-                        var topic = json["topic"]?.ToString();
-
-                        if (throughput <= 0)
-                        {
-                            Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, topic {topic}, Throughput: {throughput}. Ignoring message.");
-                            break;
-                        }
-
-                        Console.WriteLine($"-- Received throughput message from admin client listening on port {adminPort}, topic {topic}, Throughput: {throughput}.");
-                            if (_dyconitCollections[topic].ContainsKey("thresholds") && _dyconitCollections[topic].ContainsKey("rules"))
-                            {
-                                var throughputThreshold = (int)((JToken)_dyconitCollections[topic]["thresholds"])["throughput"];
-                                var rules = (JArray)_dyconitCollections[topic]["rules"];
-
-                                foreach (var rule in rules)
-                                {
-                                    var condition = rule["condition"].ToString();
-                                    var actions = rule["actions"];
-
-                                    var isConditionMet = EvaluateCondition(condition, throughput.Value, throughputThreshold);
-                                    if (isConditionMet)
-                                    {
-                                        foreach (var action in actions)
-                                        {
-                                            var type = action["type"].ToString();
-                                            var value = (double)action["value"];
-
-                                            var bounds = (Dictionary<string, int>)_dyconitCollections[topic]["bounds"];
-                                            var newBounds = new Dictionary<string, int>();
-
-                                            foreach (var bound in bounds)
-                                            {
-                                                int newValue = type == "multiply" ? (int)(bound.Value * value) : (int)(bound.Value - value);
-                                                newValue = Math.Max(1, newValue); // Ensure value is not less than 1
-                                                newBounds[bound.Key] = newValue;
-                                            }
-
-                                            _dyconitCollections[topic]["bounds"] = newBounds;
-
-                                            var newMessage = new JObject
-                                            {
-                                                { "eventType", "updateConitEvent" },
-                                                { "staleness", newBounds["Staleness"] },
-                                                { "orderError", newBounds["OrderError"] },
-                                                { "numericalError", newBounds["NumericalError"] },
-                                                { "collection", topic }
-                                            };
-
-                                            foreach (var port in ((List<Tuple<int, DateTime>>)_dyconitCollections[topic]["ports"]).ToList())
-                                            {
-                                                SendMessageOverTcp(newMessage.ToString(), port.Item1);
-                                            }
-
-                                            Console.WriteLine($"--- Changed bounds of dyconit collection '{topic}' to: {string.Join(", ", newBounds)}.");
-                                        }
-                                    }
-                                }
-                        }
-
-                        break;
-
-                    case "overheadMessage":
-
-                        var syncThroughput = JsonConvert.DeserializeObject<Dictionary<string, int>>(json["data"].ToString());
-                        adminPort = json["adminPort"]?.ToObject<int>();
-
-
-
-                        foreach (var collection in syncThroughput)
-                        {
-
-                            Console.WriteLine($"-- Received overhead message from admin client listening on port {adminPort}, collection {collection.Key}, Throughput: {collection.Value}.");
-
-                            if (_dyconitCollections.ContainsKey(collection.Key))
-                            {
-                                if (_dyconitCollections[collection.Key].ContainsKey("thresholds") && _dyconitCollections[collection.Key].ContainsKey("rules"))
-                                {
-                                    var throughputThreshold = (int)((JToken)_dyconitCollections[collection.Key]["thresholds"])["overhead_throughput"];
-
-                                    Console.WriteLine($"--- Collection: {collection.Key}, Throughput: {collection.Value}, Overhead Threshold: {throughputThreshold}.");
-
-                                    var rules = (JArray)_dyconitCollections[collection.Key]["rules"];
-
-                                    foreach (var rule in rules)
-                                    {
-                                        var condition = rule["condition"].ToString();
-                                        var actions = rule["actions"];
-
-                                        var isConditionMet = EvaluateCondition(condition, collection.Value, throughputThreshold);
-                                        if (isConditionMet)
-                                        {
-                                            foreach (var action in actions)
-                                            {
-                                                var type = action["type"].ToString();
-                                                var value = (double)action["value"];
-
-                                                var bounds = (Dictionary<string, int>)_dyconitCollections[collection.Key]["bounds"];
-                                                var newBounds = new Dictionary<string, int>();
-
-                                                foreach (var bound in bounds)
-                                                {
-                                                    int newValue = type == "multiply" ? (int)(bound.Value * value) : (int)(bound.Value - value);
-                                                    newValue = Math.Max(1, newValue); // Ensure value is not less than 1
-                                                    newBounds[bound.Key] = newValue;
-                                                }
-
-                                                _dyconitCollections[collection.Key]["bounds"] = newBounds;
-
-                                                var newMessage = new JObject
-                                                {
-                                                    { "eventType", "updateConitEvent" },
-                                                    { "staleness", newBounds["Staleness"] },
-                                                    { "orderError", newBounds["OrderError"] },
-                                                    { "numericalError", newBounds["NumericalError"] },
-                                                    { "collection", collection.Key }
-                                                };
-
-                                                foreach (var port in ((List<Tuple<int, DateTime>>)_dyconitCollections[collection.Key]["ports"]).ToList())
-                                                {
-                                                    SendMessageOverTcp(newMessage.ToString(), port.Item1);
-                                                }
-
-                                                Console.WriteLine($"--- Changed bounds of dyconit collection '{collection.Key}' to: {string.Join(", ", newBounds)}.");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        break;
-
-                    default:
-                        Console.WriteLine($"Unknown message received with eventType '{eventType}': {message}");
-                        break;
-                }
-            });
+            }
+            catch (Exception ex)
+            {
+                Log.Debug($"Error processing message: {ex.Message}");
+            }
         }
 
-        bool EvaluateCondition(string condition, double throughput, int threshold)
+
+        private Task ParseMessageAsync(string message)
+        {
+            var json = JObject.Parse(message);
+            var eventType = json.Value<string>("eventType");
+            var adminClientPort = json.Value<int?>("adminPort");
+
+            Log.Debug($"- Message received: {message}");
+            Log.Debug($"- Event type: {eventType}");
+            Log.Debug($"- Admin client port: {adminClientPort}");
+
+            switch (eventType)
+            {
+                case "newAdminEvent":
+                    Log.Debug($"-- New admin event received from port {adminClientPort}.");
+                    var conits = json["conits"] as JObject;
+                    if (adminClientPort.HasValue && conits != null)
+                    {
+                        ProcessNewAdminEvent(adminClientPort.Value, conits);
+                        WelcomeNewNode(adminClientPort.Value, conits);
+                    };
+                    break;
+                case "heartbeatResponse":
+                    Log.Debug($"-- Heartbeat response received from port {adminClientPort}.");
+                    ProcessHeartbeatResponse();
+                    break;
+                case "throughput":
+                    Log.Debug($"-- Throughput received from port {adminClientPort}.");
+                    var throughput = json.Value<double?>("throughput");
+                    var collectionName = json.Value<string>("collectionName");
+                    if (adminClientPort.HasValue && throughput.HasValue && collectionName != null)
+                    {
+                        ProcessThroughput(throughput, adminClientPort, collectionName, json);
+                    }
+                    break;
+                case "overheadMessage":
+                    Log.Debug($"-- Overhead message received from port {adminClientPort}.");
+                    var syncThroughput = json["data"] as JObject;
+                    if (adminClientPort.HasValue && syncThroughput != null)
+                    {
+                        ProcessOverheadMessage(adminClientPort.Value, syncThroughput);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return Task.CompletedTask;
+
+        }
+
+        private void ProcessOverheadMessage(int value, JObject syncThroughput)
+        {
+            foreach (var collection in syncThroughput)
+            {
+                var collectionName = collection.Key;
+                var throughputToken = collection.Value; // Store the JToken to avoid null reference warnings
+                var throughput = throughputToken?.Value<double>(); // Use null conditional operator to handle possible null reference
+
+                var adminClientPort = value;
+
+                // check if the collection has thresholds and rules
+                var collectionObj = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
+                if (collectionObj == null || collectionObj.Thresholds == null || collectionObj.Rules == null)
+                {
+                    Log.Debug($"-- Collection {collectionName} has no thresholds or rules. Ignoring...");
+                    continue;
+                }
+                if (throughput != null)
+                {
+                    ApplyRules(collectionObj, collectionObj.Thresholds.OverheadThroughput, throughput.Value, adminClientPort);
+                };
+            }
+        }
+
+        private void ProcessThroughput(double? throughput, int? adminClientPort, string? collectionName, JObject json)
+        {
+            if (throughput <= 0 || throughput == null || collectionName == null || adminClientPort == null)
+            {
+                Log.Debug($"-- Received invalid throughput: {throughput}. Ignoring...");
+                return;
+            }
+
+            Log.Debug($"-- Received throughput: {throughput} for adminCLient {adminClientPort} in collection {collectionName}.");
+
+            // check if the collection has thresholds and rules
+            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
+            if (collection == null || collection.Thresholds == null || collection.Rules == null)
+            {
+                Log.Debug($"-- Collection {collectionName} has no thresholds or rules. Ignoring...");
+                return;
+            }
+            ApplyRules(collection, collection.Thresholds.Throughput, throughput.Value, adminClientPort.Value);
+        }
+
+        private async void ApplyRules(Collection collection, int? threshold, double throughput, int? adminClientPort)
+        {
+            if (collection.Rules == null || threshold == null)
+            {
+                Log.Debug($"-- Collection {collection.Name} has no rules or threshold. Ignoring...");
+                return;
+            }
+            foreach (var rule in collection.Rules)
+            {
+                var condition = rule.Condition;
+                var policyActions = rule.PolicyActions;
+
+                if (condition == null || policyActions == null)
+                {
+                    Log.Debug($"-- Rule for collection {collection.Name} has no condition or actions. Ignoring...");
+                    continue;
+                }
+
+                var isConditionMet = EvaluateCondition(condition, throughput, threshold);
+                if (isConditionMet)
+                {
+                    Log.Debug($"-- Condition {condition} for collection {collection.Name} is true. Applying actions...");
+                    ApplyActions(collection, policyActions, adminClientPort);
+                    await SendUpdatedBoundsToCollection(collection, adminClientPort);
+                }
+            }
+        }
+
+        private async Task SendUpdatedBoundsToCollection(Collection collection, int? adminClientPort)
+        {
+            // Send the new bounds for the adminClient to all other nodes in the collection
+            var nodes = collection.Nodes?.Where(n => n.Port != adminClientPort).ToList();
+
+            if (nodes == null)
+            {
+                Log.Debug($"-- Collection {collection.Name} has no nodes. Ignoring...");
+                return;
+            }
+
+            foreach (var node in nodes)
+            {
+                if (node.Bounds == null)
+                {
+                    Log.Debug($"-- Node {node.Port} has no bounds. Ignoring...");
+                    continue;
+                }
+
+                var message = new JObject
+                {
+                    ["eventType"] = "updateConitEvent",
+                    ["collectionName"] = collection.Name,
+                    ["adminClientPort"] = adminClientPort,
+                    ["bounds"] = new JObject
+                    {
+                        ["Staleness"] = node.Bounds.Staleness ?? 1,
+                        ["NumericalError"] = node.Bounds.NumericalError ?? 1,
+                    }
+                };
+
+                Log.Debug($"-- Sending updated bounds to node {node.Port} in collection {collection.Name}.");
+                Log.Debug(JsonConvert.SerializeObject(message, Formatting.Indented));
+
+                await SendMessageOverTcp(message.ToString(), node.Port ?? 0).ConfigureAwait(false);
+            }
+        }
+
+
+
+        bool EvaluateCondition(string condition, double throughput, int? threshold)
         {
             // Assuming the condition format is "{variable} {operator} {threshold}"
             var parts = condition.Split(' ');
@@ -499,6 +335,249 @@ namespace Dyconit.Overlord
             }
         }
 
+        private void ApplyActions(Collection collection, List<PolicyAction> actions, int? adminClientPort)
+        {
+            foreach (var action in actions)
+            {
+                var actionType = action.Type;
+                int? actionValue = (int?)action.Value;
+
+                // retrieve the bounds of the adminClientPort for the collection
+                var bounds = collection.Nodes?.FirstOrDefault(n => n.Port == adminClientPort)?.Bounds;
+
+                if (bounds == null)
+                {
+                    Log.Debug($"-- No bounds found for adminClientPort {adminClientPort} in collection {collection.Name}. Ignoring...");
+                    continue;
+                }
+
+                // apply the action
+                switch (actionType)
+                {
+                    case "add":
+                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness + actionValue < 1 ? 1 : bounds.Staleness + actionValue) : null;
+                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError + actionValue < 1 ? 1 : bounds.NumericalError + actionValue) : null;
+                        break;
+                    case "subtract":
+                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness - actionValue < 1 ? 1 : bounds.Staleness - actionValue) : null;
+                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError - actionValue < 1 ? 1 : bounds.NumericalError - actionValue) : null;
+                        break;
+                    case "multiply":
+                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness * actionValue < 1 ? 1 : bounds.Staleness * actionValue) : null;
+                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError * actionValue < 1 ? 1 : bounds.NumericalError * actionValue) : null;
+                        break;
+                    case "divide":
+                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness / actionValue < 1 ? 1 : bounds.Staleness / actionValue) : null;
+                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError / actionValue < 1 ? 1 : bounds.NumericalError / actionValue) : null;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void ProcessNewAdminEvent(int adminClientPort, JObject? conits)
+        {
+            var collectionName = conits?.Value<string>("collectionName");
+            var staleness = conits?.Value<int?>("Staleness");
+            var numericalError = conits?.Value<int?>("NumericalError");
+
+            if (collectionName == null || staleness == null || numericalError == null)
+            {
+                Log.Debug("Invalid conit object.");
+                return;
+            }
+
+            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
+            if (collection == null)
+            {
+                collection = new Collection
+                {
+                    Name = collectionName,
+                    Nodes = new List<Node>()
+                };
+                _dyconitCollections.Collections?.Add(collection);
+            }
+            else if (collection.Nodes == null)
+            {
+                collection.Nodes = new List<Node>();
+            }
+
+            var node = collection.Nodes?.FirstOrDefault(n => n.Port == adminClientPort);
+            if (node == null)
+            {
+                node = new Node
+                {
+                    Port = adminClientPort,
+                    LastHeartbeatTime = DateTime.Now,
+                    Bounds = new Bounds
+                    {
+                        Staleness = staleness,
+                        NumericalError = numericalError
+                    }
+                };
+            }
+            else
+            {
+                node.LastHeartbeatTime = DateTime.Now;
+                node.Bounds = new Bounds
+                {
+                    Staleness = staleness,
+                    NumericalError = numericalError
+                };
+            }
+
+            collection.Nodes?.Add(node);
+
+            //print the entire _dyconitCollections object
+            Log.Debug(JsonConvert.SerializeObject(_dyconitCollections, Formatting.Indented));
+        }
+
+        private async void WelcomeNewNode(int adminClientPort, JObject? conits)
+        {
+            var collectionName = conits?.Value<string>("collectionName");
+            var staleness = conits?.Value<int?>("Staleness");
+            var numericalError = conits?.Value<int?>("NumericalError");
+
+            // Check if there are more than 1 nodes in the collection
+            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
+            if (collection != null && collection.Nodes != null && collection.Nodes.Count > 1)
+            {
+                // Send a new node event to all the other nodes in the collection
+                foreach (var node in collection.Nodes ?? Enumerable.Empty<Node>())
+                {
+                    if (node.Port != null && node.Port != adminClientPort)
+                    {
+                        var newAdminMessage = new JObject
+                        {
+                            ["eventType"] = "newNodeEvent",
+                            ["port"] = adminClientPort,
+                            ["collectionName"] = collectionName,
+                            ["staleness"] = staleness,
+                            ["numericalError"] = numericalError
+                        };
+
+                        await SendMessageOverTcp(newAdminMessage.ToString(), node.Port.Value);
+                        Log.Debug($"Sent new node event to port {node.Port.Value}.");
+
+                        var welcomeMessage = new JObject
+                        {
+                            ["eventType"] = "newNodeEvent",
+                            ["port"] = node.Port.Value,
+                            ["collectionName"] = collectionName,
+                            ["staleness"] = staleness,
+                            ["numericalError"] = numericalError
+                        };
+
+                        await SendMessageOverTcp(welcomeMessage.ToString(), adminClientPort);
+                        Log.Debug($"Sent welcome message to port {adminClientPort}.");
+                    }
+                }
+            }
+        }
+
+        private void ProcessHeartbeatResponse()
+        {
+            var heartbeatTime = DateTime.Now;
+
+            // update last heartbeat time for node
+            foreach (var collection in _dyconitCollections.Collections ?? new List<Collection>())
+            {
+                foreach (var node in collection.Nodes ?? new List<Node>())
+                {
+                    if (node.LastHeartbeatTime.HasValue)
+                    {
+                        node.LastHeartbeatTime = heartbeatTime;
+                    }
+                }
+            }
+        }
+
+        public async void SendHeartbeatAsync()
+        {
+            var heartbeatMessage = new JObject
+            {
+                ["eventType"] = "heartbeatEvent",
+                ["port"] = _listenPort,
+            };
+
+            while (true)
+            {
+                await Task.Delay(10000);
+
+                // Create a copy of the collection before iterating
+                var collections = _dyconitCollections.Collections?.ToList() ?? new List<Collection>();
+
+                foreach (var collection in collections)
+                {
+
+                    heartbeatMessage["collectionName"] = collection.Name;
+
+                    // Create a copy of the nodes list before iterating
+                    var nodes = collection.Nodes?.ToList() ?? new List<Node>();
+
+                    foreach (var node in nodes)
+                    {
+                        if (node.Port != null)
+                        {
+                            await SendMessageOverTcp(heartbeatMessage.ToString(), node.Port.Value);
+                            Log.Debug($"Sent heartbeat to port {node.Port.Value}.");
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public async void KeepTrackOfNodesAsync()
+        {
+            while (true)
+            {
+                await Task.Delay(10000);
+
+                // remove nodes that have not sent a heartbeat in the last 30 seconds
+                var heartbeatTime = DateTime.Now;
+                foreach (var collection in _dyconitCollections.Collections ?? new List<Collection>())
+                {
+                    var nodesToRemove = new List<Node>(); // List to store nodes to be removed
+
+                    foreach (var node in collection.Nodes ?? new List<Node>())
+                    {
+                        if (node.LastHeartbeatTime.HasValue && heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds > 30)
+                        {
+                            nodesToRemove.Add(node);
+                            Log.Debug($"Marked node with port {node.Port} for removal from collection {collection.Name}.");
+                        }
+                    }
+
+                    // Remove the marked nodes
+                    foreach (var nodeToRemove in nodesToRemove)
+                    {
+                        collection.Nodes?.Remove(nodeToRemove);
+                        Log.Debug($"Removed node with port {nodeToRemove.Port} from collection {collection.Name}.");
+
+                        // inform other nodes that this node has been removed
+                        foreach (var otherNode in collection.Nodes ?? new List<Node>())
+                        {
+                            if (otherNode.Port != null)
+                            {
+                                var removeNodeMessage = new JObject
+                                {
+                                    ["eventType"] = "removeNodeEvent",
+                                    ["port"] = nodeToRemove.Port,
+                                    ["collectionName"] = collection.Name
+                                };
+
+                                await SendMessageOverTcp(removeNodeMessage.ToString(), otherNode.Port.Value);
+                                Log.Debug($"Sent remove node event to port {otherNode.Port.Value}.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         private async Task SendMessageOverTcp(string message, int port)
         {
             try
@@ -517,24 +596,19 @@ namespace Dyconit.Overlord
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to send message over TCP: {ex.Message}");
+                Log.Debug($"Failed to send message to port {port}. Exception: {ex.Message}. Removing from collection...");
 
                 // Remove the admin client from the dyconit collections
-                foreach (var collection in _dyconitCollections.ToList())
+                var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Nodes != null && c.Nodes.Any(n => n.Port == port));
+                if (collection != null)
                 {
-                    foreach (var adminClient in ((List<Tuple<int, DateTime>>)collection.Value["ports"]).ToList())
+                    var node = collection.Nodes?.FirstOrDefault(n => n.Port == port);
+                    if (node != null)
                     {
-                        if (adminClient.Item1 == port)
-                        {
-
-
-                            ((List<Tuple<int, DateTime>>)collection.Value["ports"]).Remove(adminClient);
-                            // notify all other nodes that this node has been removed
-                            await RemoveNodeAtAdmins(port, collection.Key);
-
-                            Console.WriteLine($"--- Removed admin client listening on port '{port}' from dyconit collection '{collection.Key}'.");
-                        }
+                        collection.Nodes?.Remove(node);
                     }
                 }
             }
-        }}}
+        }
+    }
+}

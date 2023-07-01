@@ -10,7 +10,7 @@ namespace Dyconit
         static void Main(string[] args)
         {
             // Create an instance of DyconitOverlord
-            var dyconitOverlord = new DyconitOverlord2();
+            var dyconitOverlord = new DyconitOverlord();
             Console.WriteLine("- Dyconit overlord started.");
             dyconitOverlord.ParsePolicies();
             dyconitOverlord.StartListening();

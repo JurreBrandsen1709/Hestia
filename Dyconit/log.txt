@@ -1,0 +1,2378 @@
+2023-07-01 13:02:32.475 +02:00 [DBG] Policies folder found.
+2023-07-01 13:02:32.527 +02:00 [DBG] Found 1 policy files.
+2023-07-01 13:02:32.574 +02:00 [DBG] Added policy for collection topic_priority.
+2023-07-01 13:02:32.576 +02:00 [DBG] - Dyconit overlord started listening.
+2023-07-01 13:02:37.223 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 5838,
+  "conits": {
+    "collectionName": "topic_priority",
+    "Staleness": 200,
+    "NumericalError": 5
+  }
+}
+
+2023-07-01 13:02:37.234 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:02:37.240 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:37.245 +02:00 [DBG] -- New admin event received from port 5838.
+2023-07-01 13:02:37.494 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:37.2530348+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+2023-07-01 13:02:39.263 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 5838,
+  "conits": {
+    "collectionName": "topic_normal",
+    "Staleness": 500,
+    "NumericalError": 10
+  }
+}
+
+2023-07-01 13:02:39.266 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:02:39.267 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:39.268 +02:00 [DBG] -- New admin event received from port 5838.
+2023-07-01 13:02:39.269 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:37.2530348+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "topic_normal",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:39.2690634+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        }
+      ],
+      "Thresholds": null,
+      "Rules": null
+    }
+  ]
+}
+2023-07-01 13:02:40.615 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 8878,
+  "conits": {
+    "collectionName": "topic_priority",
+    "Staleness": 200,
+    "NumericalError": 5
+  }
+}
+
+2023-07-01 13:02:40.617 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:02:40.618 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:40.619 +02:00 [DBG] -- New admin event received from port 8878.
+2023-07-01 13:02:40.620 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:37.2530348+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        },
+        {
+          "Port": 8878,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:40.620179+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "topic_normal",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:39.2690634+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        }
+      ],
+      "Thresholds": null,
+      "Rules": null
+    }
+  ]
+}
+2023-07-01 13:02:42.188 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 5838,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:02:42.198 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:02:42.204 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:42.209 +02:00 [DBG] -- Overhead message received from port 5838.
+2023-07-01 13:02:42.224 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:02:42.666 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 8878,
+  "conits": {
+    "collectionName": "topic_normal",
+    "Staleness": 500,
+    "NumericalError": 10
+  }
+}
+
+2023-07-01 13:02:42.668 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:02:42.669 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:42.670 +02:00 [DBG] -- New admin event received from port 8878.
+2023-07-01 13:02:42.670 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:37.2530348+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 400,
+            "NumericalError": 10
+          }
+        },
+        {
+          "Port": 8878,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:40.620179+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "topic_normal",
+      "Nodes": [
+        {
+          "Port": 5838,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:39.2690634+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        },
+        {
+          "Port": 8878,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:02:42.6706596+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        }
+      ],
+      "Thresholds": null,
+      "Rules": null
+    }
+  ]
+}
+2023-07-01 13:02:42.698 +02:00 [DBG] Sent new node event to port 5838.
+2023-07-01 13:02:44.292 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:02:44.634 +02:00 [DBG] Sent heartbeat to port 5838.
+2023-07-01 13:02:44.724 +02:00 [DBG] Sent new node event to port 5838.
+2023-07-01 13:02:44.739 +02:00 [DBG] Sent welcome message to port 8878.
+2023-07-01 13:02:45.592 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 8878,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:02:45.599 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:02:45.606 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:45.608 +02:00 [DBG] -- Overhead message received from port 8878.
+2023-07-01 13:02:45.616 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:02:46.680 +02:00 [DBG] Sent heartbeat to port 8878.
+2023-07-01 13:02:46.771 +02:00 [DBG] Sent welcome message to port 8878.
+2023-07-01 13:02:47.674 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:02:47.675 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 5838
+}
+
+2023-07-01 13:02:47.677 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:02:47.677 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:47.678 +02:00 [DBG] -- Heartbeat response received from port 5838.
+2023-07-01 13:02:48.716 +02:00 [DBG] Sent heartbeat to port 5838.
+2023-07-01 13:02:48.746 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 8878
+}
+
+2023-07-01 13:02:48.748 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:02:48.750 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:48.750 +02:00 [DBG] -- Heartbeat response received from port 8878.
+2023-07-01 13:02:49.259 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 5838,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:02:49.268 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:02:49.271 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:49.274 +02:00 [DBG] -- Overhead message received from port 5838.
+2023-07-01 13:02:49.276 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:02:50.757 +02:00 [DBG] Sent heartbeat to port 8878.
+2023-07-01 13:02:51.312 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:02:51.314 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 5838
+}
+
+2023-07-01 13:02:51.316 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:02:51.317 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:51.318 +02:00 [DBG] -- Heartbeat response received from port 5838.
+2023-07-01 13:02:52.647 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 8878,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:02:52.653 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:02:52.654 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:52.656 +02:00 [DBG] -- Overhead message received from port 8878.
+2023-07-01 13:02:52.658 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:02:54.691 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:02:54.694 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 8878
+}
+
+2023-07-01 13:02:54.698 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:02:54.699 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:54.700 +02:00 [DBG] -- Heartbeat response received from port 8878.
+2023-07-01 13:02:54.701 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 5.785303131630469,
+  "adminPort": 5838,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:02:54.702 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:02:54.703 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:54.704 +02:00 [DBG] -- Throughput received from port 5838.
+2023-07-01 13:02:56.322 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 5838,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:02:56.327 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:02:56.329 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:56.330 +02:00 [DBG] -- Overhead message received from port 5838.
+2023-07-01 13:02:56.331 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:02:58.376 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:02:58.378 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 4.99914444641944,
+  "adminPort": 5838,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:02:58.380 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:02:58.382 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:02:58.382 +02:00 [DBG] -- Throughput received from port 5838.
+2023-07-01 13:02:58.383 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 8.178194153799957,
+  "adminPort": 8878,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:02:58.384 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:02:58.384 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:58.385 +02:00 [DBG] -- Throughput received from port 8878.
+2023-07-01 13:02:59.707 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 8878,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:02:59.711 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:02:59.712 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:02:59.713 +02:00 [DBG] -- Overhead message received from port 8878.
+2023-07-01 13:02:59.713 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:03:01.758 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:03:01.760 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 17.765573516328587,
+  "adminPort": 8878,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:03:01.762 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:01.763 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:03:01.764 +02:00 [DBG] -- Throughput received from port 8878.
+2023-07-01 13:03:02.811 +02:00 [DBG] Sent heartbeat to port 5838.
+2023-07-01 13:03:03.386 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 5838,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:03:03.393 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:03:03.397 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:03.401 +02:00 [DBG] -- Overhead message received from port 5838.
+2023-07-01 13:03:03.404 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:03:04.305 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 2.1948151880811957,
+  "adminPort": 5838,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:03:04.308 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:04.310 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:04.311 +02:00 [DBG] -- Throughput received from port 5838.
+2023-07-01 13:03:04.861 +02:00 [DBG] Sent heartbeat to port 8878.
+2023-07-01 13:03:04.862 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 5838
+}
+
+2023-07-01 13:03:04.865 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:03:04.867 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:04.869 +02:00 [DBG] -- Heartbeat response received from port 5838.
+2023-07-01 13:03:05.451 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:03:06.333 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.996677169787583,
+  "adminPort": 5838,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:03:06.338 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:06.341 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:06.342 +02:00 [DBG] -- Throughput received from port 5838.
+2023-07-01 13:03:06.767 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 8878,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:03:06.772 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:03:06.774 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:03:06.777 +02:00 [DBG] -- Overhead message received from port 8878.
+2023-07-01 13:03:06.780 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:03:06.907 +02:00 [DBG] Sent heartbeat to port 5838.
+2023-07-01 13:03:08.826 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:03:08.831 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 8878
+}
+
+2023-07-01 13:03:08.834 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:03:08.837 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:03:08.838 +02:00 [DBG] -- Heartbeat response received from port 8878.
+2023-07-01 13:03:08.840 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7962497179887942,
+  "adminPort": 8878,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:03:08.841 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:08.842 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:03:08.843 +02:00 [DBG] -- Throughput received from port 8878.
+2023-07-01 13:03:08.951 +02:00 [DBG] Sent heartbeat to port 8878.
+2023-07-01 13:03:08.966 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 5838
+}
+
+2023-07-01 13:03:08.968 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:03:08.969 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:08.969 +02:00 [DBG] -- Heartbeat response received from port 5838.
+2023-07-01 13:03:09.743 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7979722109810115,
+  "adminPort": 8878,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:03:09.750 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:09.753 +02:00 [DBG] - Admin client port: 8878
+2023-07-01 13:03:09.756 +02:00 [DBG] -- Throughput received from port 8878.
+2023-07-01 13:03:10.440 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 5838,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:03:10.445 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:03:10.447 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:10.449 +02:00 [DBG] -- Overhead message received from port 5838.
+2023-07-01 13:03:10.452 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:03:14.554 +02:00 [DBG] Failed to send message to port 8878. Exception: No connection could be made because the target machine actively refused it. [::ffff:127.0.0.1]:8878. Removing from collection...
+2023-07-01 13:03:14.561 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:03:14.565 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7971049358325712,
+  "adminPort": 5838,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:03:14.566 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:14.567 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:03:14.568 +02:00 [DBG] -- Throughput received from port 5838.
+2023-07-01 13:03:19.287 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9971958571287567,
+  "adminPort": 5838,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:03:19.296 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:03:19.303 +02:00 [DBG] - Admin client port: 5838
+2023-07-01 13:07:02.946 +02:00 [DBG] Policies folder found.
+2023-07-01 13:07:02.993 +02:00 [DBG] Found 1 policy files.
+2023-07-01 13:07:03.029 +02:00 [DBG] Added policy for collection topic_priority.
+2023-07-01 13:07:03.030 +02:00 [DBG] - Dyconit overlord started listening.
+2023-07-01 13:07:07.758 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 9345,
+  "conits": {
+    "collectionName": "topic_priority",
+    "Staleness": 200,
+    "NumericalError": 5
+  }
+}
+
+2023-07-01 13:07:07.761 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:07:07.762 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:07.763 +02:00 [DBG] -- New admin event received from port 9345.
+2023-07-01 13:07:07.873 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 9345,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:07.7662801+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+2023-07-01 13:07:08.959 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 7459,
+  "conits": {
+    "collectionName": "topic_priority",
+    "Staleness": 200,
+    "NumericalError": 5
+  }
+}
+
+2023-07-01 13:07:08.970 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:07:08.973 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:08.977 +02:00 [DBG] -- New admin event received from port 7459.
+2023-07-01 13:07:08.983 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 9345,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:07.7662801+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        },
+        {
+          "Port": 7459,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:08.9826298+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+2023-07-01 13:07:09.798 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 9345,
+  "conits": {
+    "collectionName": "topic_normal",
+    "Staleness": 500,
+    "NumericalError": 10
+  }
+}
+
+2023-07-01 13:07:09.811 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:07:09.819 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:09.832 +02:00 [DBG] -- New admin event received from port 9345.
+2023-07-01 13:07:09.846 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 9345,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:07.7662801+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        },
+        {
+          "Port": 7459,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:08.9826298+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "topic_normal",
+      "Nodes": [
+        {
+          "Port": 9345,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:09.8454658+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        }
+      ],
+      "Thresholds": null,
+      "Rules": null
+    }
+  ]
+}
+2023-07-01 13:07:11.022 +02:00 [DBG] - Message received: {
+  "eventType": "newAdminEvent",
+  "type": "consumer",
+  "adminPort": 7459,
+  "conits": {
+    "collectionName": "topic_normal",
+    "Staleness": 500,
+    "NumericalError": 10
+  }
+}
+
+2023-07-01 13:07:11.032 +02:00 [DBG] - Event type: newAdminEvent
+2023-07-01 13:07:11.036 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:11.042 +02:00 [DBG] -- New admin event received from port 7459.
+2023-07-01 13:07:11.045 +02:00 [DBG] {
+  "Collections": [
+    {
+      "Name": "topic_priority",
+      "Nodes": [
+        {
+          "Port": 9345,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:07.7662801+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        },
+        {
+          "Port": 7459,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:08.9826298+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 200,
+            "NumericalError": 5
+          }
+        }
+      ],
+      "Thresholds": {
+        "Throughput": 5,
+        "overhead_throughput": 2
+      },
+      "Rules": [
+        {
+          "Condition": "throughput >= threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 0.9
+            }
+          ]
+        },
+        {
+          "Condition": "throughput < threshold",
+          "PolicyActions": [
+            {
+              "Type": "multiply",
+              "Value": 2.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "topic_normal",
+      "Nodes": [
+        {
+          "Port": 9345,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:09.8454658+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        },
+        {
+          "Port": 7459,
+          "SyncCount": null,
+          "LastHeartbeatTime": "2023-07-01T13:07:11.0452416+02:00",
+          "LastTimeSincePull": null,
+          "Bounds": {
+            "Staleness": 500,
+            "NumericalError": 10
+          }
+        }
+      ],
+      "Thresholds": null,
+      "Rules": null
+    }
+  ]
+}
+2023-07-01 13:07:11.092 +02:00 [DBG] Sent new node event to port 9345.
+2023-07-01 13:07:12.709 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:12.718 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:12.723 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:12.728 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:12.740 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:12.749 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:12.758 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 200,
+    "NumericalError": 5
+  }
+}
+2023-07-01 13:07:13.141 +02:00 [DBG] Sent new node event to port 9345.
+2023-07-01 13:07:13.141 +02:00 [DBG] Sent welcome message to port 7459.
+2023-07-01 13:07:13.944 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:13.955 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:13.961 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:13.967 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:13.973 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:13.979 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:13.983 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 400,
+    "NumericalError": 10
+  }
+}
+2023-07-01 13:07:14.812 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:15.094 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:07:15.202 +02:00 [DBG] Sent welcome message to port 7459.
+2023-07-01 13:07:16.037 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:17.143 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:07:17.159 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:07:17.167 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:17.172 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:17.178 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:07:19.189 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:07:19.221 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:07:19.227 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:19.230 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:19.231 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:07:19.758 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:19.768 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:19.774 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:19.776 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:19.782 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:19.786 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:19.790 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 400,
+    "NumericalError": 10
+  }
+}
+2023-07-01 13:07:21.243 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:07:21.848 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:21.854 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:21.868 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:21.873 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:21.879 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:21.884 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:21.888 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:21.889 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 800,
+    "NumericalError": 20
+  }
+}
+2023-07-01 13:07:23.945 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:23.952 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:07:23.960 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:23.966 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:23.971 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:07:23.977 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:07:23.982 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:23.986 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:23.989 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:07:24.851 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 5.792001940360595,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:24.858 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:24.863 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:24.866 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:26.075 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 8.39378373164402,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:26.082 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:26.086 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:26.091 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:26.816 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:26.826 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:26.830 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:26.834 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:26.838 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:26.841 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:26.844 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 800,
+    "NumericalError": 20
+  }
+}
+2023-07-01 13:07:28.893 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:28.895 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 4.991212570971799,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:28.898 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:28.899 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:28.899 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:28.901 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:28.902 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:28.903 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:28.904 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:28.905 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:28.905 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:28.906 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 1600,
+    "NumericalError": 40
+  }
+}
+2023-07-01 13:07:30.951 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:30.954 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 17.551995993038876,
+  "adminPort": 7459,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:30.957 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:30.959 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:30.962 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:33.314 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:07:33.890 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:33.898 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:33.900 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:33.901 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:33.902 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:33.903 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:33.905 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 1600,
+    "NumericalError": 40
+  }
+}
+2023-07-01 13:07:35.364 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:07:35.953 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:35.959 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.998188122937645,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:35.968 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:35.971 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:35.973 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:35.974 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:35.977 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:35.978 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:35.979 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:35.980 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:35.981 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:35.983 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 3200,
+    "NumericalError": 80
+  }
+}
+2023-07-01 13:07:37.415 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:07:38.034 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:38.038 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:07:38.042 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:38.043 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:38.044 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:07:38.046 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7953443131271987,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:38.048 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:38.050 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:38.053 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:38.054 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7958319817203459,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:38.056 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:38.057 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:38.058 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:38.059 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:07:38.061 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:38.062 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:38.063 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:07:38.113 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7950795433652722,
+  "adminPort": 7459,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:38.120 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:38.121 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:38.122 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:39.462 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:07:39.493 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:07:39.496 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:39.497 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:39.500 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:07:40.954 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:40.964 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:40.970 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:40.976 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:40.980 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:40.985 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:40.989 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 3200,
+    "NumericalError": 80
+  }
+}
+2023-07-01 13:07:43.032 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:43.038 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:07:43.047 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:43.053 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:43.058 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:07:43.063 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:43.071 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:43.076 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:43.080 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:43.084 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:43.088 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:43.089 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 6400,
+    "NumericalError": 160
+  }
+}
+2023-07-01 13:07:45.126 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:45.129 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7974062349585804,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:45.132 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:45.133 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:45.135 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:46.045 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9992546378859035,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:46.050 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:46.052 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:46.054 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:46.887 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9976278169673514,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:46.895 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:46.900 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:46.905 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:48.021 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:48.032 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:48.040 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:48.045 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:48.051 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:48.056 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:48.059 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 6400,
+    "NumericalError": 160
+  }
+}
+2023-07-01 13:07:50.115 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:50.121 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 2.1952073355367627,
+  "adminPort": 7459,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:50.130 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:50.133 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:50.135 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:50.136 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:50.138 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:50.140 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:50.141 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:50.142 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:50.143 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:50.143 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 12800,
+    "NumericalError": 320
+  }
+}
+2023-07-01 13:07:51.532 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:07:52.183 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:53.572 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:07:53.603 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:07:53.611 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:53.615 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:53.620 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:07:54.862 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9936303907740847,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:54.872 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:54.878 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:54.884 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:55.092 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:55.103 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:55.111 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:55.117 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:07:55.123 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:55.129 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:07:55.132 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 12800,
+    "NumericalError": 320
+  }
+}
+2023-07-01 13:07:55.618 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:07:57.190 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:57.195 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:07:57.203 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:57.208 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:57.213 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:07:57.215 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9934421335444361,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:07:57.222 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:57.226 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:57.228 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:57.229 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:07:57.232 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:07:57.235 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:57.237 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:07:57.238 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:07:57.240 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:07:57.240 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 25600,
+    "NumericalError": 640
+  }
+}
+2023-07-01 13:07:57.670 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:07:59.288 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:07:59.292 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9978137524544142,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:59.301 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:59.306 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:59.310 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:07:59.313 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:07:59.316 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:59.317 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:07:59.320 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:07:59.323 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9997481117278468,
+  "adminPort": 7459,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:07:59.325 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:07:59.325 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:59.327 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:07:59.741 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:07:59.747 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:07:59.751 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:07:59.755 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:02.162 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:02.173 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:02.180 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:02.187 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:02.193 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:02.199 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:02.204 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 25600,
+    "NumericalError": 640
+  }
+}
+2023-07-01 13:08:04.246 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:04.248 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:04.252 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:04.255 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:04.256 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:04.257 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:04.257 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:04.258 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 51200,
+    "NumericalError": 1280
+  }
+}
+2023-07-01 13:08:06.300 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:06.305 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7951163142623967,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:06.311 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:06.313 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:06.314 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:06.316 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.998315140572378,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:06.318 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:06.318 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:06.319 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:06.891 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 2.193814408645958,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:06.898 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:06.901 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:06.904 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:08.116 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.7955618021598931,
+  "adminPort": 7459,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:08.117 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:08.118 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:08.119 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:09.209 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:09.219 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:09.224 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:09.228 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:09.231 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:09.234 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:09.236 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 51200,
+    "NumericalError": 1280
+  }
+}
+2023-07-01 13:08:09.722 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:08:11.290 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:11.296 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:11.301 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:11.304 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:11.308 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:11.310 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:11.311 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:11.311 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 102400,
+    "NumericalError": 2560
+  }
+}
+2023-07-01 13:08:11.768 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:08:13.369 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:13.375 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:08:13.381 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:13.383 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:13.385 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:08:13.821 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:08:13.836 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:08:13.839 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:13.840 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:13.842 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:14.866 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.994304465875905,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:14.872 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:14.873 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:14.875 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:15.876 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:08:15.891 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:08:15.893 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:15.893 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:15.894 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:08:16.094 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 2.194429703529156,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:16.099 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:16.101 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:16.102 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:16.282 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:16.292 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:16.296 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:16.298 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:16.301 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:16.305 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:16.307 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 102400,
+    "NumericalError": 2560
+  }
+}
+2023-07-01 13:08:18.359 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:18.364 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.79996616063618,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:18.370 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:18.372 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:18.374 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:18.376 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:18.378 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:18.379 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:18.379 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:18.380 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:18.381 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:18.381 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 204800,
+    "NumericalError": 5120
+  }
+}
+2023-07-01 13:08:20.413 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:20.415 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:08:20.418 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:20.420 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:20.424 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:20.425 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9979734156050835,
+  "adminPort": 7459,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:20.427 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:20.428 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:20.429 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:23.345 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:23.353 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:23.357 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:23.361 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:23.363 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:23.365 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:23.367 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 204800,
+    "NumericalError": 5120
+  }
+}
+2023-07-01 13:08:24.571 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:24.581 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:24.584 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:24.586 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:24.589 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:24.592 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:24.594 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 409600,
+    "NumericalError": 10240
+  }
+}
+2023-07-01 13:08:25.409 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:26.638 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:26.641 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9940396559452072,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:26.644 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:26.645 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:26.645 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:26.647 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.995276979860971,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:26.648 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:26.649 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:26.650 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:26.917 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9943943955602867,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:26.925 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:26.927 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:26.930 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:27.939 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:08:29.985 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:08:30.000 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:08:30.002 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:30.003 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:30.004 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:08:30.404 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:30.410 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:30.413 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:30.415 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:30.417 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:30.420 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:30.422 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 409600,
+    "NumericalError": 10240
+  }
+}
+2023-07-01 13:08:32.038 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:08:32.475 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:32.479 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:32.482 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:32.483 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:32.484 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:32.485 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:32.485 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:32.486 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 819200,
+    "NumericalError": 20480
+  }
+}
+2023-07-01 13:08:34.090 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:08:34.538 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:34.545 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:08:34.551 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:34.554 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:34.557 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:34.559 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:08:34.561 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:34.562 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:34.563 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:08:34.879 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.794521183265795,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:34.885 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:34.890 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:34.894 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:36.089 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9982784830868205,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:36.094 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:36.097 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:36.098 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:36.153 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:08:36.160 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:36.163 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:36.167 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:36.928 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 2.1936538034197826,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:36.935 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:36.939 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:36.943 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:37.473 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:37.475 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:37.476 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:37.477 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:37.477 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:37.478 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:37.479 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 819200,
+    "NumericalError": 20480
+  }
+}
+2023-07-01 13:08:38.701 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:38.710 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:38.714 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:38.717 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:38.720 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:38.722 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:38.724 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 1638400,
+    "NumericalError": 40960
+  }
+}
+2023-07-01 13:08:39.523 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:40.782 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:44.523 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:44.527 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:44.529 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:44.530 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:44.530 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:44.531 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:44.532 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 1638400,
+    "NumericalError": 40960
+  }
+}
+2023-07-01 13:08:46.159 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:08:46.580 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:46.581 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.997806209001895,
+  "adminPort": 9345,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:46.583 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:46.584 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:46.585 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:46.586 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:46.587 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:46.588 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:46.589 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:46.589 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:46.590 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:46.591 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 3276800,
+    "NumericalError": 81920
+  }
+}
+2023-07-01 13:08:48.212 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:08:48.635 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:48.638 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.996697741473287,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:48.640 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:48.642 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:48.643 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:48.644 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9944681431581364,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:48.645 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:48.646 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:48.647 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:48.648 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:08:48.649 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:48.649 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:48.650 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:08:50.265 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:08:50.280 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:08:50.282 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:50.283 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:50.283 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:51.567 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:51.575 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:51.578 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:51.580 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:51.582 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:51.585 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:51.586 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 3276800,
+    "NumericalError": 81920
+  }
+}
+2023-07-01 13:08:52.316 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:08:53.624 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:53.627 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:08:53.632 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:53.636 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:53.637 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:08:53.638 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:53.640 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:53.641 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:53.642 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:08:53.643 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:53.644 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:08:53.645 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 6553600,
+    "NumericalError": 163840
+  }
+}
+2023-07-01 13:08:55.689 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:08:55.691 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:08:55.693 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:08:55.693 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:55.694 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:08:56.109 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9994812146040588,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:08:56.115 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:56.119 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:08:56.120 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:08:56.933 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": -35.15769334129469,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:08:56.942 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:08:56.946 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:56.950 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:08:58.623 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:08:58.629 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:08:58.632 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:08:58.636 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:08:58.638 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:08:58.640 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:08:58.641 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 6553600,
+    "NumericalError": 163840
+  }
+}
+2023-07-01 13:09:00.688 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:09:00.690 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:09:00.692 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:09:00.693 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:09:00.694 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:09:00.695 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:09:00.696 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:09:00.696 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 13107200,
+    "NumericalError": 327680
+  }
+}
+2023-07-01 13:09:02.736 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:09:04.368 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:09:05.687 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:09:05.689 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:09:05.690 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:09:05.691 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:09:05.691 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:09:05.692 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:09:05.693 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 13107200,
+    "NumericalError": 327680
+  }
+}
+2023-07-01 13:09:06.414 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:09:07.738 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:09:07.742 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9973424160748672,
+  "adminPort": 7459,
+  "topic": "topic_priority"
+}
+
+2023-07-01 13:09:07.751 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:09:07.755 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:09:07.760 +02:00 [DBG] -- Throughput received from port 7459.
+2023-07-01 13:09:07.763 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:09:07.765 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:09:07.766 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:09:07.767 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:09:07.768 +02:00 [DBG] - Message received: {
+  "eventType": "throughput",
+  "throughput": 1.9968945095345523,
+  "adminPort": 9345,
+  "topic": "topic_normal"
+}
+
+2023-07-01 13:09:07.769 +02:00 [DBG] - Event type: throughput
+2023-07-01 13:09:07.770 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:09:07.771 +02:00 [DBG] -- Throughput received from port 9345.
+2023-07-01 13:09:07.772 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 7459,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:09:07.773 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:09:07.774 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:09:07.776 +02:00 [DBG] -- Overhead message received from port 7459.
+2023-07-01 13:09:07.777 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:09:07.777 +02:00 [DBG] -- Sending updated bounds to node 9345 in collection topic_priority.
+2023-07-01 13:09:07.778 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 7459,
+  "bounds": {
+    "Staleness": 26214400,
+    "NumericalError": 655360
+  }
+}
+2023-07-01 13:09:08.464 +02:00 [DBG] Sent heartbeat to port 9345.
+2023-07-01 13:09:09.830 +02:00 [DBG] -- Collection topic_normal has no thresholds or rules. Ignoring...
+2023-07-01 13:09:09.835 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:09:09.840 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:09:09.842 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:09:09.844 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:09:10.513 +02:00 [DBG] Sent heartbeat to port 7459.
+2023-07-01 13:09:10.513 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 9345
+}
+
+2023-07-01 13:09:10.516 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:09:10.517 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:09:10.517 +02:00 [DBG] -- Heartbeat response received from port 9345.
+2023-07-01 13:09:12.552 +02:00 [DBG] - Message received: {
+  "eventType": "heartbeatResponse",
+  "adminPort": 7459
+}
+
+2023-07-01 13:09:12.558 +02:00 [DBG] - Event type: heartbeatResponse
+2023-07-01 13:09:12.562 +02:00 [DBG] - Admin client port: 7459
+2023-07-01 13:09:12.565 +02:00 [DBG] -- Heartbeat response received from port 7459.
+2023-07-01 13:09:12.753 +02:00 [DBG] - Message received: {
+  "eventType": "overheadMessage",
+  "adminPort": 9345,
+  "data": {
+    "topic_priority": 0,
+    "topic_normal": 0
+  }
+}
+
+2023-07-01 13:09:12.761 +02:00 [DBG] - Event type: overheadMessage
+2023-07-01 13:09:12.763 +02:00 [DBG] - Admin client port: 9345
+2023-07-01 13:09:12.767 +02:00 [DBG] -- Overhead message received from port 9345.
+2023-07-01 13:09:12.770 +02:00 [DBG] -- Condition throughput < threshold for collection topic_priority is true. Applying actions...
+2023-07-01 13:09:12.772 +02:00 [DBG] -- Sending updated bounds to node 7459 in collection topic_priority.
+2023-07-01 13:09:12.774 +02:00 [DBG] {
+  "eventType": "updateConitEvent",
+  "collectionName": "topic_priority",
+  "adminClientPort": 9345,
+  "bounds": {
+    "Staleness": 26214400,
+    "NumericalError": 655360
+  }
+}
