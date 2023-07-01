@@ -14,8 +14,8 @@ namespace Dyconit.Helper
 {
     public class Bounds
     {
-        public int ?Staleness { get; set; }
-        public int ?NumericalError { get; set; }
+        public double ?Staleness { get; set; }
+        public double ?NumericalError { get; set; }
 
         internal void UpdateBounds(int? staleness, int? numericalError)
         {
@@ -182,15 +182,6 @@ namespace Dyconit.Helper
                 }
             }
             return adminClientPort;
-        }
-
-        static public void ConfigureLogging()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .WriteTo.File("log.txt")
-                .CreateLogger();
         }
 
         public static JObject GetConitConfiguration(string collectionName, int staleness, int numericalError)

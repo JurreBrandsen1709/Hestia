@@ -40,7 +40,7 @@ namespace Dyconit.Consumer
                 {
                     new JProperty("eventType", "newAdminEvent"),
                     new JProperty( "type", messageType),
-                    new JProperty("adminPort", _adminPort),
+                    new JProperty("port", _adminPort),
                     new JProperty("conits", _conits)
                 };
 

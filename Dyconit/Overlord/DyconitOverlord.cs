@@ -15,12 +15,21 @@ namespace Dyconit.Overlord
 
         public DyconitOverlord()
         {
-            DyconitHelper.ConfigureLogging();
+            ConfigureLogging();
             _dyconitCollections = new RootObject
             {
                 Collections = new List<Collection>()
             };
 
+        }
+
+        static public void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("log.txt")
+                .CreateLogger();
         }
 
         public void ParsePolicies()
@@ -145,7 +154,6 @@ namespace Dyconit.Overlord
             var eventType = json.Value<string>("eventType");
             var adminClientPort = json.Value<int?>("port");
 
-            Log.Debug($"- Message received: {message}");
             Log.Debug($"- Event type: {eventType}");
             Log.Debug($"- Admin client port: {adminClientPort}");
 
@@ -165,7 +173,6 @@ namespace Dyconit.Overlord
                     ProcessHeartbeatResponse();
                     break;
                 case "throughput":
-                    Log.Debug($"-- Throughput received from port {adminClientPort}.");
                     var throughput = json.Value<double?>("throughput");
                     var collectionName = json.Value<string>("collectionName");
                     if (adminClientPort.HasValue && throughput.HasValue && collectionName != null)
@@ -217,7 +224,7 @@ namespace Dyconit.Overlord
         {
             if (throughput <= 0 || throughput == null || collectionName == null || adminClientPort == null)
             {
-                Log.Debug($"-- Received invalid throughput: {throughput}. Ignoring...");
+                Log.Error($"-- Received invalid throughput: {throughput}. Ignoring...");
                 return;
             }
 
@@ -264,7 +271,7 @@ namespace Dyconit.Overlord
         private async Task SendUpdatedBoundsToCollection(Collection collection, int? adminClientPort)
         {
             // Send the new bounds for the adminClient to all other nodes in the collection
-            var nodes = collection.Nodes?.Where(n => n.Port != adminClientPort).ToList();
+            var nodes = collection.Nodes?.ToList();
 
             if (nodes == null)
             {
@@ -279,6 +286,8 @@ namespace Dyconit.Overlord
                     Log.Debug($"-- Node {node.Port} has no bounds. Ignoring...");
                     continue;
                 }
+
+                Log.Warning($"staleness: {node.Bounds.Staleness}, numerical error: {node.Bounds.NumericalError}");
 
                 var message = new JObject
                 {
@@ -331,9 +340,9 @@ namespace Dyconit.Overlord
             foreach (var action in actions)
             {
                 var actionType = action.Type;
-                int? actionValue = (int?)action.Value;
+                double actionValue = (double)action.Value!;
 
-                // retrieve the bounds of the adminClientPort for the collection
+                // Retrieve the bounds of the adminClientPort for the collection
                 var bounds = collection.Nodes?.FirstOrDefault(n => n.Port == adminClientPort)?.Bounds;
 
                 if (bounds == null)
@@ -342,30 +351,42 @@ namespace Dyconit.Overlord
                     continue;
                 }
 
-                // apply the action
+                // Apply the action
                 switch (actionType)
                 {
                     case "add":
-                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness + actionValue < 1 ? 1 : bounds.Staleness + actionValue) : null;
-                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError + actionValue < 1 ? 1 : bounds.NumericalError + actionValue) : null;
+                        bounds.Staleness = ApplyAction(bounds.Staleness, actionValue, (x, y) => x + y);
+                        bounds.NumericalError = ApplyAction(bounds.NumericalError, actionValue, (x, y) => x + y);
                         break;
                     case "subtract":
-                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness - actionValue < 1 ? 1 : bounds.Staleness - actionValue) : null;
-                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError - actionValue < 1 ? 1 : bounds.NumericalError - actionValue) : null;
+                        bounds.Staleness = ApplyAction(bounds.Staleness, actionValue, (x, y) => x - y);
+                        bounds.NumericalError = ApplyAction(bounds.NumericalError, actionValue, (x, y) => x - y);
                         break;
                     case "multiply":
-                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness * actionValue < 1 ? 1 : bounds.Staleness * actionValue) : null;
-                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError * actionValue < 1 ? 1 : bounds.NumericalError * actionValue) : null;
+                        bounds.Staleness = ApplyAction(bounds.Staleness, actionValue, (x, y) => x * y);
+                        bounds.NumericalError = ApplyAction(bounds.NumericalError, actionValue, (x, y) => x * y);
                         break;
                     case "divide":
-                        bounds.Staleness = bounds.Staleness.HasValue ? (bounds.Staleness / actionValue < 1 ? 1 : bounds.Staleness / actionValue) : null;
-                        bounds.NumericalError = bounds.NumericalError.HasValue ? (bounds.NumericalError / actionValue < 1 ? 1 : bounds.NumericalError / actionValue) : null;
+                        bounds.Staleness = ApplyAction(bounds.Staleness, actionValue, (x, y) => x / y);
+                        bounds.NumericalError = ApplyAction(bounds.NumericalError, actionValue, (x, y) => x / y);
                         break;
                     default:
                         break;
                 }
+
+                // Helper function to apply the action
+                T ApplyAction<T>(T value, double actionValue, Func<T, double, T> operation)
+                {
+                    if (value != null)
+                    {
+                        return operation(value, actionValue);
+                    }
+                    return value;
+                }
             }
         }
+
+
 
         private void ProcessNewAdminEvent(int adminClientPort, JObject? conits)
         {

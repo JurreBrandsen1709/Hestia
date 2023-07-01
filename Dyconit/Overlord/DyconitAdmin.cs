@@ -21,7 +21,7 @@ namespace Dyconit.Overlord
 
         public DyconitAdmin(string bootstrapServers, int adminPort, JObject conitCollection)
         {
-            DyconitHelper.ConfigureLogging();
+            ConfigureLogging();
 
             _listenPort = adminPort;
             _adminClientConfig = new AdminClientConfig
@@ -35,6 +35,15 @@ namespace Dyconit.Overlord
             Log.Debug("DyconitCollections: {DyconitCollections}", JsonConvert.SerializeObject(_dyconitCollections, Formatting.Indented));
 
             ListenForMessagesAsync();
+        }
+
+        static public void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("log.txt")
+                .CreateLogger();
         }
 
         private async void ListenForMessagesAsync()
@@ -51,8 +60,6 @@ namespace Dyconit.Overlord
                 var reader = new StreamReader(client.GetStream());
                 var message = await reader.ReadToEndAsync().ConfigureAwait(false);
 
-                Log.Debug("Received message: {Message}", message);
-
                 // Parse message and act accordingly
                 await ParseMessageAsync(message);
 
@@ -64,10 +71,11 @@ namespace Dyconit.Overlord
 
         private Task ParseMessageAsync(string message)
         {
-            Log.Debug("Parsing message: {Message}", message);
 
             var messageObject = JObject.Parse(message);
             var eventType = messageObject["eventType"]?.ToString();
+
+            Log.Debug("Event Type: {EventType}", eventType);
 
             switch (eventType)
             {
@@ -121,8 +129,6 @@ namespace Dyconit.Overlord
                 IsPartitionEOF = dw.IsPartitionEOF
             }).ToList();
 
-            Log.Debug("Received data: {ReceivedData}", JsonConvert.SerializeObject(_receivedData, Formatting.Indented));
-
             if (_localData != null)
             {
                 UpdateLocalData(_localData, collectionName);
@@ -165,14 +171,12 @@ namespace Dyconit.Overlord
             // Filter localData to keep only the items with matching topic
             if (_receivedData != null){
                 _receivedData = _receivedData.Where(item => item.Topic == collectionName).ToList();
-
-                Log.Debug("Updated _receivedData: {ReceivedData}", JsonConvert.SerializeObject(_receivedData, Formatting.Indented));
             }
 
             // check if the topic of the _receivedData is the same as the topic of localData
             if(_receivedData == null || _receivedData.Count() < localData.Count() || _receivedData.First().Topic != localData.First().Topic)
             {
-                Log.Debug("Received data topic is not the same as local data topic");
+                Log.Debug("Received data is old.. Skipping update");
                 _localData = localData;
 
                 SyncResult earlyResult = new SyncResult
@@ -187,26 +191,20 @@ namespace Dyconit.Overlord
             // Merge the received data with the local data
             var mergedData = _receivedData.Union(localData, new ConsumeResultComparer()).ToList();
 
-            // print the content of localData, _receivedData and mergedData
-            Log.Debug("localData: {LocalData}", JsonConvert.SerializeObject(localData, Formatting.Indented));
-            Log.Debug("_receivedData: {ReceivedData}", JsonConvert.SerializeObject(_receivedData, Formatting.Indented));
-            Log.Debug("mergedData: {MergedData}", JsonConvert.SerializeObject(mergedData, Formatting.Indented));
-
-
-            // foreach (var item in localData)
-            // {
-            //     Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} localData: {item.Message.Value}");
-            // }
-            // Console.WriteLine("--------------------------------------------------");
-            // foreach (var item in _receivedData)
-            // {
-            //     Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} _receivedData: {item.Message.Value}");
-            // }
-            // Console.WriteLine("--------------------------------------------------");
-            // foreach (var item in mergedData)
-            // {
-            //     Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} mergedData: {item.Message.Value}");
-            // }
+            foreach (var item in localData)
+            {
+                Log.Debug($"[{_listenPort}] - localData: {item.Message.Value}");
+            }
+            Log.Debug("--------------------------------------------------");
+            foreach (var item in _receivedData)
+            {
+                Log.Debug($"[{_listenPort}] - _receivedData: {item.Message.Value}");
+            }
+            Log.Debug("--------------------------------------------------");
+            foreach (var item in mergedData)
+            {
+                Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
+            }
 
             bool isNotSame = mergedData.Count() != localData.Count();
 
@@ -225,7 +223,7 @@ namespace Dyconit.Overlord
 
         private async Task HandleSyncRequestAsync(JObject messageObject)
         {
-            Log.Information("Handling syncRequest: {MessageObject}", messageObject.ToString());
+            Log.Information("Handling syncRequest");
             var syncRequestPort = messageObject["port"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
 
@@ -261,13 +259,11 @@ namespace Dyconit.Overlord
             {
                 node.SyncCount++;
             }
-
-            Log.Debug("Updated node: {Node}", JsonConvert.SerializeObject(node, Formatting.Indented));
         }
 
         private async Task HandleHeartbeatEventAsync(JObject messageObject)
         {
-            Log.Information("Handling heartbeatEvent: {MessageObject}", messageObject.ToString());
+            Log.Information("Handling heartbeatEvent");
 
             var heartbeatResponse = new JObject
             {
@@ -283,7 +279,7 @@ namespace Dyconit.Overlord
 
         private Task HandleUpdateConitEventAsync(JObject messageObject)
         {
-            Log.Information("Handling updateConitEvent: {MessageObject}", messageObject);
+            Log.Information("Handling updateConitEvent}");
 
             // get the collection name and the corresponding node based on the port
             var collectionName = messageObject["collectionName"]?.ToString();
@@ -291,26 +287,25 @@ namespace Dyconit.Overlord
                 ?.FirstOrDefault(c => c.Name == collectionName);
 
             // get the node based on the port
-            var nodePort = messageObject["adminClientPort"]?.ToObject<int>();
+            var nodePort = messageObject["port"]?.ToObject<int>();
             var node = collection?.Nodes
                 ?.FirstOrDefault(n => n.Port == nodePort);
 
             // update the node's bounds
-            node?.Bounds?.UpdateBounds(
-                staleness: messageObject["staleness"]?.ToObject<int>(),
-                numericalError: messageObject["numericalError"]?.ToObject<int>()
-            );
+            node!.Bounds!.Staleness = messageObject["bounds"]!["Staleness"]?.ToObject<int>();
+            node.Bounds.NumericalError = messageObject["bounds"]!["NumericalError"]?.ToObject<int>();
 
             Log.Debug("Updated node: {Node}", JsonConvert.SerializeObject(node, Formatting.Indented));
 
             return Task.CompletedTask;
         }
 
+
         private Task HandleRemoveNodeEventAsync(JObject messageObject)
         {
-            Log.Information("Handling removeNodeEvent: {MessageObject}", messageObject);
+            Log.Information("Handling removeNodeEvent");
 
-            var removeNodePort = messageObject["adminClientPort"]?.ToObject<int>();
+            var removeNodePort = messageObject["port"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
 
             // remove the node from the collection
@@ -326,7 +321,7 @@ namespace Dyconit.Overlord
 
         private Task HandleNewNodeEventAsync(JObject messageObject)
         {
-            Log.Information("Handling newNodeEvent: {MessageObject}", messageObject);
+            Log.Information("Handling newNodeEvent");
 
             var newNodePort = messageObject["port"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
@@ -336,6 +331,8 @@ namespace Dyconit.Overlord
             {
                 Port = newNodePort,
                 LastHeartbeatTime = DateTime.Now,
+                LastTimeSincePull = DateTime.Now,
+                SyncCount = 0,
                 Bounds = new Bounds
                 {
                     Staleness = messageObject["staleness"]?.ToObject<int>(),
@@ -357,17 +354,17 @@ namespace Dyconit.Overlord
 
         private async Task SendSyncCountAsync()
         {
-            var message = new JObject
-            {
-                ["eventType"] = "overheadMessage",
-                ["port"] = _listenPort,
-                ["data"] = new JObject()
-            };
-
             while (true)
             {
+                var message = new JObject
+                {
+                    ["eventType"] = "overheadMessage",
+                    ["port"] = _listenPort,
+                    ["data"] = new JObject()
+                };
+
                 // delay for 5 seconds
-                await Task.Delay(5000).ConfigureAwait(false);
+                await Task.Delay(20000);
                 var syncNodes = new List<Node>();
 
                 // loop through each collection and get the total sync count
@@ -424,6 +421,8 @@ namespace Dyconit.Overlord
                     {
                         Port = adminPort,
                         LastHeartbeatTime = DateTime.Now,
+                        LastTimeSincePull = DateTime.Now,
+                        SyncCount = 0,
                         Bounds = new Bounds
                         {
                             Staleness = conit.Value?["Staleness"]?.ToObject<int>(),
@@ -450,7 +449,6 @@ namespace Dyconit.Overlord
                         await writer.WriteLineAsync(message);
                         await writer.FlushAsync();
                     }
-                    Log.Information("Message sent over TCP: {Message}", message);
                 }
             }
             catch (Exception ex)
@@ -465,8 +463,6 @@ namespace Dyconit.Overlord
 
             // Check if we have received new data from an other node since the last time we checked
             SyncResult result = UpdateLocalData(localData, collectionName);
-
-            Log.Debug("Result of updating local data: {Result}", JsonConvert.SerializeObject(result, Formatting.Indented));
 
             // retrieve the staleness bound for the collection name and port combination
             var stalenessBound = _dyconitCollections.Collections
@@ -497,12 +493,20 @@ namespace Dyconit.Overlord
                 return result;
             }
 
+            Log.Debug("other nodes: {OtherNodes}", JsonConvert.SerializeObject(otherNodes, Formatting.Indented));
+
             // Compare the consume time with the LastTimeSincePull for each node.
             // If the difference is greater than the staleness bound, we need to pull data from the other node
             foreach (var node in otherNodes)
             {
                 var timeSincePull = consumedTime - node.LastTimeSincePull;
-                if (timeSincePull.HasValue && timeSincePull.Value.TotalSeconds > stalenessBound.Value)
+
+                Log.Debug("Consumed time: {ConsumedTime}", consumedTime);
+                Log.Debug("Last time since pull: {LastTimeSincePull}", node.LastTimeSincePull);
+                Log.Debug("Difference for node with port {Port}: {TimeSincePull}", node.Port, timeSincePull!.Value.TotalMilliseconds);
+                Log.Debug("Staleness bound: {StalenessBound}", stalenessBound.Value);
+
+                if (timeSincePull.HasValue && timeSincePull.Value.TotalMilliseconds > stalenessBound.Value)
                 {
                     Log.Information("Pulling data from node with port {Port}", node.Port);
 
