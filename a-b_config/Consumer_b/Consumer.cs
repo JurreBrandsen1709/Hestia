@@ -12,6 +12,7 @@ using Serilog;
 class Consumer
 {
     private static Dictionary<string, List<ConsumeResult<Null, string>>> _uncommittedConsumedMessages = new Dictionary<string, List<ConsumeResult<Null, string>>>();
+
     // private static Dictionary<string, Dictionary<string, object>> _localCollection = new Dictionary<string, Dictionary<string, object>>();
     private static JObject _localCollection = new JObject();
 
@@ -99,17 +100,25 @@ class Consumer
                     int waitTime = _random.Next(400, 600);
                     await Task.Delay(waitTime);
 
-                    var consumedTime = DateTime.Now;
+                    SyncResult result = await DyconitLogger.BoundStaleness(_uncommittedConsumedMessages[topic], topic);
 
-                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages[topic], topic);
+                    Log.Information($"**-*[{topic}] - result: {result.Data.Count} {result.changed}");
 
                     _uncommittedConsumedMessages[topic] = result.Data;
                     var commit = result.changed;
 
                     if (_uncommittedConsumedMessages[topic].Count > 0)
                     {
-                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
-                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                        // check if the uncommitted messages topic is the same as the topic of the consumed message
+                        if (_uncommittedConsumedMessages[topic].First().TopicPartition.Topic == topic)
+                        {
+                            var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                            _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                        }
+                        else
+                        {
+                            Log.Information($"[{topic}] - Uncommitted messages topic is not the same as the topic of the consumed message");
+                        }
                     }
 
                     Log.Debug($"[{topic}] - lastcommittedoffset: {_lastCommittedOffset}");
@@ -141,8 +150,9 @@ class Consumer
                     if (_lastCommittedOffset > 0)
                     {
                         Log.Information($"[{topic}] - Assigning topic {topic} with offset {_lastCommittedOffset}");
-                        consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
+                        consumer.Seek(new TopicPartitionOffset(topic, 0, _lastCommittedOffset));
                     }
+
                 }
             }
             catch (OperationCanceledException)

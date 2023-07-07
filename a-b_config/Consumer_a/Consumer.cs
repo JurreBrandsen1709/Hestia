@@ -99,9 +99,7 @@ class Consumer
                     int waitTime = _random.Next(4000, 6000);
                     await Task.Delay(waitTime);
 
-                    var consumedTime = DateTime.Now;
-
-                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages[topic], topic);
+                    SyncResult result = await DyconitLogger.BoundStaleness(_uncommittedConsumedMessages[topic], topic);
 
                     // log the count of the result.data
                     Log.Information($"**-*[{topic}] - result: {result.Data.Count} {result.changed}");

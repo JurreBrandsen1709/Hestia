@@ -134,16 +134,6 @@ namespace Dyconit.Overlord
                 IsPartitionEOF = dw.IsPartitionEOF
             }).ToList();
 
-            // if (_localData != null)
-            // {
-            //     UpdateLocalData(_localData, collectionName);
-            // }
-            // else
-            // {
-            //     Log.Error("Local data is null");
-            // }
-
-
             // update the last time since pull for the sender port and collection combination
             var collection = _dyconitCollections.Collections
                 ?.FirstOrDefault(c => c.Name == collectionName);
@@ -202,12 +192,6 @@ namespace Dyconit.Overlord
                     Log.Error("Buffer contains key {topic}", topic);
                     _receivedData = _buffer[topic];
 
-                    // print the current _receivedData
-                    // foreach (var item in _receivedData)
-                    // {
-                    //     Log.Error($"Topic: {item.Topic} -- Partition: {item.Partition} -- Offset: {item.Offset} -- Key: {item.Message.Key} -- Value: {item.Message.Value}");
-                    // }
-
                     _buffer.Remove(topic);
                 }
                 else
@@ -229,12 +213,6 @@ namespace Dyconit.Overlord
                     Log.Error("Buffer contains key {topic}", topic);
                     _receivedData = _buffer[topic];
                     _buffer.Remove(topic);
-
-                    // print the current _receivedData
-                    // foreach (var item in _receivedData)
-                    // {
-                    //     Log.Error($"Topic: {item.Topic} -- Partition: {item.Partition} -- Offset: {item.Offset} -- Key: {item.Message.Key} -- Value: {item.Message.Value}");
-                    // }
                 }
                 else
                 {
@@ -301,6 +279,29 @@ namespace Dyconit.Overlord
             bool isNotSame = mergedData.Count() != localData.Count();
 
             Log.Debug("isNotSame: {IsNotSame}, localData.Count: {LocalDataCount}, _receivedData.Count: {ReceivedDataCount}, mergedData.Count: {MergedDataCount}", isNotSame, localData.Count(), _receivedData.Count(), mergedData.Count());
+
+            // check if the merged data has the same topic as the collection name. if this is not the case, store the merged data in the buffer
+            if (mergedData.First().Topic != collectionName)
+            {
+                Log.Error("Merged data topic does not match collection name");
+
+                if (_buffer.ContainsKey(topic))
+                {
+                    _buffer[topic] = mergedData;
+                }
+                else
+                {
+                    _buffer.Add(topic, mergedData);
+                }
+
+                Log.Error($"Adding merged data to buffer -- Collection name: {mergedData.First().Topic} -- Buffer count: {_buffer.Count()}");
+
+                return new SyncResult
+                {
+                    changed = false,
+                    Data = _localData,
+                };
+            }
 
             SyncResult result = new SyncResult
             {
@@ -558,7 +559,7 @@ namespace Dyconit.Overlord
             }
         }
 
-        public async Task<SyncResult> BoundStaleness(DateTime consumedTime, List<ConsumeResult<Null, string>> localData, string collectionName)
+        public async Task<SyncResult> BoundStaleness(List<ConsumeResult<Null, string>> localData, string collectionName)
         {
             Log.Information("Bounding staleness for collection {CollectionName} and port {Port}", collectionName, _listenPort);
             var portsStalenessExceeded = new List<int>();
@@ -595,7 +596,7 @@ namespace Dyconit.Overlord
                 return result;
             }
 
-            consumedTime = DateTime.Now;
+            var consumedTime = DateTime.Now;
 
             // Log.Debug("other nodes: {OtherNodes}", JsonConvert.SerializeObject(otherNodes, Formatting.Indented));
 
