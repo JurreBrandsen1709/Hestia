@@ -1,82 +1,48 @@
-using Confluent.Kafka;
 using System;
+using System.Text;
 using System.Collections.Generic;
-using System.Threading;
+using Confluent.Kafka;
 
-class Program
-{
-    static void Main()
+public class Producer
     {
-        var producerConfig = new ProducerConfig
+        public static void Main(string[] args)
         {
-            BootstrapServers = "localhost:9092"
-        };
+            var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
 
-        var consumerConfig = new ConsumerConfig
-        {
-            BootstrapServers = "localhost:9092",
-            GroupId = "my-group",
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = false
-        };
-
-        var topics = new List<string> { "topic1", "topic2" };
-
-        // Start a producer thread to continuously produce messages to the topics
-        var producerThread = new Thread(() => ProduceMessages(producerConfig, topics));
-        producerThread.Start();
-
-        // Start a consumer thread for each topic to consume messages
-        var consumerThreads = new List<Thread>();
-        foreach (var topic in topics)
-        {
-            var consumerThread = new Thread(() => ConsumeMessages(consumerConfig, topic));
-            consumerThread.Start();
-            consumerThreads.Add(consumerThread);
-        }
-
-        // Wait for the producer and consumer threads to complete
-        producerThread.Join();
-        foreach (var consumerThread in consumerThreads)
-        {
-            consumerThread.Join();
-        }
-    }
-
-    static void ProduceMessages(ProducerConfig config, List<string> topics)
-    {
-        using (var producer = new ProducerBuilder<Null, string>(config).Build())
-        {
-            var rnd = new Random();
-            var counter = 1;
-
-            while (true)
+            using (var producer = new ProducerBuilder<string, string>(config).Build())
+            using (var producer2 = new DependentProducerBuilder<Null, int>(producer.Handle).Build())
             {
-                var topic = topics[rnd.Next(0, topics.Count)];
-                var message = $"Message {counter} - Topic: {topic}";
+                // write (null, int) data to topic "second-data" using the same underlying broker connections.
+                for (int i = 0; i < 50000; i++)
+                {
+                    producer2.Produce("topic6", new Message<Null, int> { Value = 42 });
 
-                var deliveryReport = producer.ProduceAsync(topic, new Message<Null, string> { Value = message }).Result;
-                Console.WriteLine($"Produced message: {message} | Partition: {deliveryReport.Partition} | Offset: {deliveryReport.Offset}");
+                    // add a little delay between each message
+                    // System.Threading.Thread.Sleep(1);
+                }
 
-                counter++;
+                for (int i = 0; i < 50000; i++)
+                {
+                    producer2.ProduceAsync("topic2", new Message<Null, int> { Value = 42 });
+                }
 
-                Thread.Sleep(1000);
+                for (int i = 0; i < 50000; i++)
+                {
+                    producer2.ProduceAsync("topic3", new Message<Null, int> { Value = 42 });
+                }
+
+                for (int i = 0; i < 50000; i++)
+                {
+                    producer2.ProduceAsync("topic4", new Message<Null, int> { Value = 42 });
+                }
+
+                for (int i = 0; i < 50000; i++)
+                {
+                    producer2.ProduceAsync("topic5", new Message<Null, int> { Value = 42 });
+                }
+
+                // As the Tasks returned by ProduceAsync are not waited on there will still be messages in flight.
+                producer.Flush(TimeSpan.FromSeconds(10));
             }
         }
     }
-
-    static void ConsumeMessages(ConsumerConfig config, string topic)
-    {
-        using (var consumer = new ConsumerBuilder<Null, string>(config).Build())
-        {
-            consumer.Subscribe(topic);
-
-            while (true)
-            {
-                var consumeResult = consumer.Consume();
-
-                Console.WriteLine($"Consumed message: {consumeResult.Message.Value} | Partition: {consumeResult.Partition} | Offset: {consumeResult.Offset}");
-            }
-        }
-    }
-}

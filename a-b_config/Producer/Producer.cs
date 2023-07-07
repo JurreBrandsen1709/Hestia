@@ -19,7 +19,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 class Producer {
-    static async void Main(string[] args)
+    static void Main(string[] args)
     {
         // configure bootstrap.servers in text
         var configuration = new ProducerConfig

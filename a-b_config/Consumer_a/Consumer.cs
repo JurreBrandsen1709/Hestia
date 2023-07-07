@@ -7,6 +7,7 @@ using Confluent.Kafka;
 using Dyconit.Helper;
 using Dyconit.Overlord;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 class Consumer
 {
@@ -31,7 +32,7 @@ class Consumer
 
         foreach (var topic in topics)
         {
-            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 200 : 500, topic == "topic_priority" ? 5 : 10);
+            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 2000 : 5000, topic == "topic_priority" ? 5 : 10);
 
             _localCollection[topic] = conitConfiguration;
 
@@ -39,7 +40,7 @@ class Consumer
             _uncommittedConsumedMessages.Add(topic, consumedMessages);
         }
 
-        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, 1, adminPort, _localCollection);
+        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection);
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -64,7 +65,7 @@ class Consumer
 
     static async Task ConsumeMessages(string topic, CancellationToken token, ConsumerConfig configuration, int adminPort, DyconitAdmin DyconitLogger, JToken conitConfiguration)
     {
-        // long _lastCommittedOffset = -1;
+        long _lastCommittedOffset = -1;
         var collectionConfiguration = _localCollection[topic];
 
         using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
@@ -72,9 +73,9 @@ class Consumer
 
             consumer.Subscribe(topic);
             // Introduce a delay to allow the consumer to retrieve the committed offset for the topic/partition.
-            // await Task.Delay(TimeSpan.FromSeconds(10));
+            await Task.Delay(TimeSpan.FromSeconds(10));
 
-            // _ = CalculateThroughput(consumer, adminPort, token, topic);
+            _ = CalculateThroughput(consumer, adminPort, token, topic);
 
             try
             {
@@ -82,37 +83,39 @@ class Consumer
                 {
                     var consumeResult = consumer.Consume(token);
                     var inputMessage = consumeResult.Message.Value;
-                    // _totalLocalWeight += DyconitHelper.GetMessageWeight(consumeResult);
+                    _totalLocalWeight += DyconitHelper.GetMessageWeight(consumeResult);
 
+                    Log.Information($"[{topic}] - Consumed message '{inputMessage}' at: '{consumeResult.TopicPartitionOffset}'.");
+                     _lastCommittedOffset = consumeResult.Offset;
 
-                    Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} Consumed message with value '{inputMessage}', weight '{DyconitHelper.GetMessageWeight(consumeResult)}'");
-                    // _lastCommittedOffset = consumeResult.Offset;
+                    // if we consume a message that is older than the last committed offset, we ignore it.
+                    if (consumeResult.Offset < _lastCommittedOffset)
+                    {
+                        continue;
+                    }
 
-                    // // if we consume a message that is older than the last committed offset, we ignore it.
-                    // if (consumeResult.Offset < _lastCommittedOffset)
-                    // {
-                    //     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} Ignoring message with offset {consumeResult.Offset}");
-                    //     continue;
-                    // }
+                    _uncommittedConsumedMessages[topic].Add(consumeResult);
 
-                    // _uncommittedConsumedMessages[topic].Add(consumeResult);
-
-                    int waitTime = _random.Next(400, 600);
+                    int waitTime = _random.Next(4000, 6000);
                     await Task.Delay(waitTime);
 
-                    // var consumedTime = DateTime.Now;
+                    var consumedTime = DateTime.Now;
 
-                    // Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} bounding staleness");
-                    // SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages[topic], collectionConfiguration, topic);
+                    SyncResult result = await DyconitLogger.BoundStaleness(consumedTime, _uncommittedConsumedMessages[topic], topic);
 
-                    // _uncommittedConsumedMessages[topic] = result.Data;
-                    // var commit = result.changed;
+                    // log the count of the result.data
+                    Log.Information($"**-*[{topic}] - result: {result.Data.Count} {result.changed}");
 
-                    // if (_uncommittedConsumedMessages[topic].Count > 0)
-                    // {
-                    //     var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
-                    //     _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
-                    // }
+                    _uncommittedConsumedMessages[topic] = result.Data;
+                    var commit = result.changed;
+
+                    if (_uncommittedConsumedMessages[topic].Count > 0)
+                    {
+                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                    }
+
+                    Log.Debug($"[{topic}] - lastcommittedoffset: {_lastCommittedOffset}");
 
                     // Console.WriteLine($"[{adminPort}] - {DateTime.Now:HH:mm:ss.fff} bounding numerical error");
                     // SyncResult result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], collectionConfiguration, topic, _totalLocalWeight);
@@ -125,24 +128,24 @@ class Consumer
                     //     _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     // }
 
-                    // Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} result: {_uncommittedConsumedMessages.Count} {commit}");
-                    // if (commit)
-                    // {
-                    //     _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
-                    //     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} Committed messages");
-                    //     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} After committing lastcommittedoffset is: {_lastCommittedOffset}");
-                    // }
-                    // else
-                    // {
-                    //     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} No messages to commit");
-                    // }
+                    Log.Information($"[{topic}] - result: {_uncommittedConsumedMessages.Count} {commit}");
+                    if (commit)
+                    {
+                        _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
+                        Log.Information($"[{topic}] - Committed messages");
+                        Log.Information($"[{topic}] - After committing lastcommittedoffset is: {_lastCommittedOffset}");
+                    }
+                    else
+                    {
+                        Log.Information($"[{topic}] - No messages to commit");
+                    }
 
-                    // Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} lastcommittedoffset: {_lastCommittedOffset}");
-                    // if (_lastCommittedOffset > 0)
-                    // {
-                    //     Console.WriteLine($"[{topic}] - {DateTime.Now:HH:mm:ss.fff} Assigning topic {topic} with offset {_lastCommittedOffset}");
-                    //     consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
-                    // }
+                    Log.Information($"[{topic}] - lastcommittedoffset: {_lastCommittedOffset}");
+                    if (_lastCommittedOffset > 0)
+                    {
+                        Log.Information($"[{topic}] - Assigning topic {topic} with offset {_lastCommittedOffset}");
+                        consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -207,12 +210,12 @@ class Consumer
 
             if (previousOffset == Offset.Unset)
             {
-                Console.WriteLine($"====================[{adminPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} No previous offset for topic {topic} partition {partition.PartitionId}");
+                Log.Debug($"[{adminPort}] - No previous offset for topic {topic} partition {partition.PartitionId}");
                 previousOffset = 0;
             }
 
             offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));
-            Console.WriteLine($"~~~~~[{adminPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Previous offset for topic {topic} partition {partition.PartitionId}: {previousOffset}");
+            Log.Debug($"[{adminPort}] - Previous offset for topic {topic} partition {partition.PartitionId}: {previousOffset}");
         }
 
         await Task.Delay(TimeSpan.FromSeconds(5));
@@ -233,19 +236,19 @@ class Consumer
                 currentOffset = 0;
             }
             DateTime currentTimestamp = DateTime.UtcNow;
-            Console.WriteLine($"~~~~~[{adminPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Current Offset for topic {topic} partition {partition.PartitionId}: {currentOffset}");
+            Log.Debug($"[{adminPort}] - Current Offset for topic {topic} partition {partition.PartitionId}: {currentOffset}");
 
             double consumptionRate = (currentOffset - previousOffset) / (currentTimestamp - previousTimestamp).TotalSeconds;
             topicThroughput += consumptionRate;
-            Console.WriteLine($"~~~~~[{adminPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Consumption rate for topic {topic} partition {partition.PartitionId}: {consumptionRate}");
+            Log.Debug($"[{adminPort}] - Consumption rate for topic {topic} partition {partition.PartitionId}: {consumptionRate}");
         }
 
         var throughputMessage = new JObject
         {
             { "eventType", "throughput" },
             { "throughput", topicThroughput },
-            { "adminPort", adminPort },
-            { "topic", topic }
+            { "port", adminPort },
+            { "collectionName", topic }
         };
 
         await DyconitHelper.SendMessageOverTcp(throughputMessage.ToString(), 6666, adminPort);

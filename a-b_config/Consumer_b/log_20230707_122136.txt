@@ -1,0 +1,103 @@
+2023-07-07 12:21:42.893 +02:00 [DBG] Event Type: newNodeEvent
+2023-07-07 12:21:44.808 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-07 12:21:46.840 +02:00 [DBG] Event Type: newNodeEvent
+2023-07-07 12:21:48.791 +02:00 [DBG] [5715] - No previous offset for topic topic_priority partition 0
+2023-07-07 12:21:48.793 +02:00 [DBG] [5715] - Previous offset for topic topic_priority partition 0: 0
+2023-07-07 12:21:48.796 +02:00 [INF] [topic_priority] - Consumed message '0 topic_priority' at: 'topic_priority [[0]] @0'.
+2023-07-07 12:21:48.870 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-07 12:21:49.306 +02:00 [INF] Bounding staleness for collection topic_priority and port 5715
+2023-07-07 12:21:49.317 +02:00 [ERR] localData Topic: topic_priority
+2023-07-07 12:21:49.319 +02:00 [ERR] Local data Count: 1
+2023-07-07 12:21:49.321 +02:00 [ERR] Received data is null
+2023-07-07 12:21:49.324 +02:00 [DBG] Consumed time: "2023-07-07T12:21:49.3012601+02:00"
+2023-07-07 12:21:49.327 +02:00 [DBG] Last time since pull: "2023-07-07T12:21:42.9094839+02:00"
+2023-07-07 12:21:49.331 +02:00 [DBG] Difference for node with port 6485: 6391.7762
+2023-07-07 12:21:49.336 +02:00 [DBG] Staleness bound: 2000
+2023-07-07 12:21:49.339 +02:00 [INF] Pulling data from node with port 6485
+2023-07-07 12:21:50.810 +02:00 [DBG] [5715] - No previous offset for topic topic_normal partition 0
+2023-07-07 12:21:50.812 +02:00 [DBG] [5715] - Previous offset for topic topic_normal partition 0: 0
+2023-07-07 12:21:50.816 +02:00 [INF] [topic_normal] - Consumed message '0 topic_normal' at: 'topic_normal [[0]] @0'.
+2023-07-07 12:21:51.403 +02:00 [INF] Bounding staleness for collection topic_normal and port 5715
+2023-07-07 12:21:51.409 +02:00 [ERR] localData Topic: topic_normal
+2023-07-07 12:21:51.412 +02:00 [ERR] Local data Count: 1
+2023-07-07 12:21:51.413 +02:00 [ERR] Received data is null
+2023-07-07 12:21:51.415 +02:00 [DBG] Consumed time: "2023-07-07T12:21:51.4036379+02:00"
+2023-07-07 12:21:51.416 +02:00 [DBG] Last time since pull: "2023-07-07T12:21:46.8446229+02:00"
+2023-07-07 12:21:51.417 +02:00 [DBG] Difference for node with port 6485: 4559.015
+2023-07-07 12:21:51.418 +02:00 [DBG] Staleness bound: 5000
+2023-07-07 12:21:51.419 +02:00 [ERR] localData Topic: topic_normal
+2023-07-07 12:21:51.420 +02:00 [ERR] Local data Count: 1
+2023-07-07 12:21:51.420 +02:00 [ERR] Received data is null
+2023-07-07 12:21:51.421 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 1
+2023-07-07 12:21:51.422 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-07 12:21:51.423 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-07 12:21:51.423 +02:00 [INF] [topic_normal] - lastcommittedoffset: 1
+2023-07-07 12:21:51.424 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 1
+2023-07-07 12:21:51.480 +02:00 [INF] [topic_normal] - Consumed message '1 topic_normal' at: 'topic_normal [[0]] @1'.
+2023-07-07 12:21:51.973 +02:00 [INF] Bounding staleness for collection topic_normal and port 5715
+2023-07-07 12:21:51.979 +02:00 [ERR] localData Topic: topic_normal
+2023-07-07 12:21:51.984 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:21:51.987 +02:00 [ERR] Received data is null
+2023-07-07 12:21:51.991 +02:00 [DBG] Consumed time: "2023-07-07T12:21:51.9733093+02:00"
+2023-07-07 12:21:51.993 +02:00 [DBG] Last time since pull: "2023-07-07T12:21:46.8446229+02:00"
+2023-07-07 12:21:51.995 +02:00 [DBG] Difference for node with port 6485: 5128.6864
+2023-07-07 12:21:51.997 +02:00 [DBG] Staleness bound: 5000
+2023-07-07 12:21:51.999 +02:00 [INF] Pulling data from node with port 6485
+2023-07-07 12:21:52.250 +02:00 [DBG] Event Type: syncRequest
+2023-07-07 12:21:53.808 +02:00 [DBG] [5715] - Current Offset for topic topic_priority partition 0: 1
+2023-07-07 12:21:53.815 +02:00 [DBG] [5715] - Consumption rate for topic topic_priority partition 0: 0,1993969677384081
+2023-07-07 12:21:54.390 +02:00 [DBG] Event Type: syncResponse
+2023-07-07 12:21:54.423 +02:00 [ERR] localData Topic: topic_normal
+2023-07-07 12:21:54.424 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:21:54.425 +02:00 [ERR] Received data Count: 1
+2023-07-07 12:21:54.426 +02:00 [ERR] --Received data topic does not match local data topic
+2023-07-07 12:21:54.427 +02:00 [ERR] Adding received data to buffer -- Collection name: topic_priority -- Buffer count: 1
+2023-07-07 12:21:54.495 +02:00 [ERR] localData Topic: topic_normal
+2023-07-07 12:21:54.499 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:21:54.502 +02:00 [ERR] Received data Count: 1
+2023-07-07 12:21:54.507 +02:00 [ERR] --Received data topic does not match local data topic
+2023-07-07 12:21:54.789 +02:00 [DBG] Event Type: syncRequest
+2023-07-07 12:21:56.814 +02:00 [DBG] Event Type: syncResponse
+2023-07-07 12:21:56.819 +02:00 [ERR] localData Topic: topic_normal
+2023-07-07 12:21:56.822 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:21:56.826 +02:00 [ERR] Received data Count: 1
+2023-07-07 12:21:56.829 +02:00 [DBG] Received data is old.. Skipping update -- Received data count: 1 -- Local data count: 2
+2023-07-07 12:21:56.921 +02:00 [ERR] localData Topic: topic_priority
+2023-07-07 12:21:56.922 +02:00 [ERR] Local data Count: 1
+2023-07-07 12:21:56.923 +02:00 [ERR] Received data Count: 1
+2023-07-07 12:21:56.923 +02:00 [ERR] --Received data topic does not match local data topic
+2023-07-07 12:21:56.924 +02:00 [ERR] Buffer contains key topic_priority
+2023-07-07 12:21:56.927 +02:00 [DBG] [5715] - localData: 0 topic_priority
+2023-07-07 12:21:56.928 +02:00 [DBG] --------------------------------------------------
+2023-07-07 12:21:56.929 +02:00 [DBG] [5715] - _receivedData: 0 topic_priority
+2023-07-07 12:21:56.930 +02:00 [DBG] --------------------------------------------------
+2023-07-07 12:21:56.930 +02:00 [DBG] [5715] - mergedData: 0 topic_priority
+2023-07-07 12:21:56.931 +02:00 [DBG] isNotSame: false, localData.Count: 1, _receivedData.Count: 1, mergedData.Count: 1
+2023-07-07 12:21:56.933 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 1
+2023-07-07 12:21:56.933 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-07 12:21:56.934 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-07 12:21:56.935 +02:00 [INF] [topic_priority] - lastcommittedoffset: 1
+2023-07-07 12:21:56.935 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 1
+2023-07-07 12:21:57.015 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-07 12:21:57.044 +02:00 [INF] [topic_priority] - Consumed message '1 topic_priority' at: 'topic_priority [[0]] @1'.
+2023-07-07 12:21:57.526 +02:00 [INF] Bounding staleness for collection topic_priority and port 5715
+2023-07-07 12:21:57.529 +02:00 [ERR] localData Topic: topic_priority
+2023-07-07 12:21:57.534 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:21:57.537 +02:00 [ERR] Received data is null
+2023-07-07 12:21:57.540 +02:00 [DBG] Consumed time: "2023-07-07T12:21:57.5261628+02:00"
+2023-07-07 12:21:57.543 +02:00 [DBG] Last time since pull: "2023-07-07T12:21:54.4281244+02:00"
+2023-07-07 12:21:57.546 +02:00 [DBG] Difference for node with port 6485: 3098.0384
+2023-07-07 12:21:57.551 +02:00 [DBG] Staleness bound: 2000
+2023-07-07 12:21:57.554 +02:00 [INF] Pulling data from node with port 6485
+2023-07-07 12:21:58.781 +02:00 [DBG] [5715] - Previous offset for topic topic_priority partition 0: 2
+2023-07-07 12:22:01.621 +02:00 [DBG] Event Type: syncResponse
+2023-07-07 12:22:01.627 +02:00 [ERR] localData Topic: topic_priority
+2023-07-07 12:22:01.629 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:22:01.633 +02:00 [ERR] Received data Count: 3
+2023-07-07 12:22:01.635 +02:00 [ERR] --Received data topic does not match local data topic
+2023-07-07 12:22:01.636 +02:00 [ERR] Adding received data to buffer -- Collection name: topic_normal -- Buffer count: 1
+2023-07-07 12:22:01.665 +02:00 [ERR] localData Topic: topic_priority
+2023-07-07 12:22:01.670 +02:00 [ERR] Local data Count: 2
+2023-07-07 12:22:01.673 +02:00 [ERR] Received data Count: 3
+2023-07-07 12:22:01.676 +02:00 [ERR] --Received data topic does not match local data topic
+2023-07-07 12:22:07.799 +02:00 [DBG] Event Type: heartbeatEvent
