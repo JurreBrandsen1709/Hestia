@@ -273,6 +273,8 @@ namespace Dyconit.Overlord
             // Send the new bounds for the adminClient to all other nodes in the collection
             var nodes = collection.Nodes?.ToList();
 
+            Log.Error($" --- There are {nodes?.Count} nodes in the collection {collection.Name}");
+
             if (nodes == null)
             {
                 Log.Debug($"-- Collection {collection.Name} has no nodes. Ignoring...");

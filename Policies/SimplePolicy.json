@@ -12,7 +12,7 @@
       "actions": [
         {
           "type": "multiply",
-          "value": 1.001
+          "value": 1.1
         }
       ]
     },
@@ -21,7 +21,7 @@
       "actions": [
         {
           "type": "multiply",
-          "value": 0.999
+          "value": 0.9
         }
       ]
     }

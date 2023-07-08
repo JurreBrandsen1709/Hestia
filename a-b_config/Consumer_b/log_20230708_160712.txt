@@ -1,0 +1,246 @@
+2023-07-08 16:07:19.051 +02:00 [DBG] Event Type: newNodeEvent
+2023-07-08 16:07:20.541 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:07:22.593 +02:00 [DBG] Event Type: newNodeEvent
+2023-07-08 16:07:24.642 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:07:24.809 +02:00 [DBG] [7176] - No previous offset for topic topic_priority partition 0
+2023-07-08 16:07:24.812 +02:00 [DBG] [7176] - Previous offset for topic topic_priority partition 0: 0
+2023-07-08 16:07:24.819 +02:00 [INF] [topic_priority] - Consumed message '31 topic_priority' at: 'topic_priority [[0]] @31'.
+2023-07-08 16:07:25.250 +02:00 [INF] Bounding staleness for collection topic_priority and port 7176
+2023-07-08 16:07:25.257 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:25.2574656+02:00"
+2023-07-08 16:07:25.259 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:19.0681941+02:00"
+2023-07-08 16:07:25.260 +02:00 [DBG] Difference for node with port 9211: 6189.2715
+2023-07-08 16:07:25.262 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:07:25.263 +02:00 [INF] Pulling data from node with port 9211
+2023-07-08 16:07:26.843 +02:00 [DBG] [7176] - No previous offset for topic topic_normal partition 0
+2023-07-08 16:07:26.846 +02:00 [DBG] [7176] - Previous offset for topic topic_normal partition 0: 0
+2023-07-08 16:07:26.848 +02:00 [INF] [topic_normal] - Consumed message '50 topic_normal' at: 'topic_normal [[0]] @50'.
+2023-07-08 16:07:27.331 +02:00 [INF] Bounding staleness for collection topic_normal and port 7176
+2023-07-08 16:07:27.334 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:27.3346566+02:00"
+2023-07-08 16:07:27.337 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:22.6000639+02:00"
+2023-07-08 16:07:27.338 +02:00 [DBG] Difference for node with port 9211: 4734.5927
+2023-07-08 16:07:27.339 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:07:27.340 +02:00 [INF] **-*[topic_normal] - result: 1 False
+2023-07-08 16:07:27.342 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 51
+2023-07-08 16:07:27.344 +02:00 [INF] NO Numerical Error detected: 1 < 25
+2023-07-08 16:07:27.345 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:07:27.346 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:07:27.346 +02:00 [INF] [topic_normal] - lastcommittedoffset: 51
+2023-07-08 16:07:27.348 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 51
+2023-07-08 16:07:27.479 +02:00 [INF] [topic_normal] - Consumed message '51 topic_normal' at: 'topic_normal [[0]] @51'.
+2023-07-08 16:07:27.965 +02:00 [INF] Bounding staleness for collection topic_normal and port 7176
+2023-07-08 16:07:27.967 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:27.9675050+02:00"
+2023-07-08 16:07:27.973 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:22.6000639+02:00"
+2023-07-08 16:07:27.978 +02:00 [DBG] Difference for node with port 9211: 5367.4411
+2023-07-08 16:07:27.981 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:07:27.989 +02:00 [INF] Pulling data from node with port 9211
+2023-07-08 16:07:28.850 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:07:28.969 +02:00 [DBG] Added total weight of collection topic_priority to 2
+2023-07-08 16:07:29.827 +02:00 [DBG] [7176] - Current Offset for topic topic_priority partition 0: 32
+2023-07-08 16:07:29.829 +02:00 [DBG] [7176] - Consumption rate for topic topic_priority partition 0: 6,379550605715403
+2023-07-08 16:07:30.998 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:07:31.010 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:07:31.046 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": 0,
+    "Offset": 30,
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight",
+          "Value": "AAAAAAAA8D8="
+        }
+      ]
+    },
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:07:31.059 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:07:31.062 +02:00 [DBG] Added total weight of collection topic_normal to 2
+2023-07-08 16:07:31.124 +02:00 [DBG] [7176] - localData: 31 topic_priority
+2023-07-08 16:07:31.127 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:07:31.128 +02:00 [DBG] [7176] - _receivedData: 30 topic_priority
+2023-07-08 16:07:31.129 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:07:31.131 +02:00 [DBG] [7176] - mergedData: 30 topic_priority
+2023-07-08 16:07:31.131 +02:00 [DBG] [7176] - mergedData: 31 topic_priority
+2023-07-08 16:07:31.132 +02:00 [DBG] isNotSame: true, localData.Count: 1, _receivedData.Count: 1, mergedData.Count: 2
+2023-07-08 16:07:31.134 +02:00 [INF] **-*[topic_priority] - result: 2 True
+2023-07-08 16:07:31.135 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 32
+2023-07-08 16:07:31.137 +02:00 [DBG] [topic_priority] - Adding weight: 2
+2023-07-08 16:07:31.140 +02:00 [INF] NO Numerical Error detected: 2 < 10
+2023-07-08 16:07:31.141 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:07:31.159 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:07:31.160 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 32
+2023-07-08 16:07:31.160 +02:00 [INF] [topic_priority] - lastcommittedoffset: 32
+2023-07-08 16:07:31.161 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 32
+2023-07-08 16:07:31.524 +02:00 [INF] [topic_priority] - Consumed message '32 topic_priority' at: 'topic_priority [[0]] @32'.
+2023-07-08 16:07:31.850 +02:00 [DBG] [7176] - Current Offset for topic topic_normal partition 0: 52
+2023-07-08 16:07:31.854 +02:00 [DBG] [7176] - Consumption rate for topic topic_normal partition 0: 10,391212774829093
+2023-07-08 16:07:31.959 +02:00 [INF] Bounding staleness for collection topic_priority and port 7176
+2023-07-08 16:07:31.961 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:31.9613847+02:00"
+2023-07-08 16:07:31.964 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:31.0590720+02:00"
+2023-07-08 16:07:31.970 +02:00 [DBG] Difference for node with port 9211: 902.3127
+2023-07-08 16:07:31.976 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:07:31.978 +02:00 [INF] **-*[topic_priority] - result: 3 False
+2023-07-08 16:07:31.979 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 33
+2023-07-08 16:07:31.983 +02:00 [INF] NO Numerical Error detected: 1 < 10
+2023-07-08 16:07:31.986 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:07:31.990 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:07:31.993 +02:00 [INF] [topic_priority] - lastcommittedoffset: 33
+2023-07-08 16:07:31.995 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 33
+2023-07-08 16:07:32.038 +02:00 [INF] [topic_priority] - Consumed message '33 topic_priority' at: 'topic_priority [[0]] @33'.
+2023-07-08 16:07:32.590 +02:00 [INF] Bounding staleness for collection topic_priority and port 7176
+2023-07-08 16:07:32.594 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:32.5947325+02:00"
+2023-07-08 16:07:32.600 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:31.0590720+02:00"
+2023-07-08 16:07:32.606 +02:00 [DBG] Difference for node with port 9211: 1535.6605
+2023-07-08 16:07:32.612 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:07:32.613 +02:00 [INF] **-*[topic_priority] - result: 4 False
+2023-07-08 16:07:32.614 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 34
+2023-07-08 16:07:32.615 +02:00 [INF] NO Numerical Error detected: 2 < 10
+2023-07-08 16:07:32.618 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:07:32.622 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:07:32.625 +02:00 [INF] [topic_priority] - lastcommittedoffset: 34
+2023-07-08 16:07:32.626 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 34
+2023-07-08 16:07:33.049 +02:00 [INF] [topic_priority] - Consumed message '34 topic_priority' at: 'topic_priority [[0]] @34'.
+2023-07-08 16:07:33.103 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:07:33.108 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:07:33.113 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": 0,
+    "Offset": 53,
+    "Message": {
+      "Key": null,
+      "Value": "53 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight",
+          "Value": "AAAAAAAA8D8="
+        }
+      ]
+    },
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:07:33.122 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:07:33.197 +02:00 [INF] **-*[topic_normal] - result: 2 False
+2023-07-08 16:07:33.198 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 52
+2023-07-08 16:07:33.200 +02:00 [INF] NO Numerical Error detected: 2 < 25
+2023-07-08 16:07:33.202 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:07:33.203 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:07:33.205 +02:00 [INF] [topic_normal] - lastcommittedoffset: 52
+2023-07-08 16:07:33.206 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 52
+2023-07-08 16:07:33.545 +02:00 [INF] [topic_normal] - Consumed message '52 topic_normal' at: 'topic_normal [[0]] @52'.
+2023-07-08 16:07:33.584 +02:00 [INF] Bounding staleness for collection topic_priority and port 7176
+2023-07-08 16:07:33.587 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:33.5877250+02:00"
+2023-07-08 16:07:33.589 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:31.0590720+02:00"
+2023-07-08 16:07:33.591 +02:00 [DBG] Difference for node with port 9211: 2528.653
+2023-07-08 16:07:33.592 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:07:33.594 +02:00 [INF] Pulling data from node with port 9211
+2023-07-08 16:07:34.125 +02:00 [INF] Bounding staleness for collection topic_normal and port 7176
+2023-07-08 16:07:34.128 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:34.1282153+02:00"
+2023-07-08 16:07:34.129 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:33.1212381+02:00"
+2023-07-08 16:07:34.131 +02:00 [DBG] Difference for node with port 9211: 1006.9772
+2023-07-08 16:07:34.132 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:07:34.134 +02:00 [INF] **-*[topic_normal] - result: 3 False
+2023-07-08 16:07:34.137 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 53
+2023-07-08 16:07:34.141 +02:00 [INF] NO Numerical Error detected: 3 < 25
+2023-07-08 16:07:34.144 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:07:34.145 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:07:34.146 +02:00 [INF] [topic_normal] - lastcommittedoffset: 53
+2023-07-08 16:07:34.147 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 53
+2023-07-08 16:07:34.560 +02:00 [INF] [topic_normal] - Consumed message '53 topic_normal' at: 'topic_normal [[0]] @53'.
+2023-07-08 16:07:34.803 +02:00 [DBG] [7176] - Previous offset for topic topic_priority partition 0: 35
+2023-07-08 16:07:35.026 +02:00 [INF] Bounding staleness for collection topic_normal and port 7176
+2023-07-08 16:07:35.030 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:35.0304126+02:00"
+2023-07-08 16:07:35.032 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:33.1212381+02:00"
+2023-07-08 16:07:35.036 +02:00 [DBG] Difference for node with port 9211: 1909.1745
+2023-07-08 16:07:35.043 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:07:35.047 +02:00 [INF] **-*[topic_normal] - result: 4 False
+2023-07-08 16:07:35.048 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 54
+2023-07-08 16:07:35.050 +02:00 [INF] NO Numerical Error detected: 4 < 25
+2023-07-08 16:07:35.051 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:07:35.053 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:07:35.055 +02:00 [INF] [topic_normal] - lastcommittedoffset: 54
+2023-07-08 16:07:35.057 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 54
+2023-07-08 16:07:35.069 +02:00 [INF] [topic_normal] - Consumed message '54 topic_normal' at: 'topic_normal [[0]] @54'.
+2023-07-08 16:07:35.583 +02:00 [INF] Bounding staleness for collection topic_normal and port 7176
+2023-07-08 16:07:35.589 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:07:35.5897994+02:00"
+2023-07-08 16:07:35.592 +02:00 [DBG] Last time since pull: "2023-07-08T16:07:33.1212381+02:00"
+2023-07-08 16:07:35.596 +02:00 [DBG] Difference for node with port 9211: 2468.5613
+2023-07-08 16:07:35.598 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:07:35.600 +02:00 [INF] **-*[topic_normal] - result: 5 False
+2023-07-08 16:07:35.604 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 55
+2023-07-08 16:07:35.607 +02:00 [INF] NO Numerical Error detected: 5 < 25
+2023-07-08 16:07:35.609 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:07:35.611 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:07:35.612 +02:00 [INF] [topic_normal] - lastcommittedoffset: 55
+2023-07-08 16:07:35.614 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 55
+2023-07-08 16:07:36.518 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:07:37.684 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:07:37.688 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": 0,
+    "Offset": 30,
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight",
+          "Value": "AAAAAAAA8D8="
+        }
+      ]
+    },
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": 0,
+    "Offset": 31,
+    "Message": {
+      "Key": null,
+      "Value": "31 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight",
+          "Value": "AAAAAAAA8D8="
+        }
+      ]
+    },
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:07:37.805 +02:00 [INF] **-*[topic_priority] - result: 5 False
+2023-07-08 16:07:37.809 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 35
+2023-07-08 16:07:37.811 +02:00 [INF] NO Numerical Error detected: 3 < 10
+2023-07-08 16:07:37.812 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:07:37.813 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:07:37.814 +02:00 [INF] [topic_priority] - lastcommittedoffset: 35
+2023-07-08 16:07:37.815 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 35
+2023-07-08 16:07:38.754 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:07:45.578 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:07:45.586 +02:00 [DBG] Updated total weight of collection topic_priority to 3

@@ -17,7 +17,7 @@ namespace Dyconit.Helper
         public double ?Staleness { get; set; }
         public double ?NumericalError { get; set; }
 
-        internal void UpdateBounds(int? staleness, int? numericalError)
+        internal void UpdateBounds(double? staleness, double? numericalError)
         {
             if (staleness != null)
             {
@@ -75,6 +75,7 @@ namespace Dyconit.Helper
     {
         public bool changed { get; set; }
         public List<ConsumeResult<Null, string>> ?Data { get; set; }
+        public double ?Weight { get; set; } = 0;
 
     }
 

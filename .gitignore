@@ -1,6 +1,7 @@
 # Ignore bin and obj folders
 **/bin/
 **/obj/
+**/.txt
 
 # Ignore .env files
 **/.env

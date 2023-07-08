@@ -18,7 +18,8 @@ class Consumer
     public static int adminPort = DyconitHelper.FindPort();
     public static DyconitAdmin _DyconitLogger;
     private static Random _random = new Random();
-    private static double _totalLocalWeight = 0.0;
+
+    private static Dictionary<string, double> _totalWeight = new Dictionary<string, double>();
 
     static async Task Main()
     {
@@ -32,12 +33,14 @@ class Consumer
 
         foreach (var topic in topics)
         {
-            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 2000 : 5000, topic == "topic_priority" ? 5 : 10);
+            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 2000 : 5000, topic == "topic_priority" ? 10 : 25);
 
             _localCollection[topic] = conitConfiguration;
 
             var consumedMessages = new List<ConsumeResult<Null, string>>();
             _uncommittedConsumedMessages.Add(topic, consumedMessages);
+
+            _totalWeight.Add(topic, 0);
         }
 
         _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection);
@@ -83,7 +86,7 @@ class Consumer
                 {
                     var consumeResult = consumer.Consume(token);
                     var inputMessage = consumeResult.Message.Value;
-                    _totalLocalWeight += DyconitHelper.GetMessageWeight(consumeResult);
+                    _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
 
                     Log.Information($"[{topic}] - Consumed message '{inputMessage}' at: '{consumeResult.TopicPartitionOffset}'.");
                      _lastCommittedOffset = consumeResult.Offset;
@@ -115,16 +118,27 @@ class Consumer
 
                     Log.Debug($"[{topic}] - lastcommittedoffset: {_lastCommittedOffset}");
 
-                    // Console.WriteLine($"[{adminPort}] - {DateTime.Now:HH:mm:ss.fff} bounding numerical error");
-                    // SyncResult result = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], collectionConfiguration, topic, _totalLocalWeight);
-                    // _uncommittedConsumedMessages[topic] = result.Data;
-                    // var commit = result.changed;
 
-                    // if (_uncommittedConsumedMessages[topic].Count > 0)
-                    // {
-                    //     var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
-                    //     _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
-                    // }
+                    // if there is a new weight in the result, we add it to the total weight
+                    if (result.Weight != 0)
+                    {
+                        Log.Debug($"[{topic}] - Adding weight: {result.Weight.Value}");
+                        _totalWeight[topic] += result.Weight.Value - _totalWeight[topic];
+                    }
+
+
+                    Log.Information($"[{adminPort}] - {DateTime.Now:HH:mm:ss.fff} bounding numerical error");
+
+                    bool boundResult = DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
+                    commit = boundResult || commit;
+
+                    _uncommittedConsumedMessages[topic] = result.Data;
+
+                    if (_uncommittedConsumedMessages[topic].Count > 0)
+                    {
+                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                    }
 
                     Log.Information($"[{topic}] - result: {_uncommittedConsumedMessages.Count} {commit}");
                     if (commit)
@@ -132,6 +146,7 @@ class Consumer
                         _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
                         Log.Information($"[{topic}] - Committed messages");
                         Log.Information($"[{topic}] - After committing lastcommittedoffset is: {_lastCommittedOffset}");
+                        _totalWeight[topic] = 0.0;
                     }
                     else
                     {

@@ -20,6 +20,7 @@ namespace Dyconit.Overlord
         private bool _synced;
         private HashSet<int> _syncResponses = new HashSet<int>();
         private Dictionary<string, List<ConsumeResult<Null, string>>> _buffer = new Dictionary<string, List<ConsumeResult<Null, string>>>();
+        private Dictionary<string, double> _totalWeight = new Dictionary<string, double>();
 
         public DyconitAdmin(string bootstrapServers, int adminPort, JObject conitCollection)
         {
@@ -118,6 +119,7 @@ namespace Dyconit.Overlord
             // deserialize the data
             List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(data)!;
 
+
             // Convert back to original format
             _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
             {
@@ -129,7 +131,7 @@ namespace Dyconit.Overlord
                     Key = dw.Message?.Key!, // Handle possible null value
                     Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
                     Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
-                    Headers = new Headers()
+                    Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
                 },
                 IsPartitionEOF = dw.IsPartitionEOF
             }).ToList();
@@ -163,16 +165,23 @@ namespace Dyconit.Overlord
             return Task.CompletedTask;
         }
 
+        private Headers ConvertToKafkaHeaders(List<HeaderWrapper> headerWrappers)
+        {
+            var headers = new Headers();
+            foreach (var headerWrapper in headerWrappers)
+            {
+                headers.Add(headerWrapper.Key, headerWrapper.Value);
+            }
+            return headers;
+        }
+
         private SyncResult UpdateLocalData(List<ConsumeResult<Null, string>> localData, string collectionName)
         {
             _localData = localData;
             var topic = localData.First().Topic;
-            Log.Error($"localData Topic: {topic}");
-            Log.Error($"Local data Count: {_localData.Count}");
 
             if (_receivedData == null)
             {
-                Log.Error("Received data is null");
 
                 return new SyncResult
                 {
@@ -181,15 +190,11 @@ namespace Dyconit.Overlord
                 };
             }
 
-            Log.Error($"Received data Count: {_receivedData.Count}");
-
             if (_receivedData.Count == 0)
             {
-                Log.Error("Received data count is 0");
 
                 if (_buffer.ContainsKey(topic))
                 {
-                    Log.Error("Buffer contains key {topic}", topic);
                     _receivedData = _buffer[topic];
 
                     _buffer.Remove(topic);
@@ -206,11 +211,8 @@ namespace Dyconit.Overlord
 
             if (_receivedData.First().Topic != localData.First().Topic)
             {
-                Log.Error("--Received data topic does not match local data topic");
-
                 if (_buffer.ContainsKey(topic))
                 {
-                    Log.Error("Buffer contains key {topic}", topic);
                     _receivedData = _buffer[topic];
                     _buffer.Remove(topic);
                 }
@@ -227,8 +229,6 @@ namespace Dyconit.Overlord
                         _buffer.Add(key, _receivedData);
                     }
 
-                    Log.Error($"Adding received data to buffer -- Collection name: {_receivedData.First().Topic} -- Buffer count: {_buffer.Count()}");
-
                     return new SyncResult
                     {
                         changed = false,
@@ -240,15 +240,6 @@ namespace Dyconit.Overlord
             // check if the topic of the _receivedData is the same as the topic of localData
             if (_receivedData == null || _receivedData.Count < localData.Count)
             {
-                if (_receivedData == null)
-                {
-                    Log.Debug($"Received data is null.. Skipping update -- Received data count: 0 -- Local data count: {localData.Count()}");
-                }
-                else
-                {
-                    Log.Debug($"Received data is old.. Skipping update -- Received data count: {_receivedData.Count()} -- Local data count: {localData.Count()}");
-                }
-
                 SyncResult earlyResult = new SyncResult
                 {
                     changed = false || _synced,
@@ -283,8 +274,6 @@ namespace Dyconit.Overlord
             // check if the merged data has the same topic as the collection name. if this is not the case, store the merged data in the buffer
             if (mergedData.First().Topic != collectionName)
             {
-                Log.Error("Merged data topic does not match collection name");
-
                 if (_buffer.ContainsKey(topic))
                 {
                     _buffer[topic] = mergedData;
@@ -293,8 +282,6 @@ namespace Dyconit.Overlord
                 {
                     _buffer.Add(topic, mergedData);
                 }
-
-                Log.Error($"Adding merged data to buffer -- Collection name: {mergedData.First().Topic} -- Buffer count: {_buffer.Count()}");
 
                 return new SyncResult
                 {
@@ -307,6 +294,7 @@ namespace Dyconit.Overlord
             {
                 changed = isNotSame || _synced,
                 Data = mergedData,
+                Weight = _totalWeight[topic]
             };
 
             _localData = mergedData;
@@ -314,6 +302,7 @@ namespace Dyconit.Overlord
 
             // Clear the received data
             _receivedData = null;
+            _totalWeight[topic] = 0;
 
             return result;
         }
@@ -336,8 +325,16 @@ namespace Dyconit.Overlord
             List<ConsumeResultWrapper<Null, string>> wrapperList = _localData!.Select(cr => new ConsumeResultWrapper<Null, string>(cr)).ToList();
             string consumeResultWrapped = JsonConvert.SerializeObject(wrapperList, Formatting.Indented);
 
-            // print the consumeResultWrapped
-            // Log.Error("consumeResultWrapped: {ConsumeResultWrapped}", consumeResultWrapped);
+            if (!_totalWeight.ContainsKey(collectionName))
+            {
+                _totalWeight.Add(collectionName, _localData!.Sum(cr => DyconitHelper.GetMessageWeight(cr)));
+                Log.Debug($"Added total weight of collection {collectionName} to {_totalWeight[collectionName]}");
+            }
+            else // if the key does exist, update it
+            {
+                _totalWeight[collectionName] = _localData!.Sum(cr => DyconitHelper.GetMessageWeight(cr));
+                Log.Debug($"Updated total weight of collection {collectionName} to {_totalWeight[collectionName]}");
+            }
 
             var syncResponse = new JObject
             {
@@ -351,6 +348,7 @@ namespace Dyconit.Overlord
 
             // Log.Information("Sent syncResponse to port {Port}", syncRequestPort);
             _synced = true;
+            Log.Error("=========================Synced is true=========================");
 
             // increment the sync for the port and colleciton combination
             var collection = _dyconitCollections.Collections
@@ -361,6 +359,8 @@ namespace Dyconit.Overlord
             {
                 node.SyncCount++;
             }
+
+
         }
 
         private async Task HandleHeartbeatEventAsync(JObject messageObject)
@@ -394,8 +394,8 @@ namespace Dyconit.Overlord
                 ?.FirstOrDefault(n => n.Port == nodePort);
 
             // update the node's bounds
-            node!.Bounds!.Staleness = messageObject["bounds"]!["Staleness"]?.ToObject<int>();
-            node.Bounds.NumericalError = messageObject["bounds"]!["NumericalError"]?.ToObject<int>();
+            node!.Bounds!.Staleness = messageObject["bounds"]!["Staleness"]?.ToObject<double>();
+            node.Bounds.NumericalError = messageObject["bounds"]!["NumericalError"]?.ToObject<double>();
 
             // Log.Debug("Updated node: {Node}", JsonConvert.SerializeObject(node, Formatting.Indented));
 
@@ -659,5 +659,60 @@ namespace Dyconit.Overlord
                 await Task.Delay(100);
             }
         }
+
+        public bool BoundNumericalError(List<ConsumeResult<Null, string>> list, string topic, double totalLocalWeight)
+{
+    // get the number of nodes in the collection
+    var numberOfNodes = _dyconitCollections.Collections
+        ?.FirstOrDefault(c => c.Name == topic)
+        ?.Nodes
+        ?.Count;
+
+    // if the number of nodes is null, we can't do anything
+    if (!numberOfNodes.HasValue || numberOfNodes.Value == 0 || numberOfNodes.Value == 1)
+    {
+        Log.Warning("Number of nodes is null for collection {CollectionName} and port {Port}", topic, _listenPort);
+        return false || _synced;
+    }
+    else
+    {
+        var otherNodes = _dyconitCollections.Collections
+            ?.FirstOrDefault(c => c.Name == topic)
+            ?.Nodes
+            ?.Where(n => n.Port != _listenPort);
+
+        // go through the numerical error bounds for each node which is not the current node
+        foreach (var node in otherNodes!)
+        {
+            double numericalErrorBound = node.Bounds!.NumericalError!.Value;
+
+            // calculate the average weight per node
+            double averageWeightPerNode = totalLocalWeight / (numberOfNodes.Value - 1);
+
+            // if the average weight per node is greater than the numerical error bound, we need to send data to the other node
+            if (averageWeightPerNode > numericalErrorBound)
+            {
+                Log.Information($"Numerical Error detected: {averageWeightPerNode} > {numericalErrorBound}. Sending data to node with port {node.Port}");
+
+                // send a sync request to the other node
+                var message = new JObject
+                {
+                    ["eventType"] = "syncRequest",
+                    ["port"] = node.Port,
+                    ["collectionName"] = topic,
+                };
+
+                SendMessageOverTcp(message.ToString(), _listenPort).Wait();
+            }
+            else
+            {
+                Log.Information($"NO Numerical Error detected: {averageWeightPerNode} < {numericalErrorBound}");
+            }
+        }
+
+        return false || _synced;
+    }
+}
+
     }
 }

@@ -1,0 +1,7366 @@
+2023-07-08 16:16:54.282 +02:00 [DBG] Event Type: newNodeEvent
+2023-07-08 16:16:56.277 +02:00 [DBG] Event Type: newNodeEvent
+2023-07-08 16:17:00.014 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:00.140 +02:00 [DBG] [5252] - No previous offset for topic topic_priority partition 0
+2023-07-08 16:17:00.145 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 0
+2023-07-08 16:17:00.149 +02:00 [INF] [topic_priority] - Consumed message '32 topic_priority' at: 'topic_priority [[0]] @32'.
+2023-07-08 16:17:00.577 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:00.588 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:00.5881969+02:00"
+2023-07-08 16:17:00.589 +02:00 [DBG] Last time since pull: "2023-07-08T16:16:54.3061880+02:00"
+2023-07-08 16:17:00.594 +02:00 [DBG] Difference for node with port 7037: 6282.0089
+2023-07-08 16:17:00.597 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:17:00.598 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:02.159 +02:00 [DBG] [5252] - No previous offset for topic topic_normal partition 0
+2023-07-08 16:17:02.161 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 0
+2023-07-08 16:17:02.163 +02:00 [INF] [topic_normal] - Consumed message '50 topic_normal' at: 'topic_normal [[0]] @50'.
+2023-07-08 16:17:02.762 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:02.765 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:02.7656201+02:00"
+2023-07-08 16:17:02.766 +02:00 [DBG] Last time since pull: "2023-07-08T16:16:56.2833464+02:00"
+2023-07-08 16:17:02.767 +02:00 [DBG] Difference for node with port 7037: 6482.2737
+2023-07-08 16:17:02.768 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:02.768 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:03.773 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:03.890 +02:00 [DBG] Added total weight of collection topic_priority to 1
+2023-07-08 16:17:05.149 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 33
+2023-07-08 16:17:05.151 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 6,592985327331133
+2023-07-08 16:17:05.945 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:05.951 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:07.172 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 51
+2023-07-08 16:17:07.174 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: 10,177945206972108
+2023-07-08 16:17:07.994 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:07.998 +02:00 [DBG] Added total weight of collection topic_normal to 1
+2023-07-08 16:17:10.043 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:10.049 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:10.103 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:10.113 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:10.115 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:10.116 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:10.134 +02:00 [INF] **-*[topic_priority] - result: 1 False
+2023-07-08 16:17:10.135 +02:00 [DBG] [5252] - localData: 50 topic_normal
+2023-07-08 16:17:10.135 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 33
+2023-07-08 16:17:10.136 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:17:10.136 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 33
+2023-07-08 16:17:10.138 +02:00 [DBG] [5252] - _receivedData: 54 topic_normal
+2023-07-08 16:17:10.138 +02:00 [INF] NO Numerical Error detected: 1 < 10
+2023-07-08 16:17:10.140 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:17:10.141 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:17:10.141 +02:00 [DBG] [5252] - mergedData: 54 topic_normal
+2023-07-08 16:17:10.143 +02:00 [DBG] [5252] - mergedData: 50 topic_normal
+2023-07-08 16:17:10.144 +02:00 [DBG] isNotSame: true, localData.Count: 1, _receivedData.Count: 1, mergedData.Count: 2
+2023-07-08 16:17:10.147 +02:00 [INF] **-*[topic_normal] - result: 2 True
+2023-07-08 16:17:10.147 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 51
+2023-07-08 16:17:10.148 +02:00 [DBG] [topic_normal] - Adding weight: 1
+2023-07-08 16:17:10.149 +02:00 [INF] NO Numerical Error detected: 1 < 25
+2023-07-08 16:17:10.150 +02:00 [INF] [topic_normal] - result: 2 True
+2023-07-08 16:17:10.151 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:17:10.152 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 33
+2023-07-08 16:17:10.153 +02:00 [INF] [topic_priority] - lastcommittedoffset: 33
+2023-07-08 16:17:10.154 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 33
+2023-07-08 16:17:10.157 +02:00 [INF] [topic_normal] - Committed messages
+2023-07-08 16:17:10.158 +02:00 [INF] [topic_normal] - After committing lastcommittedoffset is: 51
+2023-07-08 16:17:10.159 +02:00 [INF] [topic_normal] - lastcommittedoffset: 51
+2023-07-08 16:17:10.159 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 51
+2023-07-08 16:17:10.351 +02:00 [INF] [topic_priority] - Consumed message '33 topic_priority' at: 'topic_priority [[0]] @33'.
+2023-07-08 16:17:10.351 +02:00 [INF] [topic_normal] - Consumed message '51 topic_normal' at: 'topic_normal [[0]] @51'.
+2023-07-08 16:17:10.804 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:10.809 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:10.8090586+02:00"
+2023-07-08 16:17:10.810 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:10.811 +02:00 [DBG] Difference for node with port 7037: 687.1511
+2023-07-08 16:17:10.813 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:10.814 +02:00 [INF] **-*[topic_normal] - result: 3 False
+2023-07-08 16:17:10.815 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 52
+2023-07-08 16:17:10.816 +02:00 [INF] NO Numerical Error detected: 1 < 25
+2023-07-08 16:17:10.816 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:10.817 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:10.818 +02:00 [INF] [topic_normal] - lastcommittedoffset: 52
+2023-07-08 16:17:10.818 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 52
+2023-07-08 16:17:10.864 +02:00 [INF] [topic_normal] - Consumed message '52 topic_normal' at: 'topic_normal [[0]] @52'.
+2023-07-08 16:17:10.864 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:10.868 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:10.8686606+02:00"
+2023-07-08 16:17:10.869 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1128770+02:00"
+2023-07-08 16:17:10.870 +02:00 [DBG] Difference for node with port 7037: 755.7836
+2023-07-08 16:17:10.871 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:17:10.872 +02:00 [INF] **-*[topic_priority] - result: 2 False
+2023-07-08 16:17:10.874 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 34
+2023-07-08 16:17:10.877 +02:00 [INF] NO Numerical Error detected: 1 < 10
+2023-07-08 16:17:10.878 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:10.879 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:10.880 +02:00 [INF] [topic_priority] - lastcommittedoffset: 34
+2023-07-08 16:17:10.881 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 34
+2023-07-08 16:17:11.283 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:11.284 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:11.2843763+02:00"
+2023-07-08 16:17:11.285 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:11.286 +02:00 [DBG] Difference for node with port 7037: 1162.4688
+2023-07-08 16:17:11.288 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:11.289 +02:00 [INF] **-*[topic_normal] - result: 4 False
+2023-07-08 16:17:11.290 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 53
+2023-07-08 16:17:11.294 +02:00 [INF] NO Numerical Error detected: 2 < 25
+2023-07-08 16:17:11.296 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:11.297 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:11.299 +02:00 [INF] [topic_normal] - lastcommittedoffset: 53
+2023-07-08 16:17:11.300 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 53
+2023-07-08 16:17:11.369 +02:00 [INF] [topic_priority] - Consumed message '34 topic_priority' at: 'topic_priority [[0]] @34'.
+2023-07-08 16:17:11.371 +02:00 [INF] [topic_normal] - Consumed message '53 topic_normal' at: 'topic_normal [[0]] @53'.
+2023-07-08 16:17:11.980 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:11.980 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:11.982 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:11.9829412+02:00"
+2023-07-08 16:17:11.984 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:11.9841591+02:00"
+2023-07-08 16:17:11.984 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:11.985 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1128770+02:00"
+2023-07-08 16:17:11.986 +02:00 [DBG] Difference for node with port 7037: 1861.0337
+2023-07-08 16:17:11.987 +02:00 [DBG] Difference for node with port 7037: 1871.2821
+2023-07-08 16:17:11.988 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:11.990 +02:00 [DBG] Staleness bound: 2000
+2023-07-08 16:17:11.992 +02:00 [INF] **-*[topic_normal] - result: 5 False
+2023-07-08 16:17:11.994 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 54
+2023-07-08 16:17:11.993 +02:00 [INF] **-*[topic_priority] - result: 3 False
+2023-07-08 16:17:11.995 +02:00 [INF] NO Numerical Error detected: 3 < 25
+2023-07-08 16:17:11.996 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 35
+2023-07-08 16:17:11.997 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:11.998 +02:00 [INF] NO Numerical Error detected: 2 < 10
+2023-07-08 16:17:11.999 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:11.999 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:12.000 +02:00 [INF] [topic_normal] - lastcommittedoffset: 54
+2023-07-08 16:17:12.000 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:12.001 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 54
+2023-07-08 16:17:12.002 +02:00 [INF] [topic_priority] - lastcommittedoffset: 35
+2023-07-08 16:17:12.004 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 35
+2023-07-08 16:17:12.178 +02:00 [DBG] [5252] - No previous offset for topic topic_normal partition 0
+2023-07-08 16:17:12.183 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 0
+2023-07-08 16:17:12.231 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:12.381 +02:00 [INF] [topic_normal] - Consumed message '54 topic_normal' at: 'topic_normal [[0]] @54'.
+2023-07-08 16:17:12.382 +02:00 [INF] [topic_priority] - Consumed message '35 topic_priority' at: 'topic_priority [[0]] @35'.
+2023-07-08 16:17:12.884 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:12.888 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:12.8881580+02:00"
+2023-07-08 16:17:12.890 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1128770+02:00"
+2023-07-08 16:17:12.895 +02:00 [DBG] Difference for node with port 7037: 2775.281
+2023-07-08 16:17:12.898 +02:00 [DBG] Staleness bound: 2200
+2023-07-08 16:17:12.899 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:12.931 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:12.933 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:12.9337342+02:00"
+2023-07-08 16:17:12.936 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:12.937 +02:00 [DBG] Difference for node with port 7037: 2811.8267
+2023-07-08 16:17:12.939 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:12.943 +02:00 [INF] **-*[topic_normal] - result: 6 False
+2023-07-08 16:17:12.945 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 55
+2023-07-08 16:17:12.949 +02:00 [INF] NO Numerical Error detected: 4 < 25
+2023-07-08 16:17:12.951 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:12.952 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:12.953 +02:00 [INF] [topic_normal] - lastcommittedoffset: 55
+2023-07-08 16:17:12.955 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 55
+2023-07-08 16:17:13.391 +02:00 [INF] [topic_normal] - Consumed message '55 topic_normal' at: 'topic_normal [[0]] @55'.
+2023-07-08 16:17:13.846 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:13.848 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:13.8489248+02:00"
+2023-07-08 16:17:13.850 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:13.851 +02:00 [DBG] Difference for node with port 7037: 3727.0173
+2023-07-08 16:17:13.852 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:13.853 +02:00 [INF] **-*[topic_normal] - result: 7 False
+2023-07-08 16:17:13.853 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 56
+2023-07-08 16:17:13.854 +02:00 [INF] NO Numerical Error detected: 5 < 25
+2023-07-08 16:17:13.855 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:13.856 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:13.859 +02:00 [INF] [topic_normal] - lastcommittedoffset: 56
+2023-07-08 16:17:13.860 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 56
+2023-07-08 16:17:13.902 +02:00 [INF] [topic_normal] - Consumed message '56 topic_normal' at: 'topic_normal [[0]] @56'.
+2023-07-08 16:17:14.405 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:14.411 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:14.4111235+02:00"
+2023-07-08 16:17:14.414 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:14.417 +02:00 [DBG] Difference for node with port 7037: 4289.216
+2023-07-08 16:17:14.420 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:14.426 +02:00 [INF] **-*[topic_normal] - result: 8 False
+2023-07-08 16:17:14.430 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 57
+2023-07-08 16:17:14.436 +02:00 [INF] NO Numerical Error detected: 6 < 25
+2023-07-08 16:17:14.442 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:14.450 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:14.458 +02:00 [INF] [topic_normal] - lastcommittedoffset: 57
+2023-07-08 16:17:14.464 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 57
+2023-07-08 16:17:14.920 +02:00 [INF] [topic_normal] - Consumed message '57 topic_normal' at: 'topic_normal [[0]] @57'.
+2023-07-08 16:17:15.141 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 36
+2023-07-08 16:17:15.145 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 0,5994152224972361
+2023-07-08 16:17:15.464 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:15.466 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:15.4665905+02:00"
+2023-07-08 16:17:15.467 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:10.1219075+02:00"
+2023-07-08 16:17:15.468 +02:00 [DBG] Difference for node with port 7037: 5344.683
+2023-07-08 16:17:15.469 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:15.469 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:17.029 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:17.032 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 50,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 50,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "50 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "50 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 55,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 55,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "55 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "55 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 56,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 56,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "56 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "56 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:17.128 +02:00 [INF] **-*[topic_priority] - result: 4 False
+2023-07-08 16:17:17.130 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 36
+2023-07-08 16:17:17.131 +02:00 [INF] NO Numerical Error detected: 3 < 10
+2023-07-08 16:17:17.132 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:17.132 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:17.133 +02:00 [INF] [topic_priority] - lastcommittedoffset: 36
+2023-07-08 16:17:17.134 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 36
+2023-07-08 16:17:17.160 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:17.162 +02:00 [DBG] Updated total weight of collection topic_priority to 4
+2023-07-08 16:17:17.190 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 58
+2023-07-08 16:17:17.192 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: 11,584879646782612
+2023-07-08 16:17:17.430 +02:00 [INF] [topic_priority] - Consumed message '36 topic_priority' at: 'topic_priority [[0]] @36'.
+2023-07-08 16:17:18.027 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:18.032 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:18.0322735+02:00"
+2023-07-08 16:17:18.034 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:17.0651643+02:00"
+2023-07-08 16:17:18.035 +02:00 [DBG] Difference for node with port 7037: 967.1092
+2023-07-08 16:17:18.040 +02:00 [DBG] Staleness bound: 2200
+2023-07-08 16:17:18.044 +02:00 [INF] **-*[topic_priority] - result: 5 False
+2023-07-08 16:17:18.047 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 37
+2023-07-08 16:17:18.049 +02:00 [INF] NO Numerical Error detected: 4 < 10
+2023-07-08 16:17:18.052 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:18.054 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:18.056 +02:00 [INF] [topic_priority] - lastcommittedoffset: 37
+2023-07-08 16:17:18.059 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 37
+2023-07-08 16:17:18.442 +02:00 [INF] [topic_priority] - Consumed message '37 topic_priority' at: 'topic_priority [[0]] @37'.
+2023-07-08 16:17:19.019 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:19.023 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:19.0234521+02:00"
+2023-07-08 16:17:19.029 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:17.0651643+02:00"
+2023-07-08 16:17:19.032 +02:00 [DBG] Difference for node with port 7037: 1958.2878
+2023-07-08 16:17:19.034 +02:00 [DBG] Staleness bound: 2200
+2023-07-08 16:17:19.040 +02:00 [INF] **-*[topic_priority] - result: 6 False
+2023-07-08 16:17:19.043 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 38
+2023-07-08 16:17:19.048 +02:00 [INF] NO Numerical Error detected: 5 < 10
+2023-07-08 16:17:19.050 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:19.052 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:19.056 +02:00 [INF] [topic_priority] - lastcommittedoffset: 38
+2023-07-08 16:17:19.059 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 38
+2023-07-08 16:17:19.210 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:19.215 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:19.219 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:19.454 +02:00 [INF] [topic_priority] - Consumed message '38 topic_priority' at: 'topic_priority [[0]] @38'.
+2023-07-08 16:17:19.877 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:19.881 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:19.8811191+02:00"
+2023-07-08 16:17:19.882 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:17.0651643+02:00"
+2023-07-08 16:17:19.885 +02:00 [DBG] Difference for node with port 7037: 2815.9548
+2023-07-08 16:17:19.889 +02:00 [DBG] Staleness bound: 2200
+2023-07-08 16:17:19.892 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:20.144 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 39
+2023-07-08 16:17:21.277 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:21.280 +02:00 [DBG] Updated total weight of collection topic_normal to 7
+2023-07-08 16:17:22.183 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 58
+2023-07-08 16:17:23.319 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:23.325 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:23.328 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 50,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 50,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "50 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "50 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 55,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 55,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "55 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "55 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 56,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 56,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "56 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "56 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:23.392 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:23.395 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:23.444 +02:00 [INF] **-*[topic_priority] - result: 7 False
+2023-07-08 16:17:23.446 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 39
+2023-07-08 16:17:23.448 +02:00 [INF] NO Numerical Error detected: 6 < 11
+2023-07-08 16:17:23.450 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:17:23.478 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:17:23.481 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 39
+2023-07-08 16:17:23.483 +02:00 [INF] [topic_priority] - lastcommittedoffset: 39
+2023-07-08 16:17:23.484 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 39
+2023-07-08 16:17:23.496 +02:00 [INF] [topic_priority] - Consumed message '39 topic_priority' at: 'topic_priority [[0]] @39'.
+2023-07-08 16:17:23.935 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:23.940 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:23.9400683+02:00"
+2023-07-08 16:17:23.942 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:21.9279834+02:00"
+2023-07-08 16:17:23.944 +02:00 [DBG] Difference for node with port 7037: 2012.0849
+2023-07-08 16:17:23.947 +02:00 [DBG] Staleness bound: 1980
+2023-07-08 16:17:23.949 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:25.152 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 40
+2023-07-08 16:17:25.152 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 0,1997111497756335
+2023-07-08 16:17:25.450 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:25.454 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 33,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 33,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "33 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "33 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 34,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 34,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "34 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "34 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 35,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 35,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "35 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "35 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 30,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 30,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "30 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 31,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 31,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "31 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "31 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:25.556 +02:00 [INF] **-*[topic_normal] - result: 9 False
+2023-07-08 16:17:25.558 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 58
+2023-07-08 16:17:25.560 +02:00 [INF] NO Numerical Error detected: 7 < 25
+2023-07-08 16:17:25.562 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:25.565 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:25.566 +02:00 [INF] [topic_normal] - lastcommittedoffset: 58
+2023-07-08 16:17:25.569 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 58
+2023-07-08 16:17:26.014 +02:00 [INF] [topic_normal] - Consumed message '58 topic_normal' at: 'topic_normal [[0]] @58'.
+2023-07-08 16:17:26.443 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:26.446 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:26.4466488+02:00"
+2023-07-08 16:17:26.449 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:23.3921575+02:00"
+2023-07-08 16:17:26.450 +02:00 [DBG] Difference for node with port 7037: 3054.4913
+2023-07-08 16:17:26.452 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:26.453 +02:00 [INF] **-*[topic_normal] - result: 10 False
+2023-07-08 16:17:26.455 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 59
+2023-07-08 16:17:26.458 +02:00 [INF] NO Numerical Error detected: 8 < 25
+2023-07-08 16:17:26.463 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:26.466 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:26.467 +02:00 [INF] [topic_normal] - lastcommittedoffset: 59
+2023-07-08 16:17:26.468 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 59
+2023-07-08 16:17:26.523 +02:00 [INF] [topic_normal] - Consumed message '59 topic_normal' at: 'topic_normal [[0]] @59'.
+2023-07-08 16:17:27.062 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:27.064 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:27.0649557+02:00"
+2023-07-08 16:17:27.066 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:23.3921575+02:00"
+2023-07-08 16:17:27.066 +02:00 [DBG] Difference for node with port 7037: 3672.7982
+2023-07-08 16:17:27.067 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:27.068 +02:00 [INF] **-*[topic_normal] - result: 11 False
+2023-07-08 16:17:27.069 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 60
+2023-07-08 16:17:27.070 +02:00 [INF] NO Numerical Error detected: 9 < 25
+2023-07-08 16:17:27.071 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:27.074 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:27.076 +02:00 [INF] [topic_normal] - lastcommittedoffset: 60
+2023-07-08 16:17:27.077 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 60
+2023-07-08 16:17:27.187 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 0
+2023-07-08 16:17:27.195 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: -11,58865192848555
+2023-07-08 16:17:27.537 +02:00 [INF] [topic_normal] - Consumed message '60 topic_normal' at: 'topic_normal [[0]] @60'.
+2023-07-08 16:17:28.028 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:28.054 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:28.060 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 50,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 50,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "50 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "50 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 55,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 55,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "55 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "55 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 56,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 56,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "56 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "56 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 57,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 57,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "57 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "57 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:28.089 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:28.115 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:28.1159098+02:00"
+2023-07-08 16:17:28.116 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:23.3921575+02:00"
+2023-07-08 16:17:28.117 +02:00 [DBG] Difference for node with port 7037: 4723.7523
+2023-07-08 16:17:28.117 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:28.118 +02:00 [INF] **-*[topic_normal] - result: 12 False
+2023-07-08 16:17:28.119 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 61
+2023-07-08 16:17:28.120 +02:00 [INF] NO Numerical Error detected: 10 < 25
+2023-07-08 16:17:28.121 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:17:28.122 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:17:28.123 +02:00 [INF] [topic_normal] - lastcommittedoffset: 61
+2023-07-08 16:17:28.124 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 61
+2023-07-08 16:17:28.553 +02:00 [INF] [topic_normal] - Consumed message '61 topic_normal' at: 'topic_normal [[0]] @61'.
+2023-07-08 16:17:29.049 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:29.052 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:29.0529189+02:00"
+2023-07-08 16:17:29.055 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:23.3921575+02:00"
+2023-07-08 16:17:29.063 +02:00 [DBG] Difference for node with port 7037: 5660.7614
+2023-07-08 16:17:29.068 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:29.069 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:29.282 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:29.283 +02:00 [DBG] Updated total weight of collection topic_priority to 13
+2023-07-08 16:17:30.151 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 40
+2023-07-08 16:17:31.318 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:32.182 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 62
+2023-07-08 16:17:32.193 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:32.442 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:32.447 +02:00 [DBG] Updated total weight of collection topic_normal to 13
+2023-07-08 16:17:34.493 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:34.496 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:34.499 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 50,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 50,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "50 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "50 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 55,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 55,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "55 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "55 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 56,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 56,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "56 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "56 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 57,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 57,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "57 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "57 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:34.568 +02:00 [INF] **-*[topic_priority] - result: 8 False
+2023-07-08 16:17:34.570 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 40
+2023-07-08 16:17:34.572 +02:00 [INF] NO Numerical Error detected: 1 < 9,9
+2023-07-08 16:17:34.574 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:17:34.601 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:17:34.601 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 40
+2023-07-08 16:17:34.602 +02:00 [INF] [topic_priority] - lastcommittedoffset: 40
+2023-07-08 16:17:34.603 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 40
+2023-07-08 16:17:35.102 +02:00 [INF] [topic_priority] - Consumed message '40 topic_priority' at: 'topic_priority [[0]] @40'.
+2023-07-08 16:17:35.156 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 41
+2023-07-08 16:17:35.162 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 0,1997898250997915
+2023-07-08 16:17:35.531 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:35.533 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:35.5339248+02:00"
+2023-07-08 16:17:35.535 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:28.1146777+02:00"
+2023-07-08 16:17:35.539 +02:00 [DBG] Difference for node with port 7037: 7419.2471
+2023-07-08 16:17:35.543 +02:00 [DBG] Staleness bound: 1782
+2023-07-08 16:17:35.546 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:36.399 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:37.188 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 62
+2023-07-08 16:17:37.195 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: 0
+2023-07-08 16:17:39.660 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:39.668 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 33,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 33,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "33 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "33 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 34,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 34,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "34 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "34 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 35,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 35,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "35 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "35 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 30,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 30,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "30 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 31,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 31,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "31 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "31 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 33,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 33,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "33 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "33 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:39.764 +02:00 [INF] **-*[topic_priority] - result: 9 False
+2023-07-08 16:17:39.765 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 41
+2023-07-08 16:17:39.766 +02:00 [INF] NO Numerical Error detected: 1 < 9,9
+2023-07-08 16:17:39.768 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:39.768 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:39.770 +02:00 [INF] [topic_priority] - lastcommittedoffset: 41
+2023-07-08 16:17:39.771 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 41
+2023-07-08 16:17:40.158 +02:00 [DBG] [5252] - No previous offset for topic topic_priority partition 0
+2023-07-08 16:17:40.161 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 0
+2023-07-08 16:17:40.164 +02:00 [INF] [topic_priority] - Consumed message '41 topic_priority' at: 'topic_priority [[0]] @41'.
+2023-07-08 16:17:40.483 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:40.652 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:40.656 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:40.6568037+02:00"
+2023-07-08 16:17:40.658 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:39.7479464+02:00"
+2023-07-08 16:17:40.659 +02:00 [DBG] Difference for node with port 7037: 908.8573
+2023-07-08 16:17:40.660 +02:00 [DBG] Staleness bound: 1782
+2023-07-08 16:17:40.661 +02:00 [INF] **-*[topic_priority] - result: 10 False
+2023-07-08 16:17:40.662 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 42
+2023-07-08 16:17:40.663 +02:00 [INF] NO Numerical Error detected: 2 < 9,9
+2023-07-08 16:17:40.663 +02:00 [INF] [topic_priority] - result: 2 False
+2023-07-08 16:17:40.664 +02:00 [INF] [topic_priority] - No messages to commit
+2023-07-08 16:17:40.665 +02:00 [INF] [topic_priority] - lastcommittedoffset: 42
+2023-07-08 16:17:40.665 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 42
+2023-07-08 16:17:41.179 +02:00 [INF] [topic_priority] - Consumed message '42 topic_priority' at: 'topic_priority [[0]] @42'.
+2023-07-08 16:17:41.693 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:41.694 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:41.6944449+02:00"
+2023-07-08 16:17:41.695 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:39.7479464+02:00"
+2023-07-08 16:17:41.696 +02:00 [DBG] Difference for node with port 7037: 1946.4985
+2023-07-08 16:17:41.697 +02:00 [DBG] Staleness bound: 1782
+2023-07-08 16:17:41.698 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:42.196 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 62
+2023-07-08 16:17:42.529 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:44.831 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:44.838 +02:00 [DBG] Updated total weight of collection topic_priority to 11
+2023-07-08 16:17:45.165 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 43
+2023-07-08 16:17:45.167 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 8,592518494147146
+2023-07-08 16:17:46.893 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:46.898 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:46.899 +02:00 [DBG] Updated total weight of collection topic_normal to 11
+2023-07-08 16:17:47.202 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 62
+2023-07-08 16:17:47.203 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: 0
+2023-07-08 16:17:48.943 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:48.946 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:48.947 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 50,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 50,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "50 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "50 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 51,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 51,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "51 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "51 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 52,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 52,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "52 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "52 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 53,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 53,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "53 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "53 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 55,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 55,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "55 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "55 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 56,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 56,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "56 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "56 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 57,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 57,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "57 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "57 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 58,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 58,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "58 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "58 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 59,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 59,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "59 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "59 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 60,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 60,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "60 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "60 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 61,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 61,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "61 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "61 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 62,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 62,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "62 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "62 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 63,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 63,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "63 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "63 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:49.068 +02:00 [INF] **-*[topic_priority] - result: 11 False
+2023-07-08 16:17:49.071 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 43
+2023-07-08 16:17:49.073 +02:00 [INF] NO Numerical Error detected: 3 < 9,9
+2023-07-08 16:17:49.075 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:17:49.118 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:17:49.120 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 43
+2023-07-08 16:17:49.123 +02:00 [INF] [topic_priority] - lastcommittedoffset: 43
+2023-07-08 16:17:49.125 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 43
+2023-07-08 16:17:49.259 +02:00 [INF] [topic_priority] - Consumed message '43 topic_priority' at: 'topic_priority [[0]] @43'.
+2023-07-08 16:17:49.671 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:49.679 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:49.6791891+02:00"
+2023-07-08 16:17:49.685 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:49.0304739+02:00"
+2023-07-08 16:17:49.692 +02:00 [DBG] Difference for node with port 7037: 648.7152
+2023-07-08 16:17:49.700 +02:00 [DBG] Staleness bound: 1603.8
+2023-07-08 16:17:49.706 +02:00 [INF] **-*[topic_priority] - result: 12 False
+2023-07-08 16:17:49.710 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 44
+2023-07-08 16:17:49.712 +02:00 [INF] NO Numerical Error detected: 1 < 9,9
+2023-07-08 16:17:49.713 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:17:49.758 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:17:49.760 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 44
+2023-07-08 16:17:49.761 +02:00 [INF] [topic_priority] - lastcommittedoffset: 44
+2023-07-08 16:17:49.762 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 44
+2023-07-08 16:17:50.162 +02:00 [DBG] [5252] - No previous offset for topic topic_priority partition 0
+2023-07-08 16:17:50.170 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 0
+2023-07-08 16:17:50.267 +02:00 [INF] [topic_priority] - Consumed message '44 topic_priority' at: 'topic_priority [[0]] @44'.
+2023-07-08 16:17:50.819 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:17:50.829 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:50.8298709+02:00"
+2023-07-08 16:17:50.833 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:49.0304739+02:00"
+2023-07-08 16:17:50.837 +02:00 [DBG] Difference for node with port 7037: 1799.397
+2023-07-08 16:17:50.842 +02:00 [DBG] Staleness bound: 1603.8
+2023-07-08 16:17:50.845 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:51.128 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:51.130 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 33,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 33,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "33 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "33 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 34,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 34,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "34 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "34 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 35,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 35,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "35 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "35 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 36,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 36,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "36 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "36 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 37,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 37,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "37 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "37 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 38,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 38,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "38 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "38 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 39,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 39,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "39 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "39 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 40,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 40,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "40 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "40 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 41,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 41,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "41 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "41 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 42,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 42,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "42 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "42 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 30,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 30,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "30 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 31,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 31,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "31 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "31 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:51.299 +02:00 [DBG] [5252] - localData: 54 topic_normal
+2023-07-08 16:17:51.302 +02:00 [DBG] [5252] - localData: 50 topic_normal
+2023-07-08 16:17:51.303 +02:00 [DBG] [5252] - localData: 51 topic_normal
+2023-07-08 16:17:51.304 +02:00 [DBG] [5252] - localData: 52 topic_normal
+2023-07-08 16:17:51.304 +02:00 [DBG] [5252] - localData: 53 topic_normal
+2023-07-08 16:17:51.305 +02:00 [DBG] [5252] - localData: 54 topic_normal
+2023-07-08 16:17:51.306 +02:00 [DBG] [5252] - localData: 55 topic_normal
+2023-07-08 16:17:51.306 +02:00 [DBG] [5252] - localData: 56 topic_normal
+2023-07-08 16:17:51.307 +02:00 [DBG] [5252] - localData: 57 topic_normal
+2023-07-08 16:17:51.308 +02:00 [DBG] [5252] - localData: 58 topic_normal
+2023-07-08 16:17:51.308 +02:00 [DBG] [5252] - localData: 59 topic_normal
+2023-07-08 16:17:51.309 +02:00 [DBG] [5252] - localData: 60 topic_normal
+2023-07-08 16:17:51.310 +02:00 [DBG] [5252] - localData: 61 topic_normal
+2023-07-08 16:17:51.310 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:17:51.311 +02:00 [DBG] [5252] - _receivedData: 54 topic_normal
+2023-07-08 16:17:51.311 +02:00 [DBG] [5252] - _receivedData: 50 topic_normal
+2023-07-08 16:17:51.312 +02:00 [DBG] [5252] - _receivedData: 51 topic_normal
+2023-07-08 16:17:51.313 +02:00 [DBG] [5252] - _receivedData: 52 topic_normal
+2023-07-08 16:17:51.313 +02:00 [DBG] [5252] - _receivedData: 53 topic_normal
+2023-07-08 16:17:51.314 +02:00 [DBG] [5252] - _receivedData: 55 topic_normal
+2023-07-08 16:17:51.314 +02:00 [DBG] [5252] - _receivedData: 56 topic_normal
+2023-07-08 16:17:51.315 +02:00 [DBG] [5252] - _receivedData: 57 topic_normal
+2023-07-08 16:17:51.316 +02:00 [DBG] [5252] - _receivedData: 58 topic_normal
+2023-07-08 16:17:51.316 +02:00 [DBG] [5252] - _receivedData: 59 topic_normal
+2023-07-08 16:17:51.317 +02:00 [DBG] [5252] - _receivedData: 60 topic_normal
+2023-07-08 16:17:51.317 +02:00 [DBG] [5252] - _receivedData: 61 topic_normal
+2023-07-08 16:17:51.318 +02:00 [DBG] [5252] - _receivedData: 62 topic_normal
+2023-07-08 16:17:51.318 +02:00 [DBG] [5252] - _receivedData: 63 topic_normal
+2023-07-08 16:17:51.319 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:17:51.320 +02:00 [DBG] [5252] - mergedData: 54 topic_normal
+2023-07-08 16:17:51.321 +02:00 [DBG] [5252] - mergedData: 50 topic_normal
+2023-07-08 16:17:51.322 +02:00 [DBG] [5252] - mergedData: 51 topic_normal
+2023-07-08 16:17:51.322 +02:00 [DBG] [5252] - mergedData: 52 topic_normal
+2023-07-08 16:17:51.323 +02:00 [DBG] [5252] - mergedData: 53 topic_normal
+2023-07-08 16:17:51.324 +02:00 [DBG] [5252] - mergedData: 55 topic_normal
+2023-07-08 16:17:51.324 +02:00 [DBG] [5252] - mergedData: 56 topic_normal
+2023-07-08 16:17:51.325 +02:00 [DBG] [5252] - mergedData: 57 topic_normal
+2023-07-08 16:17:51.326 +02:00 [DBG] [5252] - mergedData: 58 topic_normal
+2023-07-08 16:17:51.326 +02:00 [DBG] [5252] - mergedData: 59 topic_normal
+2023-07-08 16:17:51.327 +02:00 [DBG] [5252] - mergedData: 60 topic_normal
+2023-07-08 16:17:51.327 +02:00 [DBG] [5252] - mergedData: 61 topic_normal
+2023-07-08 16:17:51.328 +02:00 [DBG] [5252] - mergedData: 62 topic_normal
+2023-07-08 16:17:51.329 +02:00 [DBG] [5252] - mergedData: 63 topic_normal
+2023-07-08 16:17:51.329 +02:00 [DBG] isNotSame: true, localData.Count: 13, _receivedData.Count: 14, mergedData.Count: 14
+2023-07-08 16:17:51.331 +02:00 [INF] **-*[topic_normal] - result: 14 True
+2023-07-08 16:17:51.332 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 64
+2023-07-08 16:17:51.333 +02:00 [DBG] [topic_normal] - Adding weight: 11
+2023-07-08 16:17:51.333 +02:00 [INF] NO Numerical Error detected: 11 < 25
+2023-07-08 16:17:51.334 +02:00 [INF] [topic_normal] - result: 2 True
+2023-07-08 16:17:51.346 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:17:51.368 +02:00 [INF] [topic_normal] - Committed messages
+2023-07-08 16:17:51.369 +02:00 [INF] [topic_normal] - After committing lastcommittedoffset is: 64
+2023-07-08 16:17:51.370 +02:00 [INF] [topic_normal] - lastcommittedoffset: 64
+2023-07-08 16:17:51.372 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 64
+2023-07-08 16:17:51.779 +02:00 [INF] [topic_normal] - Consumed message '64 topic_normal' at: 'topic_normal [[0]] @64'.
+2023-07-08 16:17:52.201 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:52.206 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 65
+2023-07-08 16:17:52.207 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:52.2073308+02:00"
+2023-07-08 16:17:52.217 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:34.5400400+02:00"
+2023-07-08 16:17:52.224 +02:00 [DBG] Difference for node with port 7037: 17667.2908
+2023-07-08 16:17:52.229 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:52.230 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:17:54.592 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:55.180 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 45
+2023-07-08 16:17:55.182 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 8,980339880719534
+2023-07-08 16:17:56.641 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:17:56.648 +02:00 [DBG] Updated total weight of collection topic_priority to 15
+2023-07-08 16:17:57.215 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 65
+2023-07-08 16:17:57.220 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: 0
+2023-07-08 16:17:58.695 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:17:58.697 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:17:58.702 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 33,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 33,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "33 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "33 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 34,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 34,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "34 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "34 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 35,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 35,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "35 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "35 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 36,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 36,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "36 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "36 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 37,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 37,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "37 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "37 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 38,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 38,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "38 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "38 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 39,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 39,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "39 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "39 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 40,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 40,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "40 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "40 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 41,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 41,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "41 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "41 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 42,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 42,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "42 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "42 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 30,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 30,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "30 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 31,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 31,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "31 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "31 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:17:58.807 +02:00 [DBG] Event Type: heartbeatEvent
+2023-07-08 16:17:58.836 +02:00 [INF] **-*[topic_normal] - result: 15 False
+2023-07-08 16:17:58.842 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 65
+2023-07-08 16:17:58.845 +02:00 [INF] NO Numerical Error detected: 1 < 25
+2023-07-08 16:17:58.846 +02:00 [INF] [topic_normal] - result: 2 True
+2023-07-08 16:17:58.891 +02:00 [INF] [topic_normal] - Committed messages
+2023-07-08 16:17:58.893 +02:00 [INF] [topic_normal] - After committing lastcommittedoffset is: 65
+2023-07-08 16:17:58.894 +02:00 [INF] [topic_normal] - lastcommittedoffset: 65
+2023-07-08 16:17:58.895 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 65
+2023-07-08 16:17:59.346 +02:00 [INF] [topic_normal] - Consumed message '65 topic_normal' at: 'topic_normal [[0]] @65'.
+2023-07-08 16:17:59.778 +02:00 [INF] Bounding staleness for collection topic_normal and port 5252
+2023-07-08 16:17:59.780 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:17:59.7808328+02:00"
+2023-07-08 16:17:59.781 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:54.2800824+02:00"
+2023-07-08 16:17:59.782 +02:00 [DBG] Difference for node with port 7037: 5500.7504
+2023-07-08 16:17:59.783 +02:00 [DBG] Staleness bound: 5000
+2023-07-08 16:17:59.784 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:18:00.172 +02:00 [DBG] [5252] - Previous offset for topic topic_priority partition 0: 45
+2023-07-08 16:18:00.846 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:18:00.848 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 33,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 33,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "33 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "33 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 34,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 34,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "34 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "34 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 35,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 35,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "35 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "35 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 36,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 36,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "36 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "36 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 37,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 37,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "37 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "37 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 38,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 38,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "38 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "38 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 39,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 39,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "39 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "39 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 40,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 40,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "40 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "40 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 41,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 41,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "41 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "41 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 42,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 42,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "42 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "42 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 30,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 30,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "30 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "30 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 31,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 31,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "31 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "31 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_priority",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 32,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_priority",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 32,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_priority",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "32 topic_priority",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "32 topic_priority",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:18:00.907 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:18:00.908 +02:00 [DBG] Updated total weight of collection topic_normal to 16
+2023-07-08 16:18:00.923 +02:00 [DBG] [5252] - localData: 32 topic_priority
+2023-07-08 16:18:00.925 +02:00 [DBG] [5252] - localData: 33 topic_priority
+2023-07-08 16:18:00.926 +02:00 [DBG] [5252] - localData: 34 topic_priority
+2023-07-08 16:18:00.926 +02:00 [DBG] [5252] - localData: 35 topic_priority
+2023-07-08 16:18:00.927 +02:00 [DBG] [5252] - localData: 36 topic_priority
+2023-07-08 16:18:00.928 +02:00 [DBG] [5252] - localData: 37 topic_priority
+2023-07-08 16:18:00.928 +02:00 [DBG] [5252] - localData: 38 topic_priority
+2023-07-08 16:18:00.929 +02:00 [DBG] [5252] - localData: 39 topic_priority
+2023-07-08 16:18:00.930 +02:00 [DBG] [5252] - localData: 40 topic_priority
+2023-07-08 16:18:00.930 +02:00 [DBG] [5252] - localData: 41 topic_priority
+2023-07-08 16:18:00.931 +02:00 [DBG] [5252] - localData: 42 topic_priority
+2023-07-08 16:18:00.931 +02:00 [DBG] [5252] - localData: 43 topic_priority
+2023-07-08 16:18:00.932 +02:00 [DBG] [5252] - localData: 44 topic_priority
+2023-07-08 16:18:00.933 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:18:00.933 +02:00 [DBG] [5252] - _receivedData: 32 topic_priority
+2023-07-08 16:18:00.934 +02:00 [DBG] [5252] - _receivedData: 33 topic_priority
+2023-07-08 16:18:00.934 +02:00 [DBG] [5252] - _receivedData: 34 topic_priority
+2023-07-08 16:18:00.935 +02:00 [DBG] [5252] - _receivedData: 35 topic_priority
+2023-07-08 16:18:00.936 +02:00 [DBG] [5252] - _receivedData: 36 topic_priority
+2023-07-08 16:18:00.937 +02:00 [DBG] [5252] - _receivedData: 37 topic_priority
+2023-07-08 16:18:00.938 +02:00 [DBG] [5252] - _receivedData: 38 topic_priority
+2023-07-08 16:18:00.939 +02:00 [DBG] [5252] - _receivedData: 39 topic_priority
+2023-07-08 16:18:00.939 +02:00 [DBG] [5252] - _receivedData: 40 topic_priority
+2023-07-08 16:18:00.941 +02:00 [DBG] [5252] - _receivedData: 41 topic_priority
+2023-07-08 16:18:00.941 +02:00 [DBG] [5252] - _receivedData: 42 topic_priority
+2023-07-08 16:18:00.942 +02:00 [DBG] [5252] - _receivedData: 30 topic_priority
+2023-07-08 16:18:00.943 +02:00 [DBG] [5252] - _receivedData: 31 topic_priority
+2023-07-08 16:18:00.943 +02:00 [DBG] [5252] - _receivedData: 32 topic_priority
+2023-07-08 16:18:00.944 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:18:00.944 +02:00 [DBG] [5252] - mergedData: 32 topic_priority
+2023-07-08 16:18:00.945 +02:00 [DBG] [5252] - mergedData: 33 topic_priority
+2023-07-08 16:18:00.945 +02:00 [DBG] [5252] - mergedData: 34 topic_priority
+2023-07-08 16:18:00.946 +02:00 [DBG] [5252] - mergedData: 35 topic_priority
+2023-07-08 16:18:00.946 +02:00 [DBG] [5252] - mergedData: 36 topic_priority
+2023-07-08 16:18:00.947 +02:00 [DBG] [5252] - mergedData: 37 topic_priority
+2023-07-08 16:18:00.948 +02:00 [DBG] [5252] - mergedData: 38 topic_priority
+2023-07-08 16:18:00.948 +02:00 [DBG] [5252] - mergedData: 39 topic_priority
+2023-07-08 16:18:00.949 +02:00 [DBG] [5252] - mergedData: 40 topic_priority
+2023-07-08 16:18:00.950 +02:00 [DBG] [5252] - mergedData: 41 topic_priority
+2023-07-08 16:18:00.950 +02:00 [DBG] [5252] - mergedData: 42 topic_priority
+2023-07-08 16:18:00.951 +02:00 [DBG] [5252] - mergedData: 30 topic_priority
+2023-07-08 16:18:00.954 +02:00 [DBG] [5252] - mergedData: 31 topic_priority
+2023-07-08 16:18:00.954 +02:00 [DBG] [5252] - mergedData: 43 topic_priority
+2023-07-08 16:18:00.955 +02:00 [DBG] [5252] - mergedData: 44 topic_priority
+2023-07-08 16:18:00.956 +02:00 [DBG] isNotSame: true, localData.Count: 13, _receivedData.Count: 14, mergedData.Count: 15
+2023-07-08 16:18:00.957 +02:00 [INF] **-*[topic_priority] - result: 15 True
+2023-07-08 16:18:00.958 +02:00 [DBG] [topic_priority] - lastcommittedoffset: 45
+2023-07-08 16:18:00.959 +02:00 [DBG] [topic_priority] - Adding weight: 15
+2023-07-08 16:18:00.960 +02:00 [INF] Numerical Error detected: 15 > 9,9. Sending data to node with port 7037
+2023-07-08 16:18:02.218 +02:00 [DBG] [5252] - Previous offset for topic topic_normal partition 0: 66
+2023-07-08 16:18:02.958 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:18:02.960 +02:00 [DBG] Event Type: updateConitEvent
+2023-07-08 16:18:02.990 +02:00 [DBG] Event Type: syncRequest
+2023-07-08 16:18:02.990 +02:00 [INF] [topic_priority] - result: 2 True
+2023-07-08 16:18:02.992 +02:00 [DBG] Updated total weight of collection topic_priority to 15
+2023-07-08 16:18:03.033 +02:00 [INF] [topic_priority] - Committed messages
+2023-07-08 16:18:03.034 +02:00 [INF] [topic_priority] - After committing lastcommittedoffset is: 45
+2023-07-08 16:18:03.036 +02:00 [INF] [topic_priority] - lastcommittedoffset: 45
+2023-07-08 16:18:03.038 +02:00 [INF] [topic_priority] - Assigning topic topic_priority with offset 45
+2023-07-08 16:18:03.377 +02:00 [INF] [topic_priority] - Consumed message '45 topic_priority' at: 'topic_priority [[0]] @45'.
+2023-07-08 16:18:03.844 +02:00 [INF] Bounding staleness for collection topic_priority and port 5252
+2023-07-08 16:18:03.845 +02:00 [DBG] Consumed time + latency: "2023-07-08T16:18:03.8458216+02:00"
+2023-07-08 16:18:03.847 +02:00 [DBG] Last time since pull: "2023-07-08T16:17:58.8065763+02:00"
+2023-07-08 16:18:03.848 +02:00 [DBG] Difference for node with port 7037: 5039.2453
+2023-07-08 16:18:03.850 +02:00 [DBG] Staleness bound: 1940.5980000000002
+2023-07-08 16:18:03.851 +02:00 [INF] Pulling data from node with port 7037
+2023-07-08 16:18:05.193 +02:00 [DBG] [5252] - Current Offset for topic topic_priority partition 0: 46
+2023-07-08 16:18:05.194 +02:00 [DBG] [5252] - Consumption rate for topic topic_priority partition 0: 0,19916387817320838
+2023-07-08 16:18:07.085 +02:00 [ERR] Failed to send message over TCP
+System.Net.Internals.SocketExceptionFactory+ExtendedSocketException (10061): No connection could be made because the target machine actively refused it. [::ffff:127.0.0.1]:7037
+   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
+   at System.Net.Sockets.Socket.Connect(IPAddress[] addresses, Int32 port)
+--- End of stack trace from previous location ---
+   at System.Net.Sockets.Socket.Connect(IPAddress[] addresses, Int32 port)
+   at System.Net.Sockets.Socket.Connect(String host, Int32 port)
+   at System.Net.Sockets.TcpClient.Connect(String hostname, Int32 port)
+   at Dyconit.Overlord.DyconitAdmin.SendMessageOverTcp(String message, Int32 port) in C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\Overlord\DyconitAdmin.cs:line 549
+2023-07-08 16:18:07.162 +02:00 [ERR] =========================Synced is true=========================
+2023-07-08 16:18:07.163 +02:00 [DBG] Event Type: syncResponse
+2023-07-08 16:18:07.165 +02:00 [ERR] SyncResponse data: [
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 54,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 54,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "54 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "54 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 50,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 50,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "50 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "50 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 51,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 51,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "51 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "51 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 52,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 52,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "52 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "52 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 53,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 53,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "53 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "53 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 55,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 55,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "55 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "55 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 56,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 56,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "56 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "56 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 57,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 57,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "57 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "57 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 58,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 58,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "58 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "58 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 59,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 59,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "59 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "59 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 60,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 60,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "60 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "60 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 61,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 61,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "61 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "61 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 62,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 62,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "62 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "62 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 63,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 63,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "63 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "63 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 64,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 64,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "64 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "64 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  },
+  {
+    "Topic": "topic_normal",
+    "Partition": {
+      "Value": 0,
+      "IsSpecial": false
+    },
+    "Offset": {
+      "Value": 65,
+      "IsSpecial": false
+    },
+    "TopicPartition": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      }
+    },
+    "TopicPartitionOffset": {
+      "Topic": "topic_normal",
+      "Partition": {
+        "Value": 0,
+        "IsSpecial": false
+      },
+      "Offset": {
+        "Value": 65,
+        "IsSpecial": false
+      },
+      "TopicPartition": {
+        "Topic": "topic_normal",
+        "Partition": {
+          "Value": 0,
+          "IsSpecial": false
+        }
+      }
+    },
+    "Message": {
+      "Key": null,
+      "Value": "65 topic_normal",
+      "Timestamp": {
+        "Type": 0,
+        "UnixTimestampMs": 0,
+        "UtcDateTime": "1970-01-01T00:00:00Z"
+      },
+      "Headers": [
+        {
+          "Key": "Weight"
+        }
+      ]
+    },
+    "Key": null,
+    "Value": "65 topic_normal",
+    "Timestamp": {
+      "Type": 0,
+      "UnixTimestampMs": 0,
+      "UtcDateTime": "1970-01-01T00:00:00Z"
+    },
+    "Headers": [
+      {
+        "Key": "Weight"
+      }
+    ],
+    "IsPartitionEOF": false
+  }
+]
+2023-07-08 16:18:07.239 +02:00 [DBG] [5252] - Current Offset for topic topic_normal partition 0: 66
+2023-07-08 16:18:07.250 +02:00 [DBG] [5252] - Consumption rate for topic topic_normal partition 0: 0
+2023-07-08 16:18:07.254 +02:00 [DBG] [5252] - localData: 54 topic_normal
+2023-07-08 16:18:07.255 +02:00 [DBG] [5252] - localData: 50 topic_normal
+2023-07-08 16:18:07.256 +02:00 [DBG] [5252] - localData: 51 topic_normal
+2023-07-08 16:18:07.257 +02:00 [DBG] [5252] - localData: 52 topic_normal
+2023-07-08 16:18:07.257 +02:00 [DBG] [5252] - localData: 53 topic_normal
+2023-07-08 16:18:07.258 +02:00 [DBG] [5252] - localData: 55 topic_normal
+2023-07-08 16:18:07.258 +02:00 [DBG] [5252] - localData: 56 topic_normal
+2023-07-08 16:18:07.259 +02:00 [DBG] [5252] - localData: 57 topic_normal
+2023-07-08 16:18:07.260 +02:00 [DBG] [5252] - localData: 58 topic_normal
+2023-07-08 16:18:07.260 +02:00 [DBG] [5252] - localData: 59 topic_normal
+2023-07-08 16:18:07.261 +02:00 [DBG] [5252] - localData: 60 topic_normal
+2023-07-08 16:18:07.261 +02:00 [DBG] [5252] - localData: 61 topic_normal
+2023-07-08 16:18:07.262 +02:00 [DBG] [5252] - localData: 62 topic_normal
+2023-07-08 16:18:07.263 +02:00 [DBG] [5252] - localData: 63 topic_normal
+2023-07-08 16:18:07.263 +02:00 [DBG] [5252] - localData: 64 topic_normal
+2023-07-08 16:18:07.264 +02:00 [DBG] [5252] - localData: 65 topic_normal
+2023-07-08 16:18:07.265 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:18:07.265 +02:00 [DBG] [5252] - _receivedData: 54 topic_normal
+2023-07-08 16:18:07.266 +02:00 [DBG] [5252] - _receivedData: 50 topic_normal
+2023-07-08 16:18:07.266 +02:00 [DBG] [5252] - _receivedData: 51 topic_normal
+2023-07-08 16:18:07.267 +02:00 [DBG] [5252] - _receivedData: 52 topic_normal
+2023-07-08 16:18:07.268 +02:00 [DBG] [5252] - _receivedData: 53 topic_normal
+2023-07-08 16:18:07.269 +02:00 [DBG] [5252] - _receivedData: 55 topic_normal
+2023-07-08 16:18:07.270 +02:00 [DBG] [5252] - _receivedData: 56 topic_normal
+2023-07-08 16:18:07.271 +02:00 [DBG] [5252] - _receivedData: 57 topic_normal
+2023-07-08 16:18:07.272 +02:00 [DBG] [5252] - _receivedData: 58 topic_normal
+2023-07-08 16:18:07.272 +02:00 [DBG] [5252] - _receivedData: 59 topic_normal
+2023-07-08 16:18:07.273 +02:00 [DBG] [5252] - _receivedData: 60 topic_normal
+2023-07-08 16:18:07.274 +02:00 [DBG] [5252] - _receivedData: 61 topic_normal
+2023-07-08 16:18:07.275 +02:00 [DBG] [5252] - _receivedData: 62 topic_normal
+2023-07-08 16:18:07.275 +02:00 [DBG] [5252] - _receivedData: 63 topic_normal
+2023-07-08 16:18:07.276 +02:00 [DBG] [5252] - _receivedData: 64 topic_normal
+2023-07-08 16:18:07.276 +02:00 [DBG] [5252] - _receivedData: 65 topic_normal
+2023-07-08 16:18:07.277 +02:00 [DBG] --------------------------------------------------
+2023-07-08 16:18:07.278 +02:00 [DBG] [5252] - mergedData: 54 topic_normal
+2023-07-08 16:18:07.278 +02:00 [DBG] [5252] - mergedData: 50 topic_normal
+2023-07-08 16:18:07.279 +02:00 [DBG] [5252] - mergedData: 51 topic_normal
+2023-07-08 16:18:07.280 +02:00 [DBG] [5252] - mergedData: 52 topic_normal
+2023-07-08 16:18:07.280 +02:00 [DBG] [5252] - mergedData: 53 topic_normal
+2023-07-08 16:18:07.281 +02:00 [DBG] [5252] - mergedData: 55 topic_normal
+2023-07-08 16:18:07.281 +02:00 [DBG] [5252] - mergedData: 56 topic_normal
+2023-07-08 16:18:07.282 +02:00 [DBG] [5252] - mergedData: 57 topic_normal
+2023-07-08 16:18:07.283 +02:00 [DBG] [5252] - mergedData: 58 topic_normal
+2023-07-08 16:18:07.283 +02:00 [DBG] [5252] - mergedData: 59 topic_normal
+2023-07-08 16:18:07.284 +02:00 [DBG] [5252] - mergedData: 60 topic_normal
+2023-07-08 16:18:07.285 +02:00 [DBG] [5252] - mergedData: 61 topic_normal
+2023-07-08 16:18:07.287 +02:00 [DBG] [5252] - mergedData: 62 topic_normal
+2023-07-08 16:18:07.288 +02:00 [DBG] [5252] - mergedData: 63 topic_normal
+2023-07-08 16:18:07.288 +02:00 [DBG] [5252] - mergedData: 64 topic_normal
+2023-07-08 16:18:07.289 +02:00 [DBG] [5252] - mergedData: 65 topic_normal
+2023-07-08 16:18:07.290 +02:00 [DBG] isNotSame: false, localData.Count: 16, _receivedData.Count: 16, mergedData.Count: 16
+2023-07-08 16:18:07.291 +02:00 [INF] **-*[topic_normal] - result: 16 False
+2023-07-08 16:18:07.292 +02:00 [DBG] [topic_normal] - lastcommittedoffset: 66
+2023-07-08 16:18:07.292 +02:00 [INF] NO Numerical Error detected: 1 < 25
+2023-07-08 16:18:07.293 +02:00 [INF] [topic_normal] - result: 2 False
+2023-07-08 16:18:07.294 +02:00 [INF] [topic_normal] - No messages to commit
+2023-07-08 16:18:07.294 +02:00 [INF] [topic_normal] - lastcommittedoffset: 66
+2023-07-08 16:18:07.295 +02:00 [INF] [topic_normal] - Assigning topic topic_normal with offset 66
+2023-07-08 16:18:07.951 +02:00 [ERR] Failed to send message over TCP
+System.Net.Internals.SocketExceptionFactory+ExtendedSocketException (10061): No connection could be made because the target machine actively refused it. [::ffff:127.0.0.1]:7037
+   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
+   at System.Net.Sockets.Socket.Connect(IPAddress[] addresses, Int32 port)
+--- End of stack trace from previous location ---
+   at System.Net.Sockets.Socket.Connect(IPAddress[] addresses, Int32 port)
+   at System.Net.Sockets.Socket.Connect(String host, Int32 port)
+   at System.Net.Sockets.TcpClient.Connect(String hostname, Int32 port)
+   at Dyconit.Overlord.DyconitAdmin.SendMessageOverTcp(String message, Int32 port) in C:\Users\JurreB\Documents\kafka-dotnet-getting-started\Dyconit\Overlord\DyconitAdmin.cs:line 549
+2023-07-08 16:18:13.379 +02:00 [DBG] Event Type: updateConitEvent
