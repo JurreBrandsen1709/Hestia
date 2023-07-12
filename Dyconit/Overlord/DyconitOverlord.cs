@@ -25,10 +25,12 @@ namespace Dyconit.Overlord
 
         static public void ConfigureLogging()
         {
+            string logFileName = $"log_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
-                .WriteTo.File("log.txt")
+                .WriteTo.File(logFileName, rollingInterval: RollingInterval.Infinite)
                 .CreateLogger();
         }
 
@@ -38,12 +40,7 @@ namespace Dyconit.Overlord
 
             if (Directory.Exists(policiesFolderPath))
             {
-                Log.Debug("Policies folder found.");
-
                 string[] policyFiles = Directory.GetFiles(policiesFolderPath, "*policy*.json");
-
-                Log.Debug($"Found {policyFiles.Length} policy files.");
-
                 foreach (string policyFile in policyFiles)
                 {
                     string jsonContent = File.ReadAllText(policyFile);
@@ -55,7 +52,7 @@ namespace Dyconit.Overlord
                     // add some checks to see if collections, thresholds and rules are not null
                     if (collectionNames == null || thresholds == null || rules == null)
                     {
-                        Log.Debug("Policy file is not valid.");
+                        Log.Error("Policy file is not valid.");
                         continue;
                     }
 
@@ -90,13 +87,10 @@ namespace Dyconit.Overlord
 
                                 newRule.PolicyActions?.Add(newAction);
                             }
-
                             collection.Rules?.Add(newRule);
                         }
 
                         _dyconitCollections.Collections?.Add(collection);
-
-                        Log.Debug($"Added policy for collection {collectionName}.");
                     }
                 }
             }
@@ -106,13 +100,11 @@ namespace Dyconit.Overlord
         {
             _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
-            Log.Debug("- Dyconit overlord started listening.");
             Task.Run(() => ListenForMessagesAsync());
         }
 
         public void StopListening()
         {
-            Log.Debug("- Dyconit overlord stopped.");
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
             _cancellationTokenSource = null!;
@@ -143,7 +135,7 @@ namespace Dyconit.Overlord
             }
             catch (Exception ex)
             {
-                Log.Debug($"Error processing message: {ex.Message}");
+                Log.Error($"Error processing message: {ex.Message}");
             }
         }
 
@@ -154,13 +146,9 @@ namespace Dyconit.Overlord
             var eventType = json.Value<string>("eventType");
             var adminClientPort = json.Value<int?>("port");
 
-            Log.Debug($"- Event type: {eventType}");
-            Log.Debug($"- Admin client port: {adminClientPort}");
-
             switch (eventType)
             {
                 case "newAdminEvent":
-                    Log.Debug($"-- New admin event received from port {adminClientPort}.");
                     var conits = json["conits"] as JObject;
                     if (adminClientPort.HasValue && conits != null)
                     {
@@ -169,7 +157,6 @@ namespace Dyconit.Overlord
                     };
                     break;
                 case "heartbeatResponse":
-                    Log.Debug($"-- Heartbeat response received from port {adminClientPort}.");
                     ProcessHeartbeatResponse();
                     break;
                 case "throughput":
@@ -180,8 +167,7 @@ namespace Dyconit.Overlord
                         ProcessThroughput(throughput, adminClientPort, collectionName, json);
                     }
                     break;
-                case "overheadMessage":
-                    Log.Debug($"-- Overhead message received from port {adminClientPort}.");
+                case "overheadMessage":;
                     var syncThroughput = json["data"] as JObject;
                     if (adminClientPort.HasValue && syncThroughput != null)
                     {
@@ -208,11 +194,18 @@ namespace Dyconit.Overlord
 
                 // check if the collection has thresholds and rules
                 var collectionObj = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
-                if (collectionObj == null || collectionObj.Thresholds == null || collectionObj.Rules == null)
+
+                if (collectionObj == null || collectionObj.Thresholds == null || collectionObj.Rules == null || throughput == null)
                 {
-                    Log.Debug($"-- Collection {collectionName} has no thresholds or rules. Ignoring...");
                     continue;
                 }
+
+                if (throughput <= 0)
+                {
+                    Log.Warning($"-- Received invalid overhead throughput: {throughput}. Ignoring...");
+                    continue;
+                }
+
                 if (throughput != null)
                 {
                     ApplyRules(collectionObj, collectionObj.Thresholds.OverheadThroughput, throughput.Value, adminClientPort);
@@ -228,13 +221,11 @@ namespace Dyconit.Overlord
                 return;
             }
 
-            Log.Debug($"-- Received throughput: {throughput} for adminCLient {adminClientPort} in collection {collectionName}.");
-
             // check if the collection has thresholds and rules
             var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
+
             if (collection == null || collection.Thresholds == null || collection.Rules == null)
             {
-                Log.Debug($"-- Collection {collectionName} has no thresholds or rules. Ignoring...");
                 return;
             }
             ApplyRules(collection, collection.Thresholds.Throughput, throughput.Value, adminClientPort.Value);
@@ -244,9 +235,9 @@ namespace Dyconit.Overlord
         {
             if (collection.Rules == null || threshold == null)
             {
-                Log.Debug($"-- Collection {collection.Name} has no rules or threshold. Ignoring...");
                 return;
             }
+
             foreach (var rule in collection.Rules)
             {
                 var condition = rule.Condition;
@@ -254,14 +245,13 @@ namespace Dyconit.Overlord
 
                 if (condition == null || policyActions == null)
                 {
-                    Log.Debug($"-- Rule for collection {collection.Name} has no condition or actions. Ignoring...");
                     continue;
                 }
 
                 var isConditionMet = EvaluateCondition(condition, throughput, threshold);
+
                 if (isConditionMet)
                 {
-                    Log.Debug($"-- Condition {condition} for collection {collection.Name} is true. Applying actions...");
                     ApplyActions(collection, policyActions, adminClientPort);
                     await SendUpdatedBoundsToCollection(collection, adminClientPort);
                 }
@@ -273,11 +263,8 @@ namespace Dyconit.Overlord
             // Send the new bounds for the adminClient to all other nodes in the collection
             var nodes = collection.Nodes?.ToList();
 
-            Log.Error($" --- There are {nodes?.Count} nodes in the collection {collection.Name}");
-
             if (nodes == null)
             {
-                Log.Debug($"-- Collection {collection.Name} has no nodes. Ignoring...");
                 return;
             }
 
@@ -285,11 +272,8 @@ namespace Dyconit.Overlord
             {
                 if (node.Bounds == null)
                 {
-                    Log.Debug($"-- Node {node.Port} has no bounds. Ignoring...");
                     continue;
                 }
-
-                Log.Warning($"staleness: {node.Bounds.Staleness}, numerical error: {node.Bounds.NumericalError}");
 
                 var message = new JObject
                 {
@@ -302,9 +286,6 @@ namespace Dyconit.Overlord
                         ["NumericalError"] = node.Bounds.NumericalError ?? 1,
                     }
                 };
-
-                Log.Debug($"-- Sending updated bounds to node {node.Port} in collection {collection.Name}.");
-                Log.Debug(JsonConvert.SerializeObject(message, Formatting.Indented));
 
                 await SendMessageOverTcp(message.ToString(), node.Port ?? 0).ConfigureAwait(false);
             }
@@ -349,7 +330,6 @@ namespace Dyconit.Overlord
 
                 if (bounds == null)
                 {
-                    Log.Debug($"-- No bounds found for adminClientPort {adminClientPort} in collection {collection.Name}. Ignoring...");
                     continue;
                 }
 
@@ -398,7 +378,7 @@ namespace Dyconit.Overlord
 
             if (collectionName == null || staleness == null || numericalError == null)
             {
-                Log.Debug("Invalid conit object.");
+                Log.Error("Invalid conit object.");
                 return;
             }
 
@@ -442,9 +422,6 @@ namespace Dyconit.Overlord
             }
 
             collection.Nodes?.Add(node);
-
-            //print the entire _dyconitCollections object
-            Log.Debug(JsonConvert.SerializeObject(_dyconitCollections, Formatting.Indented));
         }
 
         private async void WelcomeNewNode(int adminClientPort, JObject? conits)
@@ -472,7 +449,6 @@ namespace Dyconit.Overlord
                         };
 
                         await SendMessageOverTcp(newAdminMessage.ToString(), node.Port.Value);
-                        Log.Debug($"Sent new node event to port {node.Port.Value}.");
 
                         var welcomeMessage = new JObject
                         {
@@ -484,7 +460,6 @@ namespace Dyconit.Overlord
                         };
 
                         await SendMessageOverTcp(welcomeMessage.ToString(), adminClientPort);
-                        Log.Debug($"Sent welcome message to port {adminClientPort}.");
                     }
                 }
             }
@@ -535,7 +510,6 @@ namespace Dyconit.Overlord
                         if (node.Port != null)
                         {
                             await SendMessageOverTcp(heartbeatMessage.ToString(), node.Port.Value);
-                            Log.Debug($"Sent heartbeat to port {node.Port.Value}.");
                         }
                     }
                 }
@@ -560,7 +534,6 @@ namespace Dyconit.Overlord
                         if (node.LastHeartbeatTime.HasValue && heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds > 30)
                         {
                             nodesToRemove.Add(node);
-                            Log.Debug($"Marked node with port {node.Port} for removal from collection {collection.Name}.");
                         }
                     }
 
@@ -568,7 +541,6 @@ namespace Dyconit.Overlord
                     foreach (var nodeToRemove in nodesToRemove)
                     {
                         collection.Nodes?.Remove(nodeToRemove);
-                        Log.Debug($"Removed node with port {nodeToRemove.Port} from collection {collection.Name}.");
 
                         // inform other nodes that this node has been removed
                         foreach (var otherNode in collection.Nodes ?? new List<Node>())
@@ -583,7 +555,6 @@ namespace Dyconit.Overlord
                                 };
 
                                 await SendMessageOverTcp(removeNodeMessage.ToString(), otherNode.Port.Value);
-                                Log.Debug($"Sent remove node event to port {otherNode.Port.Value}.");
                             }
                         }
                     }
@@ -610,8 +581,7 @@ namespace Dyconit.Overlord
             }
             catch (Exception ex)
             {
-                Log.Debug($"Failed to send message to port {port}. Exception: {ex.Message}. Removing from collection...");
-
+                Log.Error(ex, "Error sending message over TCP");
                 // Remove the admin client from the dyconit collections
                 var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Nodes != null && c.Nodes.Any(n => n.Port == port));
                 if (collection != null)

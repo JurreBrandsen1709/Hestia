@@ -12,14 +12,12 @@ using Serilog;
 class Consumer
 {
     private static Dictionary<string, List<ConsumeResult<Null, string>>> _uncommittedConsumedMessages = new Dictionary<string, List<ConsumeResult<Null, string>>>();
-    // private static Dictionary<string, Dictionary<string, object>> _localCollection = new Dictionary<string, Dictionary<string, object>>();
     private static JObject _localCollection = new JObject();
-
     public static int adminPort = DyconitHelper.FindPort();
     public static DyconitAdmin _DyconitLogger;
     private static Random _random = new Random();
-
     private static Dictionary<string, double> _totalWeight = new Dictionary<string, double>();
+    private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
 
     static async Task Main()
     {
@@ -39,6 +37,8 @@ class Consumer
 
             var consumedMessages = new List<ConsumeResult<Null, string>>();
             _uncommittedConsumedMessages.Add(topic, consumedMessages);
+
+            _currentOffset.Add(topic, 0);
 
             _totalWeight.Add(topic, 0);
         }
@@ -75,6 +75,7 @@ class Consumer
         {
 
             consumer.Subscribe(topic);
+
             // Introduce a delay to allow the consumer to retrieve the committed offset for the topic/partition.
             await Task.Delay(TimeSpan.FromSeconds(10));
 
@@ -86,10 +87,13 @@ class Consumer
                 {
                     var consumeResult = consumer.Consume(token);
                     var inputMessage = consumeResult.Message.Value;
-                    _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
 
-                    Log.Information($"[{topic}] - Consumed message '{inputMessage}' at: '{consumeResult.TopicPartitionOffset}'.");
+                    Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
+
+                    _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
+;
                      _lastCommittedOffset = consumeResult.Offset;
+                     _currentOffset[topic] += 1;
 
                     // if we consume a message that is older than the last committed offset, we ignore it.
                     if (consumeResult.Offset < _lastCommittedOffset)
@@ -99,35 +103,16 @@ class Consumer
 
                     _uncommittedConsumedMessages[topic].Add(consumeResult);
 
-                    int waitTime = _random.Next(4000, 6000);
-                    await Task.Delay(waitTime);
-
                     SyncResult result = await DyconitLogger.BoundStaleness(_uncommittedConsumedMessages[topic], topic);
-
-                    // log the count of the result.data
-                    Log.Information($"**-*[{topic}] - result: {result.Data.Count} {result.changed}");
-
                     _uncommittedConsumedMessages[topic] = result.Data;
                     var commit = result.changed;
 
                     if (_uncommittedConsumedMessages[topic].Count > 0)
                     {
                         var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                        _currentOffset[topic] += 1;
                         _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
-
-                    Log.Debug($"[{topic}] - lastcommittedoffset: {_lastCommittedOffset}");
-
-
-                    // if there is a new weight in the result, we add it to the total weight
-                    if (result.Weight != 0)
-                    {
-                        Log.Debug($"[{topic}] - Adding weight: {result.Weight.Value}");
-                        _totalWeight[topic] += result.Weight.Value - _totalWeight[topic];
-                    }
-
-
-                    Log.Information($"[{adminPort}] - {DateTime.Now:HH:mm:ss.fff} bounding numerical error");
 
                     bool boundResult = DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
                     commit = boundResult || commit;
@@ -137,26 +122,18 @@ class Consumer
                     if (_uncommittedConsumedMessages[topic].Count > 0)
                     {
                         var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                        _currentOffset[topic] += 1;
                         _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
 
-                    Log.Information($"[{topic}] - result: {_uncommittedConsumedMessages.Count} {commit}");
                     if (commit)
                     {
                         _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
-                        Log.Information($"[{topic}] - Committed messages");
-                        Log.Information($"[{topic}] - After committing lastcommittedoffset is: {_lastCommittedOffset}");
                         _totalWeight[topic] = 0.0;
                     }
-                    else
-                    {
-                        Log.Information($"[{topic}] - No messages to commit");
-                    }
 
-                    Log.Information($"[{topic}] - lastcommittedoffset: {_lastCommittedOffset}");
                     if (_lastCommittedOffset > 0)
                     {
-                        Log.Information($"[{topic}] - Assigning topic {topic} with offset {_lastCommittedOffset}");
                         consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
                     }
                 }
@@ -212,23 +189,15 @@ class Consumer
             return;
         }
 
-        var offsets = new Dictionary<TopicPartition, Tuple<Offset, DateTime>>();
+        var offsets = new Dictionary<TopicPartition, Tuple<double, DateTime>>();
 
         // get all partitions for the topic
         var partitions = _DyconitLogger._adminClient.GetMetadata(TimeSpan.FromSeconds(20)).Topics.First(t => t.Topic == topic).Partitions;
         foreach (var partition in partitions)
         {
             var topicPartition = new TopicPartition(topic, partition.PartitionId);
-            Offset previousOffset = consumer.Position(topicPartition);
-
-            if (previousOffset == Offset.Unset)
-            {
-                Log.Debug($"[{adminPort}] - No previous offset for topic {topic} partition {partition.PartitionId}");
-                previousOffset = 0;
-            }
-
-            offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));
-            Log.Debug($"[{adminPort}] - Previous offset for topic {topic} partition {partition.PartitionId}: {previousOffset}");
+            double previousOffset = _currentOffset[topic];
+            offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));;
         }
 
         await Task.Delay(TimeSpan.FromSeconds(5));
@@ -240,21 +209,17 @@ class Consumer
             var topicPartition = new TopicPartition(topic, partition.PartitionId);
 
             var previousValues = offsets[topicPartition];
-            long previousOffset = previousValues.Item1;
+            double previousOffset = previousValues.Item1;
             DateTime previousTimestamp = previousValues.Item2;
 
-            long currentOffset = consumer.Position(topicPartition);
-            if (currentOffset == Offset.Unset)
-            {
-                currentOffset = 0;
-            }
+            double currentOffset = _currentOffset[topic];
             DateTime currentTimestamp = DateTime.UtcNow;
-            Log.Debug($"[{adminPort}] - Current Offset for topic {topic} partition {partition.PartitionId}: {currentOffset}");
 
             double consumptionRate = (currentOffset - previousOffset) / (currentTimestamp - previousTimestamp).TotalSeconds;
             topicThroughput += consumptionRate;
-            Log.Debug($"[{adminPort}] - Consumption rate for topic {topic} partition {partition.PartitionId}: {consumptionRate}");
         }
+
+        Log.Information($"Topic {topic} message throughput: {topicThroughput} messages/s");
 
         var throughputMessage = new JObject
         {
