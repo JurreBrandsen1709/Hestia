@@ -153,6 +153,8 @@ namespace Dyconit.Overlord
 
             _syncResponses.Add(senderPort.Value);
 
+            Log.Information("Handled sync request from {SenderPort} for data {collectionName}", senderPort, collectionName);
+
             return Task.CompletedTask;
         }
 
@@ -243,20 +245,20 @@ namespace Dyconit.Overlord
             // Merge the received data with the local data
             var mergedData = _receivedData.Union(localData, new ConsumeResultComparer()).ToList();
 
-            // foreach (var item in localData)
-            // {
-            //     Log.Debug($"[{_listenPort}] - localData: {item.Message.Value}");
-            // }
-            // Log.Debug("--------------------------------------------------");
-            // foreach (var item in _receivedData)
-            // {
-            //     Log.Debug($"[{_listenPort}] - _receivedData: {item.Message.Value}");
-            // }
-            // Log.Debug("--------------------------------------------------");
-            // foreach (var item in mergedData)
-            // {
-            //     Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
-            // }
+            foreach (var item in localData)
+            {
+                Log.Debug($"[{_listenPort}] - localData: {item.Message.Value}");
+            }
+            Log.Debug("--------------------------------------------------");
+            foreach (var item in _receivedData)
+            {
+                Log.Debug($"[{_listenPort}] - _receivedData: {item.Message.Value}");
+            }
+            Log.Debug("--------------------------------------------------");
+            foreach (var item in mergedData)
+            {
+                Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
+            }
 
             bool isNotSame = mergedData.Count() != localData.Count();
 
@@ -297,6 +299,7 @@ namespace Dyconit.Overlord
 
         private async Task HandleSyncRequestAsync(JObject messageObject)
         {
+
             var syncRequestPort = messageObject["port"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
 
@@ -317,6 +320,8 @@ namespace Dyconit.Overlord
                 { "data", consumeResultWrapped },
                 { "collection", collectionName}
             };
+
+            Log.Information("Sending Sync Request to port {Port} for data in {collectionName}", syncRequestPort.Value, collectionName);
 
             await SendMessageOverTcp(syncResponse.ToString(), syncRequestPort.Value);
 
@@ -349,22 +354,32 @@ namespace Dyconit.Overlord
 
         private Task HandleUpdateConitEventAsync(JObject messageObject)
         {
-            // get the collection name and the corresponding node based on the port
+            // Get the collection name and the corresponding node based on the port
             var collectionName = messageObject["collectionName"]?.ToString();
             var collection = _dyconitCollections.Collections
                 ?.FirstOrDefault(c => c.Name == collectionName);
 
-            // get the node based on the port
+            // Get the node based on the port
             var nodePort = messageObject["port"]?.ToObject<int>();
             var node = collection?.Nodes
                 ?.FirstOrDefault(n => n.Port == nodePort);
 
-            // update the node's bounds
-            node!.Bounds!.Staleness = messageObject["bounds"]!["Staleness"]?.ToObject<double>();
-            node.Bounds.NumericalError = messageObject["bounds"]!["NumericalError"]?.ToObject<double>();
+            // Update the node's bounds
+            var newStaleness = messageObject["bounds"]?["Staleness"]?.ToObject<double>();
+            if (newStaleness != null && node != null && node.Bounds != null)
+            {
+                node.Bounds.Staleness = newStaleness;
+            }
+
+            var newNumericalError = messageObject["bounds"]?["NumericalError"]?.ToObject<double>();
+            if (newNumericalError != null && node != null && node.Bounds != null)
+            {
+                node.Bounds.NumericalError = newNumericalError;
+            }
 
             return Task.CompletedTask;
         }
+
 
 
         private Task HandleRemoveNodeEventAsync(JObject messageObject)
@@ -522,9 +537,14 @@ namespace Dyconit.Overlord
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Log.Error(ex, "Failed to send message over TCP");
+                // remove this node from every collection
+                foreach (var collection in _dyconitCollections.Collections ?? Enumerable.Empty<Collection>())
+                {
+                    collection.Nodes?.RemoveAll(n => n.Port == port);
+                }
+
             }
         }
 
@@ -603,6 +623,9 @@ namespace Dyconit.Overlord
 
         private async Task WaitForResponseAsync(List<int> portsStalenessExceeded)
         {
+            int timeout = 5000; // Set timeout to 5 seconds
+            var startTime = DateTime.UtcNow;
+
             while (true)
             {
                 if (_syncResponses.Count >= portsStalenessExceeded.Count)
@@ -611,56 +634,63 @@ namespace Dyconit.Overlord
                     break;
                 }
 
+                // Check if timeout has been exceeded
+                if (DateTime.UtcNow - startTime > TimeSpan.FromMilliseconds(timeout))
+                {
+                    Log.Warning($"Timeout exceeded while waiting for sync responses from ports: {string.Join(",", portsStalenessExceeded)}");
+                    break;
+                }
+
                 await Task.Delay(100);
             }
         }
 
         public bool BoundNumericalError(List<ConsumeResult<Null, string>> list, string topic, double totalLocalWeight)
-{
-    // get the number of nodes in the collection
-    var numberOfNodes = _dyconitCollections.Collections
-        ?.FirstOrDefault(c => c.Name == topic)
-        ?.Nodes
-        ?.Count;
-
-    // if the number of nodes is null, we can't do anything
-    if (!numberOfNodes.HasValue || numberOfNodes.Value == 0 || numberOfNodes.Value == 1)
-    {
-        return false || _synced;
-    }
-    else
-    {
-        var otherNodes = _dyconitCollections.Collections
-            ?.FirstOrDefault(c => c.Name == topic)
-            ?.Nodes
-            ?.Where(n => n.Port != _listenPort);
-
-        // go through the numerical error bounds for each node which is not the current node
-        foreach (var node in otherNodes!)
         {
-            double numericalErrorBound = node.Bounds!.NumericalError!.Value;
+            // get the number of nodes in the collection
+            var numberOfNodes = _dyconitCollections.Collections
+                ?.FirstOrDefault(c => c.Name == topic)
+                ?.Nodes
+                ?.Count;
 
-            // calculate the average weight per node
-            double averageWeightPerNode = totalLocalWeight / (numberOfNodes.Value - 1);
-
-            // if the average weight per node is greater than the numerical error bound, we need to send data to the other node
-            if (averageWeightPerNode > numericalErrorBound)
+            // if the number of nodes is null, we can't do anything
+            if (!numberOfNodes.HasValue || numberOfNodes.Value == 0 || numberOfNodes.Value == 1)
             {
-                // send a sync request to the other node
-                var message = new JObject
-                {
-                    ["eventType"] = "syncRequest",
-                    ["port"] = node.Port,
-                    ["collectionName"] = topic,
-                };
+                return false || _synced;
+            }
+            else
+            {
+                var otherNodes = _dyconitCollections.Collections
+                    ?.FirstOrDefault(c => c.Name == topic)
+                    ?.Nodes
+                    ?.Where(n => n.Port != _listenPort).ToList();
 
-                SendMessageOverTcp(message.ToString(), _listenPort).Wait();
+                // go through the numerical error bounds for each node which is not the current node
+                foreach (var node in otherNodes!)
+                {
+                    double numericalErrorBound = node.Bounds!.NumericalError!.Value;
+
+                    // calculate the average weight per node
+                    double averageWeightPerNode = totalLocalWeight / (numberOfNodes.Value - 1);
+
+                    // if the average weight per node is greater than the numerical error bound, we need to send data to the other node
+                    if (averageWeightPerNode > numericalErrorBound)
+                    {
+                        // send a sync request to the other node
+                        var message = new JObject
+                        {
+                            ["eventType"] = "syncRequest",
+                            ["port"] = node.Port,
+                            ["collectionName"] = topic,
+                        };
+
+                        SendMessageOverTcp(message.ToString(), _listenPort).Wait();
+                    }
+                }
+
+                return false || _synced;
             }
         }
-
-        return false || _synced;
-    }
-}
 
     }
 }

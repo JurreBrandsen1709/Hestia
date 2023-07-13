@@ -3,6 +3,9 @@
 **/obj/
 **/.txt
 
+# Ignore all .txt files in every folder
+**/*.txt
+
 # Ignore .env files
 **/.env
 

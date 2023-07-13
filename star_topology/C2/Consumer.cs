@@ -8,6 +8,8 @@ using Dyconit.Helper;
 using Dyconit.Overlord;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System.Diagnostics;
+
 
 class Consumer
 {
@@ -18,10 +20,15 @@ class Consumer
     private static Random _random = new Random();
     private static Dictionary<string, double> _totalWeight = new Dictionary<string, double>();
     private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
+    private static Dictionary<string, int> _consumerCount = new Dictionary<string, int>();
+    private static Process _currentProcess;
 
     static async Task Main()
     {
         var configuration = GetConsumerConfiguration();
+
+        // Create a PerformanceCounter to monitor CPU usage
+        _currentProcess = Process.GetCurrentProcess();
 
         var topics = new List<string>
         {
@@ -31,7 +38,7 @@ class Consumer
 
         foreach (var topic in topics)
         {
-            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 2000 : 5000, topic == "topic_priority" ? 10 : 25);
+            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 10000 : 15000, topic == "topic_priority" ? 10 : 25);
 
             _localCollection[topic] = conitConfiguration;
 
@@ -39,7 +46,7 @@ class Consumer
             _uncommittedConsumedMessages.Add(topic, consumedMessages);
 
             _currentOffset.Add(topic, 0);
-
+            _consumerCount.Add(topic, 0);
             _totalWeight.Add(topic, 0);
         }
 
@@ -73,7 +80,6 @@ class Consumer
 
         using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
         {
-
             consumer.Subscribe(topic);
 
             // Introduce a delay to allow the consumer to retrieve the committed offset for the topic/partition.
@@ -86,11 +92,34 @@ class Consumer
                 while (!token.IsCancellationRequested)
                 {
                     var consumeResult = consumer.Consume(token);
-                    var inputMessage = consumeResult.Message.Value;
+
+                    // check if we have consumed a message
+                    if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
+                    {
+                        var inputMessage = consumeResult.Message.Value;
+                        Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
+                    }
+                    else {
+                        // we are finished consuming messages
+                        Log.Warning($"===================== end of topic {topic} =====================");
+
+                        // send message to the overlord to indicate that we are finished consuming messages
+                        DyconitHelper.SendFinishedMessage(adminPort, topic, _uncommittedConsumedMessages[topic]);
+
+                        // commit the last consumed message
+                        DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
+
+                        break;
+                    }
+                    float cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
+                    Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
+
+                    _consumerCount[topic] += 1;
+                    Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
+
                     _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
-;
-                     _lastCommittedOffset = consumeResult.Offset;
-                     _currentOffset[topic] += 1;
+                    _lastCommittedOffset = consumeResult.Offset;
+                    _currentOffset[topic] += 1;
 
                     // if we consume a message that is older than the last committed offset, we ignore it.
                     if (consumeResult.Offset < _lastCommittedOffset)
@@ -108,6 +137,7 @@ class Consumer
                     {
                         var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
                         _currentOffset[topic] += 1;
+                        _consumerCount[topic] = _uncommittedConsumedMessages[topic].Count;
                         _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
 
@@ -120,6 +150,7 @@ class Consumer
                     {
                         var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
                         _currentOffset[topic] += 1;
+                        _consumerCount[topic] = _uncommittedConsumedMessages[topic].Count;
                         _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
 
@@ -152,7 +183,7 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "test-consumer-group-1",
+            GroupId = "c2",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,
             EnablePartitionEof = true,
@@ -194,7 +225,7 @@ class Consumer
         {
             var topicPartition = new TopicPartition(topic, partition.PartitionId);
             double previousOffset = _currentOffset[topic];
-            offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));;
+            offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));
         }
 
         await Task.Delay(TimeSpan.FromSeconds(5));
@@ -216,7 +247,7 @@ class Consumer
             topicThroughput += consumptionRate;
         }
 
-        Log.Information($"Topic {topic} throughput: {topicThroughput} messages/s");
+        Log.Information($"Topic {topic} message throughput: {topicThroughput} messages/s");
 
         var throughputMessage = new JObject
         {

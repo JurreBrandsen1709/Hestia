@@ -1,10 +1,10 @@
 {
   "policy": "throughput-threshold-policy",
-  "collectionNames": ["topic_priority"],
+  "collectionNames": ["topic_priority", "topic_normal"],
   "description": "If the threshold of the throughput is reached, we multiply the bounds by 2, otherwise we decrease the bound by half.",
   "thresholds": {
     "throughput": 5,
-    "overhead_throughput": 2
+    "overhead_throughput": 4
   },
   "rules": [
     {
@@ -12,7 +12,7 @@
       "actions": [
         {
           "type": "multiply",
-          "value": 1.1
+          "value": 0.95
         }
       ]
     },
@@ -21,7 +21,7 @@
       "actions": [
         {
           "type": "multiply",
-          "value": 0.9
+          "value": 1.05
         }
       ]
     }

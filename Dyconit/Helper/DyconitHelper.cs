@@ -264,5 +264,21 @@ namespace Dyconit.Helper
                 Console.WriteLine($"[{_listenPort}] - {DateTime.Now.ToString("HH:mm:ss.fff")} Failed to send message over TCP: {ex.Message}");
             }
         }
+
+        public static void SendFinishedMessage(int port, string topic, List<ConsumeResult<Null, string>> localdata)
+        {
+            List<ConsumeResultWrapper<Null, string>> wrapperList = localdata!.Select(cr => new ConsumeResultWrapper<Null, string>(cr)).ToList();
+            string consumeResultWrapped = JsonConvert.SerializeObject(wrapperList, Formatting.Indented);
+            var message = new JObject
+            {
+                ["eventType"] = "finishedEvent",
+                ["port"] = port,
+                ["data"] = consumeResultWrapped,
+                ["collection"] = topic
+            };
+
+            SendMessageOverTcp(message.ToString(), 6666, port).Wait();
+        }
+
     }
 }

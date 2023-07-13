@@ -174,12 +174,54 @@ namespace Dyconit.Overlord
                         ProcessOverheadMessage(adminClientPort.Value, syncThroughput);
                     }
                     break;
+                case "finishedEvent":
+
+                    Console.WriteLine("!!!!!!!!!!!!!!!!!!!Finished event received!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    var data = json["data"] as JObject;
+                    var collecitonName = data?.Value<string>("collectionName");
+
+                    if (collecitonName != null && adminClientPort.HasValue && data != null)
+                    {
+                        ProcessFinishedEvent(adminClientPort.Value, collecitonName, data);
+                    }
+                    break;
                 default:
                     break;
             }
 
             return Task.CompletedTask;
 
+        }
+
+        private async void ProcessFinishedEvent(int port, string collecitonName, JObject data)
+        {
+            // send a syncResponse to every node in the collectionName except the one that sent the finishedEvent
+            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collecitonName);
+            if (collection == null)
+            {
+                return;
+            }
+
+            var nodes = collection.Nodes?.Where(n => n.Port != port);
+            if (nodes == null)
+            {
+                return;
+            }
+
+            foreach (var node in nodes)
+            {
+                var syncResponse = new JObject
+                {
+                    ["eventType"] = "syncResponse",
+                    ["port"] = port,
+                    ["data"] = data
+                    ["collection"] = collecitonName
+                };
+
+                Log.Warning($"-- Sending FINISHED DATA to node {node.Port} for collection {collecitonName}");
+
+                await SendMessageOverTcp(syncResponse.ToString(), node.Port!.Value);
+            }
         }
 
         private void ProcessOverheadMessage(int value, JObject syncThroughput)
@@ -435,7 +477,7 @@ namespace Dyconit.Overlord
             if (collection != null && collection.Nodes != null && collection.Nodes.Count > 1)
             {
                 // Send a new node event to all the other nodes in the collection
-                foreach (var node in collection.Nodes ?? Enumerable.Empty<Node>())
+                foreach (var node in collection.Nodes.ToList() ?? Enumerable.Empty<Node>())
                 {
                     if (node.Port != null && node.Port != adminClientPort)
                     {
@@ -543,7 +585,7 @@ namespace Dyconit.Overlord
                         collection.Nodes?.Remove(nodeToRemove);
 
                         // inform other nodes that this node has been removed
-                        foreach (var otherNode in collection.Nodes ?? new List<Node>())
+                        foreach (var otherNode in collection.Nodes!.ToList() ?? new List<Node>())
                         {
                             if (otherNode.Port != null)
                             {
