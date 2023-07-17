@@ -2,6 +2,7 @@ using Confluent.Kafka;
 using System;
 using Dyconit.Message;
 
+
 class Producer {
     static void Main(string[] args)
     {
@@ -12,7 +13,7 @@ class Producer {
             StatisticsIntervalMs = 2000,
         };
 
-        const string topic = "topic_normal";
+        const string topic = "topic_priority";
         using (var producer = new ProducerBuilder<Null, String>(configuration).Build())
         {
             Console.WriteLine("Press Ctrl+C to quit.");
@@ -20,7 +21,7 @@ class Producer {
             var numProduced = 0;
             Random rnd = new Random();
 
-            for (int i = 0; i<500; i++)
+            for (int i = 0; i<50; i++)
             {
                     // create a random length payload string
                     var payload = new string(i.ToString() + " " + topic);

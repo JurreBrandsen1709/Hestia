@@ -55,6 +55,8 @@ namespace Dyconit.Helper
     public class Rule
     {
         public string ?Condition { get; set; }
+        public string ?PolicyType { get; set; }
+        public double ?SmoothingFactor { get; set; }
         public List<PolicyAction> ?PolicyActions { get; set; }
     }
 
@@ -64,6 +66,8 @@ namespace Dyconit.Helper
         public List<Node> ?Nodes { get; set; }
         public Thresholds ?Thresholds { get; set; }
         public List<Rule> ?Rules { get; set; }
+        public MovingAverage? MovingAverageThroughput { get; set; }
+        public MovingAverage? MovingAverageOverheadThroughput { get; set; }
     }
 
     public class RootObject
@@ -77,6 +81,33 @@ namespace Dyconit.Helper
         public List<ConsumeResult<Null, string>> ?Data { get; set; }
         public double ?Weight { get; set; } = 0;
 
+    }
+
+    public class MovingAverage
+    {
+        private Queue<double> _values;
+        private double _sum;
+        private int _size;
+
+        public MovingAverage(int size)
+        {
+            _values = new Queue<double>(size);
+            _sum = 0;
+            _size = size;
+        }
+
+        public void Add(double value)
+        {
+            if (_values.Count == _size)
+            {
+                _sum -= _values.Dequeue();
+            }
+
+            _values.Enqueue(value);
+            _sum += value;
+        }
+
+        public double Average => _sum / _values.Count;
     }
 
     // Custom comparer to compare ConsumeResult based on timestamps
@@ -226,7 +257,7 @@ namespace Dyconit.Helper
 
         public static long CommitStoredMessages(IConsumer<Null, string> consumer, List<ConsumeResult<Null, string>> uncommittedConsumedMessages, long lastCommittedOffset)
         {
-            foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages)
+            foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
             {
                 consumer.Commit(storedMessage);
             }

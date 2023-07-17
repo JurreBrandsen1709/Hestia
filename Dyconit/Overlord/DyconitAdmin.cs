@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Net;
 using Serilog;
 using Serilog.Events;
+using Confluent.Kafka.Admin;
 
 namespace Dyconit.Overlord
 {
@@ -31,6 +32,10 @@ namespace Dyconit.Overlord
                 BootstrapServers = bootstrapServers,
             };
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
+            _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "trans_topic_priority", NumPartitions = 1, ReplicationFactor = 1 } });
+            _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "trans_topic_normal", NumPartitions = 1, ReplicationFactor = 1 } });
+            _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "topic_normal", NumPartitions = 1, ReplicationFactor = 1 } });
+            _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "topic_priority", NumPartitions = 1, ReplicationFactor = 1 } });
             _dyconitCollections = CreateDyconitCollections(conitCollection, adminPort);
             ListenForMessagesAsync();
         }
@@ -245,24 +250,24 @@ namespace Dyconit.Overlord
             // Merge the received data with the local data
             var mergedData = _receivedData.Union(localData, new ConsumeResultComparer()).ToList();
 
-            foreach (var item in localData)
-            {
-                Log.Debug($"[{_listenPort}] - localData: {item.Message.Value}");
-            }
-            Log.Debug("--------------------------------------------------");
-            foreach (var item in _receivedData)
-            {
-                Log.Debug($"[{_listenPort}] - _receivedData: {item.Message.Value}");
-            }
-            Log.Debug("--------------------------------------------------");
-            foreach (var item in mergedData)
-            {
-                Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
-            }
+            // foreach (var item in localData)
+            // {
+            //     Log.Debug($"[{_listenPort}] - localData: {item.Message.Value}");
+            // }
+            // Log.Debug("--------------------------------------------------");
+            // foreach (var item in _receivedData)
+            // {
+            //     Log.Debug($"[{_listenPort}] - _receivedData: {item.Message.Value}");
+            // }
+            // Log.Debug("--------------------------------------------------");
+            // foreach (var item in mergedData)
+            // {
+            //     Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
+            // }
 
             bool isNotSame = mergedData.Count() != localData.Count();
 
-            // Log.Debug("isNotSame: {IsNotSame}, localData.Count: {LocalDataCount}, _receivedData.Count: {ReceivedDataCount}, mergedData.Count: {MergedDataCount}", isNotSame, localData.Count(), _receivedData.Count(), mergedData.Count());
+            Log.Debug("isNotSame: {IsNotSame}, localData.Count: {LocalDataCount}, _receivedData.Count: {ReceivedDataCount}, mergedData.Count: {MergedDataCount}", isNotSame, localData.Count(), _receivedData.Count(), mergedData.Count());
 
             // check if the merged data has the same topic as the collection name. if this is not the case, store the merged data in the buffer
             if (mergedData.First().Topic != collectionName)

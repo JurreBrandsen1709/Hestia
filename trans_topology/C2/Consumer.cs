@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,14 +14,15 @@ using System.Diagnostics;
 
 class Consumer
 {
-    private static Dictionary<string, List<ConsumeResult<Null, string>>> _uncommittedConsumedMessages = new Dictionary<string, List<ConsumeResult<Null, string>>>();
     private static JObject _localCollection = new JObject();
     public static int adminPort = DyconitHelper.FindPort();
     public static DyconitAdmin _DyconitLogger;
     private static Random _random = new Random();
-    private static Dictionary<string, double> _totalWeight = new Dictionary<string, double>();
-    private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
-    private static Dictionary<string, int> _consumerCount = new Dictionary<string, int>();
+    // Use a ConcurrentDictionary instead of a Dictionary to ensure thread-safety
+    private static ConcurrentDictionary<string, List<ConsumeResult<Null, string>>> _uncommittedConsumedMessages = new ConcurrentDictionary<string, List<ConsumeResult<Null, string>>>();
+    private static ConcurrentDictionary<string, double> _totalWeight = new ConcurrentDictionary<string, double>();
+    private static ConcurrentDictionary<string, double> _currentOffset = new ConcurrentDictionary<string, double>();
+    private static ConcurrentDictionary<string, int> _consumerCount = new ConcurrentDictionary<string, int>();
     private static Process _currentProcess;
 
     static async Task Main()
@@ -32,22 +34,21 @@ class Consumer
 
         var topics = new List<string>
         {
-            "topic_priority",
-            "topic_normal",
+            "trans_topic_priority",
+            "trans_topic_normal",
         };
 
         foreach (var topic in topics)
         {
-            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "topic_priority" ? 10000 : 15000, topic == "topic_priority" ? 10 : 25);
+            var conitConfiguration = DyconitHelper.GetConitConfiguration(topic, topic == "trans_topic_priority" ? 10000 : 15000, topic == "trans_topic_priority" ? 10 : 25);
 
             _localCollection[topic] = conitConfiguration;
 
             var consumedMessages = new List<ConsumeResult<Null, string>>();
-            _uncommittedConsumedMessages.Add(topic, consumedMessages);
-
-            _currentOffset.Add(topic, 0);
-            _consumerCount.Add(topic, 0);
-            _totalWeight.Add(topic, 0);
+            _uncommittedConsumedMessages.TryAdd(topic, consumedMessages);
+            _currentOffset.TryAdd(topic, 0);
+            _consumerCount.TryAdd(topic, 0);
+            _totalWeight.TryAdd(topic, 0);
         }
 
         _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection);
@@ -91,11 +92,7 @@ class Consumer
             {
                 while (!token.IsCancellationRequested)
                 {
-                    float cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
-                    Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
-
                     var consumeResult = consumer.Consume(token);
-                    _consumerCount[topic] += 1;
 
                     // check if we have consumed a message
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
@@ -115,7 +112,10 @@ class Consumer
 
                         break;
                     }
+                    float cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
+                    Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
 
+                    _consumerCount[topic] += 1;
                     Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
 
                     _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
@@ -184,7 +184,7 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "c3",
+            GroupId = "c2",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,
             EnablePartitionEof = true,

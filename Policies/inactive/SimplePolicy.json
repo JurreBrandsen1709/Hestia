@@ -8,6 +8,7 @@
   },
   "rules": [
     {
+      "policyType": "standard",
       "condition": "throughput >= threshold",
       "actions": [
         {
@@ -17,6 +18,7 @@
       ]
     },
     {
+      "policyType": "standard",
       "condition": "throughput < threshold",
       "actions": [
         {

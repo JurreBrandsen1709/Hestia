@@ -1,1 +1,0 @@
-A transitive consumption between A->B and B->C. Therefore also A->C.

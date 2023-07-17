@@ -62,7 +62,7 @@ def extract_information(file):
     return overhead_throughput, message_throughput, consumer_count, cpu_utilization
 
 
-file_path = 'C:\\Users\\JurreB\Documents\\kafka-dotnet-getting-started\\a-b_config\\Consumer_a\\log_20230713_120637.txt'
+file_path = 'C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\star_topology\\C4\\log_20230717_110728.txt'
 
 overhead_throughput, message_throughput, consumer_count, cpu_utilization = extract_information(file_path)
 

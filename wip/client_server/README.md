@@ -1,1 +1,0 @@
-situation where multiple clients reach a server. That server is also connected to other servers, those servers are connected to other clients.

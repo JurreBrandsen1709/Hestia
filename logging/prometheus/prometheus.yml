@@ -1,7 +1,0 @@
-global:
-  scrape_interval: 15s
-
-scrape_configs:
-  - job_name: 'your_program'
-    static_configs:
-      - targets: ['your_program:8000']

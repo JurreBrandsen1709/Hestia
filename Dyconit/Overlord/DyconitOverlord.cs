@@ -2,6 +2,7 @@ using Dyconit.Helper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 
@@ -12,6 +13,7 @@ namespace Dyconit.Overlord
         private readonly int _listenPort = 6666;
         private RootObject _dyconitCollections;
         private CancellationTokenSource? _cancellationTokenSource;
+        private Dictionary<int, double> _previousThroughput = new Dictionary<int, double>();
 
         public DyconitOverlord()
         {
@@ -48,6 +50,8 @@ namespace Dyconit.Overlord
                     JArray ?collectionNames = policyJson["collectionNames"] as JArray;
                     JToken ?thresholds = policyJson["thresholds"];
                     JArray ?rules = policyJson["rules"] as JArray;
+                    int ?averageSizeThroughput = policyJson.Value<int>("averageSizeThroughput");
+                    int ?averageSizeOverheadThroughput = policyJson.Value<int>("averageSizeOverheadThroughput");
 
                     // add some checks to see if collections, thresholds and rules are not null
                     if (collectionNames == null || thresholds == null || rules == null)
@@ -66,7 +70,11 @@ namespace Dyconit.Overlord
                                 Throughput = thresholds.Value<int>("throughput"),
                                 OverheadThroughput = thresholds.Value<int>("overhead_throughput")
                             } : null,
-                            Rules = new List<Rule>()
+                            Rules = new List<Rule>(),
+
+                            // add some checks to see if averageSizeThroughput and averageSizeOverheadThroughput are not null. In that case, set new MovingAverage to 1.
+                            MovingAverageThroughput = averageSizeThroughput != 0 ? new MovingAverage(averageSizeThroughput.Value) : null,
+                            MovingAverageOverheadThroughput = averageSizeOverheadThroughput != 0 ? new MovingAverage(averageSizeOverheadThroughput.Value) : null
                         };
 
                         foreach (JObject rule in rules ?? new JArray())
@@ -74,6 +82,8 @@ namespace Dyconit.Overlord
                             Rule? newRule = new Rule
                             {
                                 Condition = rule.Value<string>("condition"),
+                                PolicyType = rule.Value<string>("policyType"),
+                                SmoothingFactor = rule.Value<double?>("smoothingFactor"),
                                 PolicyActions = new List<PolicyAction>()
                             };
 
@@ -250,7 +260,8 @@ namespace Dyconit.Overlord
 
                 if (throughput != null)
                 {
-                    ApplyRules(collectionObj, collectionObj.Thresholds.OverheadThroughput, throughput.Value, adminClientPort);
+                    collectionObj.MovingAverageOverheadThroughput?.Add(throughput.Value);
+                    ApplyRules(collectionObj, collectionObj.Thresholds.OverheadThroughput, throughput.Value, adminClientPort, collectionObj.MovingAverageOverheadThroughput);
                 };
             }
         }
@@ -270,10 +281,12 @@ namespace Dyconit.Overlord
             {
                 return;
             }
-            ApplyRules(collection, collection.Thresholds.Throughput, throughput.Value, adminClientPort.Value);
+
+            collection.MovingAverageThroughput?.Add(throughput.Value);
+            ApplyRules(collection, collection.Thresholds.Throughput, throughput.Value, adminClientPort.Value, collection.MovingAverageThroughput);
         }
 
-        private async void ApplyRules(Collection collection, int? threshold, double throughput, int? adminClientPort)
+        private async void ApplyRules(Collection collection, int? threshold, double throughput, int? adminClientPort, MovingAverage? movingAverage)
         {
             if (collection.Rules == null || threshold == null)
             {
@@ -284,20 +297,50 @@ namespace Dyconit.Overlord
             {
                 var condition = rule.Condition;
                 var policyActions = rule.PolicyActions;
+                var policyType = rule.PolicyType;
+                var smoothingFactor = rule.SmoothingFactor;
+
 
                 if (condition == null || policyActions == null)
                 {
                     continue;
                 }
 
-                var isConditionMet = EvaluateCondition(condition, throughput, threshold);
+                if (policyType == "exponentialSmoothing")
+                {
+                    throughput = ExponentialSmoothing(throughput, smoothingFactor, adminClientPort);
+                }
+
+                var isConditionMet = EvaluateCondition(condition, throughput, threshold, movingAverage);
 
                 if (isConditionMet)
                 {
+
                     ApplyActions(collection, policyActions, adminClientPort);
                     await SendUpdatedBoundsToCollection(collection, adminClientPort);
                 }
             }
+        }
+
+        private double ExponentialSmoothing(double throughput, double? smoothingFactor, int? adminClientPort)
+        {
+            if (smoothingFactor == null || adminClientPort == null)
+            {
+                return throughput;
+            }
+
+            var alpha = smoothingFactor.Value;
+
+            if (_previousThroughput[adminClientPort.Value] == 0)
+            {
+                _previousThroughput[adminClientPort.Value] = throughput;
+                return throughput;
+            }
+
+            throughput = alpha * _previousThroughput[adminClientPort.Value] + (1 - alpha) * throughput;
+
+            _previousThroughput[adminClientPort.Value] = throughput;
+            return throughput;
         }
 
         private async Task SendUpdatedBoundsToCollection(Collection collection, int? adminClientPort)
@@ -329,23 +372,33 @@ namespace Dyconit.Overlord
                     }
                 };
 
+                Log.Information($" Upadted bounds to {message} for collection {collection.Name} on node {node.Port}");
+
                 await SendMessageOverTcp(message.ToString(), node.Port ?? 0).ConfigureAwait(false);
             }
         }
 
 
-
-        bool EvaluateCondition(string condition, double throughput, int? threshold)
+        bool EvaluateCondition(string condition, double throughput, int? threshold, MovingAverage? movingAverage)
         {
             // Assuming the condition format is "{variable} {operator} {threshold}"
             var parts = condition.Split(' ');
             var operatorSymbol = parts[1];
+            var variableSymbol = parts[0];
 
             switch (operatorSymbol)
             {
                 case ">":
+                    if (variableSymbol == "avg" && movingAverage != null)
+                    {
+                        return throughput > movingAverage.Average;
+                    }
                     return throughput > threshold;
                 case "<":
+                    if (variableSymbol == "avg" && movingAverage != null)
+                    {
+                        return throughput < movingAverage.Average;
+                    }
                     return throughput < threshold;
                 case ">=":
                     return throughput >= threshold;
@@ -410,8 +463,6 @@ namespace Dyconit.Overlord
             }
         }
 
-
-
         private void ProcessNewAdminEvent(int adminClientPort, JObject? conits)
         {
             var collectionName = conits?.Value<string>("collectionName");
@@ -464,6 +515,12 @@ namespace Dyconit.Overlord
             }
 
             collection.Nodes?.Add(node);
+
+            // check if _previousThroughput has the adminClientPort
+            if (!_previousThroughput.ContainsKey(adminClientPort))
+            {
+                _previousThroughput.Add(adminClientPort, 0);
+            }
         }
 
         private async void WelcomeNewNode(int adminClientPort, JObject? conits)
@@ -551,6 +608,7 @@ namespace Dyconit.Overlord
                     {
                         if (node.Port != null)
                         {
+                            Log.Information($"Sending heartbeat to node {node.Port}");
                             await SendMessageOverTcp(heartbeatMessage.ToString(), node.Port.Value);
                         }
                     }

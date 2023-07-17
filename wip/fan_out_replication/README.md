@@ -1,1 +1,0 @@
-Events are produced to a single cluster and then replicted to multiple destination clusters.

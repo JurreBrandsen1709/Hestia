@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,18 +10,20 @@ using Dyconit.Overlord;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Diagnostics;
+using Dyconit.Message;
 
 
 class Consumer
 {
-    private static Dictionary<string, List<ConsumeResult<Null, string>>> _uncommittedConsumedMessages = new Dictionary<string, List<ConsumeResult<Null, string>>>();
     private static JObject _localCollection = new JObject();
     public static int adminPort = DyconitHelper.FindPort();
     public static DyconitAdmin _DyconitLogger;
     private static Random _random = new Random();
-    private static Dictionary<string, double> _totalWeight = new Dictionary<string, double>();
-    private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
-    private static Dictionary<string, int> _consumerCount = new Dictionary<string, int>();
+    // Use a ConcurrentDictionary instead of a Dictionary to ensure thread-safety
+    private static ConcurrentDictionary<string, List<ConsumeResult<Null, string>>> _uncommittedConsumedMessages = new ConcurrentDictionary<string, List<ConsumeResult<Null, string>>>();
+    private static ConcurrentDictionary<string, double> _totalWeight = new ConcurrentDictionary<string, double>();
+    private static ConcurrentDictionary<string, double> _currentOffset = new ConcurrentDictionary<string, double>();
+    private static ConcurrentDictionary<string, int> _consumerCount = new ConcurrentDictionary<string, int>();
     private static Process _currentProcess;
 
     static async Task Main()
@@ -43,11 +46,10 @@ class Consumer
             _localCollection[topic] = conitConfiguration;
 
             var consumedMessages = new List<ConsumeResult<Null, string>>();
-            _uncommittedConsumedMessages.Add(topic, consumedMessages);
-
-            _currentOffset.Add(topic, 0);
-            _consumerCount.Add(topic, 0);
-            _totalWeight.Add(topic, 0);
+            _uncommittedConsumedMessages.TryAdd(topic, consumedMessages);
+            _currentOffset.TryAdd(topic, 0);
+            _consumerCount.TryAdd(topic, 0);
+            _totalWeight.TryAdd(topic, 0);
         }
 
         _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection);
@@ -101,7 +103,17 @@ class Consumer
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                     {
                         var inputMessage = consumeResult.Message.Value;
-                        // Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
+                        Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
+
+                        using (var producer = new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = "localhost:9092" }).Build())
+                        {
+                            var message = new DyconitMessage<Null, string>
+                            {
+                                Value = "trans_"+inputMessage,
+                                Weight = 1.0
+                            };
+                            await producer.ProduceAsync("trans_"+topic, message);
+                        }
                     }
                     else {
                         // we are finished consuming messages
@@ -184,7 +196,7 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "localhost:9092",
-            GroupId = "c3",
+            GroupId = "c4",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,
             EnablePartitionEof = true,

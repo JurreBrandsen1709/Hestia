@@ -20,7 +20,7 @@ class Producer {
             var numProduced = 0;
             Random rnd = new Random();
 
-            for (int i = 0; i<500; i++)
+            for (int i = 0; i<50; i++)
             {
                     // create a random length payload string
                     var payload = new string(i.ToString() + " " + topic);
