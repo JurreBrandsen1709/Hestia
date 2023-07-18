@@ -115,7 +115,6 @@ namespace Dyconit.Overlord
             // deserialize the data
             List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(data)!;
 
-
             // Convert back to original format
             _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
             {
@@ -438,7 +437,7 @@ namespace Dyconit.Overlord
 
                 var endTime = DateTime.UtcNow;
                 var elapsed = endTime - startTime;
-                var delay = TimeSpan.FromSeconds(10) - elapsed;
+                var delay = TimeSpan.FromSeconds(20) - elapsed;
 
                 if (delay > TimeSpan.Zero)
                 {
@@ -461,7 +460,7 @@ namespace Dyconit.Overlord
             // loop through each collection and get the total sync count
             foreach (var collection in _dyconitCollections.Collections ?? Enumerable.Empty<Collection>())
             {
-                var syncCount = 0;
+                double syncCount = 0;
 
                 foreach (var node in collection.Nodes ?? Enumerable.Empty<Node>())
                 {
@@ -477,7 +476,7 @@ namespace Dyconit.Overlord
 
                 // add the sync count to the message
                 message["data"]![collection.Name ?? string.Empty] = syncCount;
-                Log.Information($"Collection name: {collection.Name} overhead throughput {syncCount/10} messages/s");
+                Log.Information($"Collection name: {collection.Name} overhead throughput {syncCount} messages/s");
             }
 
             await SendMessageOverTcp(message.ToString(), 6666);

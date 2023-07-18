@@ -1,11 +1,7 @@
-import datetime
-import re
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+import re
 
-def extract_information(file):
+def extract_information(file, file_id):
     overhead_throughput = {}
     message_throughput = {}
     consumer_count = {}
@@ -24,7 +20,7 @@ def extract_information(file):
 
                 if collection_name not in overhead_throughput:
                     overhead_throughput[collection_name] = []
-                overhead_throughput[collection_name].append((time, throughput))
+                overhead_throughput[collection_name].append((time, throughput, file_id))
 
             # Extract message throughput
             topic_match = re.search(r'Topic\s(\w+)', line)
@@ -35,7 +31,7 @@ def extract_information(file):
 
                 if topic not in message_throughput:
                     message_throughput[topic] = []
-                message_throughput[topic].append((time, throughput))
+                message_throughput[topic].append((time, throughput, file_id))
 
             # Extract consumer count
             consumer_match = re.search(r"Topic: (\w+) - consumer count (\d+)", line)
@@ -45,7 +41,7 @@ def extract_information(file):
 
                 if topic not in consumer_count:
                     consumer_count[topic] = []
-                consumer_count[topic].append((time, count))
+                consumer_count[topic].append((time, count, file_id))
 
             # Extract CPU utilization
             port_match = re.search(r'port:\s(\d+)', line)
@@ -57,57 +53,46 @@ def extract_information(file):
 
                     if port not in cpu_utilization:
                         cpu_utilization[port] = []
-                    cpu_utilization[port].append((time, utilization))
+                    cpu_utilization[port].append((time, utilization, file_id))
 
     return overhead_throughput, message_throughput, consumer_count, cpu_utilization
 
+file_path = 'C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\star_topology\\'
+ # C:\Users\JurreB\Documents\kafka-dotnet-getting-started\star_topology\C1\log_20230718_115352.txt
+ # C:\Users\JurreB\Documents\kafka-dotnet-getting-started\star_topology\C1\log_20230718_132236.txt
+# C:\Users\JurreB\Documents\kafka-dotnet-getting-started\star_topology\C1\log_20230718_140628.txt
 
-file_path = 'C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\star_topology\\C4\\log_20230717_110728.txt'
+# List of file paths
+file_paths = [file_path + 'C1\\log_20230718_140628.txt',
+              file_path + 'C2\\log_20230718_140628.txt',
+              file_path + 'C3\\log_20230718_140628.txt',
+              file_path + 'C4\\log_20230718_140629.txt']
 
-overhead_throughput, message_throughput, consumer_count, cpu_utilization = extract_information(file_path)
 
-# Convert data to pandas DataFrame
-overhead_df = pd.DataFrame([(collection, time, throughput) for collection, data in overhead_throughput.items()
-                            for time, throughput in data], columns=['Collection', 'Time', 'Throughput'])
+# DataFrames
+overhead_df = pd.DataFrame(columns=['Collection', 'Time', 'Throughput', 'FileId'])
+message_df = pd.DataFrame(columns=['Topic', 'Time', 'Throughput', 'FileId'])
+consumer_df = pd.DataFrame(columns=['Topic', 'Time', 'ConsumerCount', 'FileId'])
+cpu_df = pd.DataFrame(columns=['Port', 'Time', 'Utilization', 'FileId'])
 
-message_df = pd.DataFrame([(topic, time, throughput) for topic, data in message_throughput.items()
-                           for time, throughput in data], columns=['Topic', 'Time', 'Throughput'])
+# Loop through each file and append data to DataFrames
+for file_id, file_path in enumerate(file_paths, start=1):
+    overhead_throughput, message_throughput, consumer_count, cpu_utilization = extract_information(file_path, f'log-{file_id}')
 
-consumer_df = pd.DataFrame([(topic, time, count) for topic, data in consumer_count.items()
-                            for time, count in data], columns=['Topic', 'Time', 'ConsumerCount'])
+    overhead_df = pd.concat([overhead_df, pd.DataFrame([(collection, time, throughput, file_id) for collection, data in overhead_throughput.items()
+                                                   for time, throughput, file_id in data], columns=['Collection', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
 
-cpu_df = pd.DataFrame([(port, time, utilization) for port, data in cpu_utilization.items()
-                       for time, utilization in data], columns=['Port', 'Time', 'Utilization'])
+    message_df = pd.concat([message_df, pd.DataFrame([(topic, time, throughput, file_id) for topic, data in message_throughput.items()
+                                                 for time, throughput, file_id in data], columns=['Topic', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
+
+    consumer_df = pd.concat([consumer_df, pd.DataFrame([(topic, time, count, file_id) for topic, data in consumer_count.items()
+                                                   for time, count, file_id in data], columns=['Topic', 'Time', 'ConsumerCount', 'FileId'])], ignore_index=True)
+
+    cpu_df = pd.concat([cpu_df, pd.DataFrame([(port, time, utilization, file_id) for port, data in cpu_utilization.items()
+                                          for time, utilization, file_id in data], columns=['Port', 'Time', 'Utilization', 'FileId'])], ignore_index=True)
 
 # Save data to CSV
 overhead_df.to_csv('overhead_throughput.csv', index=False)
 message_df.to_csv('message_throughput.csv', index=False)
 consumer_df.to_csv('consumer_count.csv', index=False)
 cpu_df.to_csv('cpu_utilization.csv', index=False)
-
-
-# Load the CSV file into a pandas DataFrame
-df = pd.read_csv('consumer_count.csv')
-
-# Convert the Time column to a datetime format
-df['Time'] = pd.to_datetime(df['Time'], format='%H:%M:%S.%f')
-
-# Calculate the elapsed time in seconds from the start of the recording
-df['Elapsed'] = (df['Time'] - df['Time'][0]).dt.total_seconds()
-
-# Rename the columns
-df.rename(columns={'Elapsed': 'Seconds', 'ConsumerCount': 'Count'}, inplace=True)
-
-# Create separate DataFrames for each topic
-df_topic1 = df[df['Topic'] == 'topic_normal']
-df_topic2 = df[df['Topic'] == 'topic_priority']
-
-# Plot the DataFrames with different colors
-plt.plot(df_topic1['Seconds'], df_topic1['Count'], color='blue', label='Topic Normal')
-plt.plot(df_topic2['Seconds'], df_topic2['Count'], color='red', label='Topic Priority')
-plt.xticks(range(0, int(df['Seconds'].max()) + 1, 10))
-plt.xticks(rotation=45)
-plt.xlabel('Seconds')
-plt.ylabel('Consumer Count')
-plt.legend()
-plt.show()

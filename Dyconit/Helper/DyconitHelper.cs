@@ -257,19 +257,19 @@ namespace Dyconit.Helper
 
         public static long CommitStoredMessages(IConsumer<Null, string> consumer, List<ConsumeResult<Null, string>> uncommittedConsumedMessages, long lastCommittedOffset)
         {
-            foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
-            {
-                consumer.Commit(storedMessage);
-            }
+            // foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
+            // {
+            //     consumer.Commit(storedMessage);
+            // }
 
-            // Retrieve the committed offsets for the assigned partitions
-            var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
+            // // Retrieve the committed offsets for the assigned partitions
+            // var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
 
-            // Process the committed offsets
-            foreach (var committedOffset in committedOffsets)
-            {
-                lastCommittedOffset = committedOffset.Offset.Value;
-            }
+            // // Process the committed offsets
+            // foreach (var committedOffset in committedOffsets)
+            // {
+            //     lastCommittedOffset = committedOffset.Offset.Value;
+            // }
 
             return lastCommittedOffset;
         }
@@ -305,7 +305,7 @@ namespace Dyconit.Helper
                 ["eventType"] = "finishedEvent",
                 ["port"] = port,
                 ["data"] = consumeResultWrapped,
-                ["collection"] = topic
+                ["collectionName"] = topic
             };
 
             SendMessageOverTcp(message.ToString(), 6666, port).Wait();

@@ -1,3 +1,4 @@
+using Confluent.Kafka;
 using Dyconit.Helper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -187,12 +188,16 @@ namespace Dyconit.Overlord
                 case "finishedEvent":
 
                     Console.WriteLine("!!!!!!!!!!!!!!!!!!!Finished event received!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    var data = json["data"] as JObject;
-                    var collecitonName = data?.Value<string>("collectionName");
+                    var collecitonName = json.Value<string>("collectionName");
 
-                    if (collecitonName != null && adminClientPort.HasValue && data != null)
+                    if (collecitonName != null && adminClientPort.HasValue && json["data"] != null)
                     {
-                        ProcessFinishedEvent(adminClientPort.Value, collecitonName, data);
+                        ProcessFinishedEvent(adminClientPort.Value, collecitonName, json["data"]!);
+                    }
+                    else
+                    {
+                        Log.Error("Finished event is not valid");
+                        Log.Error($"collecitonName: {collecitonName}, adminClientPort: {adminClientPort}, data: {json["data"]}");
                     }
                     break;
                 default:
@@ -203,14 +208,17 @@ namespace Dyconit.Overlord
 
         }
 
-        private async void ProcessFinishedEvent(int port, string collecitonName, JObject data)
+        private async void ProcessFinishedEvent(int port, string collecitonName, JToken data)
         {
             // send a syncResponse to every node in the collectionName except the one that sent the finishedEvent
             var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collecitonName);
             if (collection == null)
             {
+                Log.Error($"Collection {collecitonName} not found");
                 return;
             }
+
+            Console.WriteLine($"There are {collection.Nodes?.Count()} nodes in collection {collecitonName}");
 
             var nodes = collection.Nodes?.Where(n => n.Port != port);
             if (nodes == null)
@@ -218,13 +226,15 @@ namespace Dyconit.Overlord
                 return;
             }
 
+            Console.WriteLine($"There are {nodes.Count()} nodes in collection {collecitonName} except the one that sent the finishedEvent");
+
             foreach (var node in nodes)
             {
                 var syncResponse = new JObject
                 {
                     ["eventType"] = "syncResponse",
                     ["port"] = port,
-                    ["data"] = data
+                    ["data"] = JToken.Parse(data.ToString()),
                     ["collection"] = collecitonName
                 };
 
@@ -232,6 +242,7 @@ namespace Dyconit.Overlord
 
                 await SendMessageOverTcp(syncResponse.ToString(), node.Port!.Value);
             }
+
         }
 
         private void ProcessOverheadMessage(int value, JObject syncThroughput)
@@ -268,6 +279,7 @@ namespace Dyconit.Overlord
 
         private void ProcessThroughput(double? throughput, int? adminClientPort, string? collectionName, JObject json)
         {
+            Console.WriteLine($"Throughput received: {throughput} for collection {collectionName} from node {adminClientPort}");
             if (throughput <= 0 || throughput == null || collectionName == null || adminClientPort == null)
             {
                 Log.Error($"-- Received invalid throughput: {throughput}. Ignoring...");
@@ -279,6 +291,7 @@ namespace Dyconit.Overlord
 
             if (collection == null || collection.Thresholds == null || collection.Rules == null)
             {
+                Log.Error($"-- Collection {collectionName} does not have thresholds or rules. Ignoring...");
                 return;
             }
 
@@ -290,6 +303,7 @@ namespace Dyconit.Overlord
         {
             if (collection.Rules == null || threshold == null)
             {
+                Log.Error($"-- Collection {collection.Name} does not have rules or threshold. Ignoring...");
                 return;
             }
 
@@ -315,9 +329,15 @@ namespace Dyconit.Overlord
 
                 if (isConditionMet)
                 {
-
+                    Log.Warning($"-- Condition {condition} is met for collection {collection.Name} in node {adminClientPort}");
                     ApplyActions(collection, policyActions, adminClientPort);
                     await SendUpdatedBoundsToCollection(collection, adminClientPort);
+                    break;
+                }
+                else
+                {
+                    Log.Error($"-- Condition {condition} is not met for collection {collection.Name} in node {adminClientPort}");
+                    Log.Error($"-- Throughput: {throughput} | Threshold: {threshold}");
                 }
             }
         }
@@ -350,6 +370,7 @@ namespace Dyconit.Overlord
 
             if (nodes == null)
             {
+                Log.Error($"-- Collection {collection.Name} does not have nodes. Ignoring...");
                 return;
             }
 
@@ -357,6 +378,7 @@ namespace Dyconit.Overlord
             {
                 if (node.Bounds == null)
                 {
+                    Log.Error($"-- Node {node.Port} does not have bounds. Ignoring...");
                     continue;
                 }
 
@@ -425,6 +447,7 @@ namespace Dyconit.Overlord
 
                 if (bounds == null)
                 {
+                    Log.Error($"-- Could not find bounds for collection {collection.Name} on node {adminClientPort}");
                     continue;
                 }
 
@@ -591,7 +614,7 @@ namespace Dyconit.Overlord
 
             while (true)
             {
-                await Task.Delay(10000);
+                await Task.Delay(30000);
 
                 // Create a copy of the collection before iterating
                 var collections = _dyconitCollections.Collections?.ToList() ?? new List<Collection>();
@@ -621,7 +644,7 @@ namespace Dyconit.Overlord
         {
             while (true)
             {
-                await Task.Delay(10000);
+                await Task.Delay(30000);
 
                 // remove nodes that have not sent a heartbeat in the last 30 seconds
                 var heartbeatTime = DateTime.Now;
@@ -631,7 +654,7 @@ namespace Dyconit.Overlord
 
                     foreach (var node in collection.Nodes ?? new List<Node>())
                     {
-                        if (node.LastHeartbeatTime.HasValue && heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds > 30)
+                        if (node.LastHeartbeatTime.HasValue && heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds > 300)
                         {
                             nodesToRemove.Add(node);
                         }
@@ -654,6 +677,8 @@ namespace Dyconit.Overlord
                                     ["collectionName"] = collection.Name
                                 };
 
+                                Log.Warning($"Node {nodeToRemove.Port} has been removed from collection {collection.Name}");
+
                                 await SendMessageOverTcp(removeNodeMessage.ToString(), otherNode.Port.Value);
                             }
                         }
@@ -667,15 +692,17 @@ namespace Dyconit.Overlord
         {
             try
             {
-                using (var client = new TcpClient())
+                using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30))) // timeout of 30 seconds
                 {
-                    client.Connect("localhost", port);
-
-                    using (var stream = client.GetStream())
-                    using (var writer = new StreamWriter(stream))
+                    using (var client = new TcpClient())
                     {
-                        await writer.WriteLineAsync(message);
-                        await writer.FlushAsync();
+                        await client.ConnectAsync("localhost", port).ConfigureAwait(false);
+                        using (var stream = client.GetStream())
+                        using (var writer = new StreamWriter(stream))
+                        {
+                            await writer.WriteLineAsync(message).ConfigureAwait(false);
+                            await writer.FlushAsync().ConfigureAwait(false);
+                        }
                     }
                 }
             }
@@ -694,5 +721,6 @@ namespace Dyconit.Overlord
                 }
             }
         }
+
     }
 }
