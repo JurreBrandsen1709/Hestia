@@ -15,11 +15,13 @@ namespace Dyconit.Consumer
         private readonly int _type;
         private readonly JToken _conits;
         private readonly int _adminPort;
+        private readonly string _host;
 
-        public DyconitConsumerBuilder(ClientConfig config, JToken Conits, int type, int adminPort) : base(config)
+        public DyconitConsumerBuilder(ClientConfig config, JToken Conits, int type, int adminPort, string host) : base(config)
         {
             _type = type;
             _adminPort = adminPort;
+            _host = host;
             _conits = Conits;
             SendMessageToOverlord();
 
@@ -28,26 +30,20 @@ namespace Dyconit.Consumer
         {
             try
             {
-                // Determine message type based on type parameter
-                var messageType = "consumer";
-                if (_type == 2)
-                {
-                    messageType = "producer";
-                }
-
                 // Create message dictionary with updated values
                 var message = new JObject
                 {
                     new JProperty("eventType", "newAdminEvent"),
-                    new JProperty( "type", messageType),
+                    new JProperty( "type", "consumer"),
                     new JProperty("port", _adminPort),
+                    new JProperty("host", _host),
                     new JProperty("conits", _conits)
                 };
 
                 // Create a TCP client and connect to the server
                 using (var client = new TcpClient())
                 {
-                    client.Connect("localhost", 6666);
+                    client.Connect("app1", 6666);
 
                     // Get a stream object for reading and writing
                     using (var stream = client.GetStream())

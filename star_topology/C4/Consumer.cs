@@ -49,7 +49,7 @@ class Consumer
             _totalWeight.Add(topic, 0);
         }
 
-        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection);
+        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection, "app5");
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -77,7 +77,7 @@ class Consumer
         long _lastCommittedOffset = -1;
         var collectionConfiguration = _localCollection[topic];
 
-        using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
+        using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort, "app5"))
         {
             consumer.Subscribe(topic);
 
@@ -90,17 +90,21 @@ class Consumer
             {
                 while (!token.IsCancellationRequested)
                 {
-                    float cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
+                    double cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
                     Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
 
                     var consumeResult = consumer.Consume(token);
                     _consumerCount[topic] += 1;
+
+                    // add random delay to simulate processing time
+                    await Task.Delay(_random.Next(200, 600));
 
                     // check if we have consumed a message
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                     {
                         var inputMessage = consumeResult.Message.Value;
                         // Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
+
                     }
                     else {
                         // we are finished consuming messages
@@ -114,6 +118,7 @@ class Consumer
 
                         break;
                     }
+
 
                     Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
 
@@ -182,7 +187,7 @@ class Consumer
     {
         return new ConsumerConfig
         {
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = "broker:9092",
             GroupId = "c4",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,

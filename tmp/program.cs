@@ -7,7 +7,7 @@ public class Producer
     {
         public static void Main(string[] args)
         {
-            var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
+            var config = new ProducerConfig { BootstrapServers = "broker:9092" };
 
             using (var producer = new ProducerBuilder<string, string>(config).Build())
             using (var producer2 = new DependentProducerBuilder<Null, int>(producer.Handle).Build())

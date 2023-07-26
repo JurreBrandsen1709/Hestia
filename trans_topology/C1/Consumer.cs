@@ -183,7 +183,7 @@ class Consumer
     {
         return new ConsumerConfig
         {
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = "broker:9092",
             GroupId = "c1",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,

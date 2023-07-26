@@ -105,7 +105,7 @@ class Consumer
                         var inputMessage = consumeResult.Message.Value;
                         Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
 
-                        using (var producer = new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = "localhost:9092" }).Build())
+                        using (var producer = new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = "broker:9092" }).Build())
                         {
                             var message = new DyconitMessage<Null, string>
                             {
@@ -195,7 +195,7 @@ class Consumer
     {
         return new ConsumerConfig
         {
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = "broker:9092",
             GroupId = "c4",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,

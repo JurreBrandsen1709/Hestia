@@ -14,6 +14,7 @@ namespace Dyconit.Overlord
     {
         public readonly IAdminClient _adminClient;
         private readonly int _listenPort;
+        private readonly string _host;
         private readonly AdminClientConfig _adminClientConfig;
         private RootObject _dyconitCollections;
         private List<ConsumeResult<Null, string>> ?_localData = new List<ConsumeResult<Null, string>>();
@@ -22,11 +23,12 @@ namespace Dyconit.Overlord
         private HashSet<int> _syncResponses = new HashSet<int>();
         private Dictionary<string, List<ConsumeResult<Null, string>>> _buffer = new Dictionary<string, List<ConsumeResult<Null, string>>>();
 
-        public DyconitAdmin(string bootstrapServers, int adminPort, JObject conitCollection)
+        public DyconitAdmin(string bootstrapServers, int adminPort, JObject conitCollection, string host)
         {
             ConfigureLogging();
 
             _listenPort = adminPort;
+            _host = host;
             _adminClientConfig = new AdminClientConfig
             {
                 BootstrapServers = bootstrapServers,
@@ -36,7 +38,7 @@ namespace Dyconit.Overlord
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "trans_topic_normal", NumPartitions = 1, ReplicationFactor = 1 } });
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "topic_normal", NumPartitions = 1, ReplicationFactor = 1 } });
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "topic_priority", NumPartitions = 1, ReplicationFactor = 1 } });
-            _dyconitCollections = CreateDyconitCollections(conitCollection, adminPort);
+            _dyconitCollections = CreateDyconitCollections(conitCollection, adminPort, host);
             ListenForMessagesAsync();
         }
 
@@ -306,6 +308,7 @@ namespace Dyconit.Overlord
 
             var syncRequestPort = messageObject["port"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
+            var syncRequestHost = messageObject["host"]?.ToString();
 
             // check for null
             if (syncRequestPort == null || collectionName == null)
@@ -321,13 +324,14 @@ namespace Dyconit.Overlord
             {
                 { "eventType", "syncResponse" },
                 { "port", _listenPort },
+                { "host", _host},
                 { "data", consumeResultWrapped },
                 { "collection", collectionName}
             };
 
             Log.Information("Sending Sync Request to port {Port} for data in {collectionName}", syncRequestPort.Value, collectionName);
 
-            await SendMessageOverTcp(syncResponse.ToString(), syncRequestPort.Value);
+            await SendMessageOverTcp(syncResponse.ToString(), syncRequestPort.Value, syncRequestHost!);
 
             _synced = true;
 
@@ -349,11 +353,12 @@ namespace Dyconit.Overlord
             var heartbeatResponse = new JObject
             {
                 ["eventType"] = "heartbeatResponse",
-                ["port"] = _listenPort
+                ["port"] = _listenPort,
+                ["host"] = _host
             };
 
             var heartbeatResponseString = heartbeatResponse.ToString();
-            await SendMessageOverTcp(heartbeatResponseString, 6666);
+            await SendMessageOverTcp(heartbeatResponseString, 6666, "app1");
         }
 
         private Task HandleUpdateConitEventAsync(JObject messageObject)
@@ -403,11 +408,13 @@ namespace Dyconit.Overlord
         {
             var newNodePort = messageObject["port"]?.ToObject<int>();
             var collectionName = messageObject["collectionName"]?.ToString();
+            var host = messageObject["host"]?.ToString();
 
             // create a new node and add it to the collection
             var newNode = new Node
             {
                 Port = newNodePort,
+                Host = host,
                 LastHeartbeatTime = DateTime.Now,
                 LastTimeSincePull = DateTime.Now,
                 SyncCount = 0,
@@ -452,6 +459,7 @@ namespace Dyconit.Overlord
             {
                 ["eventType"] = "overheadMessage",
                 ["port"] = _listenPort,
+                ["host"] = _host,
                 ["data"] = new JObject()
             };
 
@@ -479,7 +487,7 @@ namespace Dyconit.Overlord
                 Log.Information($"Collection name: {collection.Name} overhead throughput {syncCount} messages/s");
             }
 
-            await SendMessageOverTcp(message.ToString(), 6666);
+            await SendMessageOverTcp(message.ToString(), 6666, "app1");
 
             // Reset the sync count
             foreach (var node in syncNodes)
@@ -489,7 +497,7 @@ namespace Dyconit.Overlord
         }
 
 
-        private RootObject CreateDyconitCollections(JObject conitCollection, int adminPort)
+        private RootObject CreateDyconitCollections(JObject conitCollection, int adminPort, string host)
         {
             var dyconitCollections = new RootObject
             {
@@ -510,6 +518,7 @@ namespace Dyconit.Overlord
                     var node = new Node
                     {
                         Port = adminPort,
+                        Host = host,
                         LastHeartbeatTime = DateTime.Now,
                         LastTimeSincePull = DateTime.Now,
                         SyncCount = 0,
@@ -525,13 +534,13 @@ namespace Dyconit.Overlord
             return dyconitCollections;
         }
 
-        private async Task SendMessageOverTcp(string message, int port)
+        private async Task SendMessageOverTcp(string message, int port, string host)
         {
             try
             {
                 using (var client = new TcpClient())
                 {
-                    client.Connect("localhost", port);
+                    client.Connect(host, port);
 
                     using (var stream = client.GetStream())
                     using (var writer = new StreamWriter(stream))
@@ -601,10 +610,11 @@ namespace Dyconit.Overlord
                     {
                         ["eventType"] = "syncRequest",
                         ["port"] = _listenPort,
+                        ["host"] = _host,
                         ["collectionName"] = collectionName,
                     };
 
-                    await SendMessageOverTcp(message.ToString(), node.Port!.Value);
+                    await SendMessageOverTcp(message.ToString(), node.Port!.Value, node.Host!);
 
                     // update the LastTimeSincePull for the node
                     node.LastTimeSincePull = DateTime.Now;
@@ -685,10 +695,11 @@ namespace Dyconit.Overlord
                         {
                             ["eventType"] = "syncRequest",
                             ["port"] = node.Port,
+                            ["host"] = node.Host,
                             ["collectionName"] = topic,
                         };
 
-                        SendMessageOverTcp(message.ToString(), _listenPort).Wait();
+                        SendMessageOverTcp(message.ToString(), _listenPort, _host).Wait();
                     }
                 }
 

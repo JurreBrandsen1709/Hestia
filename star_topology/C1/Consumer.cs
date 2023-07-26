@@ -49,7 +49,7 @@ class Consumer
             _totalWeight.Add(topic, 0);
         }
 
-        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection);
+        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection, "app2");
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -72,12 +72,26 @@ class Consumer
         await Task.WhenAll(consumerTasks);
     }
 
+    private async Task<double> GetCpuUsageForProcess()
+    {
+        var startTime = DateTime.UtcNow;
+        var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+        await Task.Delay(500);
+
+        var endTime = DateTime.UtcNow;
+        var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+        var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+        var totalMsPassed = (endTime - startTime).TotalMilliseconds;
+        var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+        return cpuUsageTotal * 100;
+    }
+
     static async Task ConsumeMessages(string topic, CancellationToken token, ConsumerConfig configuration, int adminPort, DyconitAdmin DyconitLogger, JToken conitConfiguration)
     {
         long _lastCommittedOffset = -1;
         var collectionConfiguration = _localCollection[topic];
 
-        using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort))
+        using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort, "app2"))
         {
             consumer.Subscribe(topic);
 
@@ -90,11 +104,14 @@ class Consumer
             {
                 while (!token.IsCancellationRequested)
                 {
-                    float cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
+                    double cpuUsage = _currentProcess.TotalProcessorTime.Ticks / (float)Stopwatch.Frequency * 100;
                     Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
 
                     var consumeResult = consumer.Consume(token);
                     _consumerCount[topic] += 1;
+
+                    // add random delay to simulate processing time
+                    await Task.Delay(_random.Next(200, 600));
 
                     // check if we have consumed a message
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
@@ -184,7 +201,7 @@ class Consumer
     {
         return new ConsumerConfig
         {
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = "broker:9092",
             GroupId = "c1",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,

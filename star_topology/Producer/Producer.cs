@@ -9,7 +9,7 @@ class Producer {
         // configure bootstrap.servers in text
         var configuration = new ProducerConfig
         {
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = "broker:9092",
             StatisticsIntervalMs = 2000,
         };
 

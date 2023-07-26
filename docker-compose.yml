@@ -19,7 +19,68 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  workload:
+    build:
+      context: .
+      dockerfile: Dockerfile.workload
+    depends_on:
+      - broker
+
+  app1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: dotnet run
+    ports:
+      - "6666:6666"
+    depends_on:
+      - broker
+
+  app2:
+    build:
+      context: .
+      dockerfile: star_topology/C1/Dockerfile
+    command: dotnet run
+    depends_on:
+      - broker
+    environment:
+      - Consumer:Host=broker
+      - Consumer:Port=9092
+
+  app3:
+    build:
+      context: .
+      dockerfile: star_topology/C2/Dockerfile
+    command: dotnet run
+    depends_on:
+      - broker
+    environment:
+      - Consumer:Host=broker
+      - Consumer:Port=9092
+
+  app4:
+    build:
+      context: .
+      dockerfile: star_topology/C3/Dockerfile
+    command: dotnet run
+    depends_on:
+      - broker
+    environment:
+      - Consumer:Host=broker
+      - Consumer:Port=9092
+
+  app5:
+    build:
+      context: .
+      dockerfile: star_topology/C4/Dockerfile
+    command: dotnet run
+    depends_on:
+      - broker
+    environment:
+      - Consumer:Host=broker
+      - Consumer:Port=9092

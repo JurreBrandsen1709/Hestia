@@ -58,15 +58,12 @@ def extract_information(file, file_id):
     return overhead_throughput, message_throughput, consumer_count, cpu_utilization
 
 file_path = 'C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\star_topology\\'
- # C:\Users\JurreB\Documents\kafka-dotnet-getting-started\star_topology\C1\log_20230718_115352.txt
- # C:\Users\JurreB\Documents\kafka-dotnet-getting-started\star_topology\C1\log_20230718_132236.txt
-# C:\Users\JurreB\Documents\kafka-dotnet-getting-started\star_topology\C1\log_20230718_140628.txt
 
 # List of file paths
-file_paths = [file_path + 'C1\\log_20230718_140628.txt',
-              file_path + 'C2\\log_20230718_140628.txt',
-              file_path + 'C3\\log_20230718_140628.txt',
-              file_path + 'C4\\log_20230718_140629.txt']
+file_paths = [file_path + 'C1\\log_20230721_105229.txt',
+              file_path + 'C2\\log_20230721_105229.txt',
+              file_path + 'C3\\log_20230721_105230.txt',
+              file_path + 'C4\\log_20230721_105230.txt']
 
 
 # DataFrames
@@ -80,7 +77,7 @@ for file_id, file_path in enumerate(file_paths, start=1):
     overhead_throughput, message_throughput, consumer_count, cpu_utilization = extract_information(file_path, f'log-{file_id}')
 
     overhead_df = pd.concat([overhead_df, pd.DataFrame([(collection, time, throughput, file_id) for collection, data in overhead_throughput.items()
-                                                   for time, throughput, file_id in data], columns=['Collection', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
+                                                   for time, throughput, file_id in data], columns=['Topic', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
 
     message_df = pd.concat([message_df, pd.DataFrame([(topic, time, throughput, file_id) for topic, data in message_throughput.items()
                                                  for time, throughput, file_id in data], columns=['Topic', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
@@ -92,7 +89,7 @@ for file_id, file_path in enumerate(file_paths, start=1):
                                           for time, utilization, file_id in data], columns=['Port', 'Time', 'Utilization', 'FileId'])], ignore_index=True)
 
 # Save data to CSV
-overhead_df.to_csv('overhead_throughput.csv', index=False)
-message_df.to_csv('message_throughput.csv', index=False)
-consumer_df.to_csv('consumer_count.csv', index=False)
-cpu_df.to_csv('cpu_utilization.csv', index=False)
+overhead_df.to_csv('e1_w2/p3_dyconit_overhead_throughput.csv', index=False)
+message_df.to_csv('e1_w2/p3_dyconit_message_throughput.csv', index=False)
+consumer_df.to_csv('e1_w2/p3_dyconit_consumer_count.csv', index=False)
+cpu_df.to_csv('e1_w2/p3_dyconit_cpu_utilization.csv', index=False)

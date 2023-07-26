@@ -1,49 +1,85 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load the data from the CSV file
-data = pd.read_csv('consumer_count.csv')
+def process_file(file_path):
+    """
+    Load the CSV file into a DataFrame, process the data, and return the computed average Consumer Lag
+    for each ConsumerCount.
+    """
+    # Load the data from the CSV file
+    data = pd.read_csv(file_path)
 
-# Separate the data into two dataframes based on the Topic
-data_priority = data[data['Topic'] == 'topic_priority']
-data_normal = data[data['Topic'] == 'topic_normal']
+    # Separate the data into two dataframes based on the Topic
+    data_priority = data[data['Topic'] == 'topic_priority']
+    data_normal = data[data['Topic'] == 'topic_normal']
 
-# Convert the Time column from string to datetime
-data_priority['Time'] = pd.to_datetime(data_priority['Time'])
-data_normal['Time'] = pd.to_datetime(data_normal['Time'])
+    # Convert the Time column from string to datetime
+    data_priority['Time'] = pd.to_datetime(data_priority['Time'])
+    data_normal['Time'] = pd.to_datetime(data_normal['Time'])
 
-# Sort the data by ConsumerCount and Time
-data_priority = data_priority.sort_values(['ConsumerCount', 'Time'])
-data_normal = data_normal.sort_values(['ConsumerCount', 'Time'])
+    # Sort the data by ConsumerCount and Time
+    data_priority = data_priority.sort_values(['ConsumerCount', 'Time'])
+    data_normal = data_normal.sort_values(['ConsumerCount', 'Time'])
 
-# Calculate the time difference between consecutive rows
-data_priority['TimeDifference'] = data_priority.groupby('ConsumerCount')['Time'].diff()
-data_normal['TimeDifference'] = data_normal.groupby('ConsumerCount')['Time'].diff()
+    # Calculate the Consumer Lag between consecutive rows
+    data_priority['TimeDifference'] = data_priority.groupby('ConsumerCount')['Time'].diff()
+    data_normal['TimeDifference'] = data_normal.groupby('ConsumerCount')['Time'].diff()
 
-# Convert the time difference to seconds for easier analysis
-data_priority['TimeDifference'] = data_priority['TimeDifference'].dt.total_seconds()
-data_normal['TimeDifference'] = data_normal['TimeDifference'].dt.total_seconds()
+    # Convert the Consumer Lag to seconds for easier analysis
+    data_priority['TimeDifference'] = data_priority['TimeDifference'].dt.total_seconds()
+    data_normal['TimeDifference'] = data_normal['TimeDifference'].dt.total_seconds()
 
-# Calculate the average time difference for each ConsumerCount for each Topic
-average_time_diff_priority = data_priority.groupby('ConsumerCount')['TimeDifference'].mean()
-average_time_diff_normal = data_normal.groupby('ConsumerCount')['TimeDifference'].mean()
+    # Calculate the average Consumer Lag for each ConsumerCount for each Topic
+    average_time_diff_priority = data_priority.groupby('ConsumerCount')['TimeDifference'].mean()
+    average_time_diff_normal = data_normal.groupby('ConsumerCount')['TimeDifference'].mean()
 
-# Plot the average time difference for each ConsumerCount for topic_priority
+    return average_time_diff_priority, average_time_diff_normal
+
+# List of file paths
+file_paths = [
+    'e1_w2/normal_consumer_count.csv',
+    'e1_w2/p1_consumer_count.csv',
+    'e1_w2/p2_consumer_count.csv',
+    'e1_w2/p3_consumer_count.csv'
+]
+
+# Dictionary to store average Consumer Lags for each file
+average_time_diffs = {}
+
+# Process each file
+for file_path in file_paths:
+    average_time_diffs[file_path.split('/')[-1]] = process_file(file_path)
+
+# Define labels for each file name
+file_labels = {
+    'normal_consumer_count.csv': 'No Sync',
+    'p1_consumer_count.csv': 'Reverse TCP policy',
+    'p2_consumer_count.csv': 'Moving Average Policy',
+    'p3_consumer_count.csv': 'Exponential Smoothing Policy'
+}
+
+# Figure for 'topic_priority'
 plt.figure(figsize=(10, 6))
-plt.plot(average_time_diff_priority.index, average_time_diff_priority.values, marker='o', label='topic_priority')
-plt.title('Average Time Difference for each ConsumerCount for topic_priority')
+for file_name, (average_time_diff_priority, _) in average_time_diffs.items():
+    label = file_labels.get(file_name, file_name)  # Get the label from the dictionary, or use the file name as the label
+    plt.plot(average_time_diff_priority.index, average_time_diff_priority.values, label=label)
+plt.title('Average Consumer Lag for each ConsumerCount - topic_priority')
 plt.xlabel('ConsumerCount')
-plt.ylabel('Average Time Difference (seconds)')
-plt.grid(True)
+plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
-plt.show()
+plt.grid(True)
+plt.savefig('e1_w2/e1_w2_consumer_lag_priority.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+# plt.show()
 
-# Plot the average time difference for each ConsumerCount for topic_normal
+# Figure for 'topic_normal'
 plt.figure(figsize=(10, 6))
-plt.plot(average_time_diff_normal.index, average_time_diff_normal.values, marker='o', color='green', label='topic_normal')
-plt.title('Average Time Difference for each ConsumerCount for topic_normal')
+for file_name, (_, average_time_diff_normal) in average_time_diffs.items():
+    label = file_labels.get(file_name, file_name)  # Get the label from the dictionary, or use the file name as the label
+    plt.plot(average_time_diff_normal.index, average_time_diff_normal.values, label=label)
+plt.title('Average Consumer Lag for each ConsumerCount - topic_normal')
 plt.xlabel('ConsumerCount')
-plt.ylabel('Average Time Difference (seconds)')
-plt.grid(True)
+plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
-plt.show()
+plt.grid(True)
+plt.savefig('e1_w2/e1_w2_consumer_lag_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+# plt.show()

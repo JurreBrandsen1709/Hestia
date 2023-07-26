@@ -33,6 +33,7 @@ namespace Dyconit.Helper
     public class Node
     {
         public int ?Port { get; set; }
+        public string ?Host { get; set; }
         public int ?SyncCount { get; set; }
         public DateTime ?LastHeartbeatTime { get; set; }
         public DateTime ?LastTimeSincePull { get; set; }
@@ -236,9 +237,9 @@ namespace Dyconit.Helper
             }
         }
 
-        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, JToken conitConfiguration, int adminPort)
+        public static IConsumer<Null, string> CreateDyconitConsumer(ConsumerConfig configuration, JToken conitConfiguration, int adminPort, string host)
         {
-            return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort).Build();
+            return new DyconitConsumerBuilder<Null, string>(configuration, conitConfiguration, 1, adminPort, host).Build();
         }
 
         public static double GetMessageWeight(ConsumeResult<Null, string> result)
@@ -280,7 +281,7 @@ namespace Dyconit.Helper
             {
                 using (var client = new TcpClient())
                 {
-                    client.Connect("localhost", port);
+                    client.Connect("app1", port);
 
                     using (var stream = client.GetStream())
                     using (var writer = new StreamWriter(stream))

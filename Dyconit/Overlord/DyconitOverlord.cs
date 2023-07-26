@@ -39,7 +39,7 @@ namespace Dyconit.Overlord
 
         public void ParsePolicies()
         {
-            string policiesFolderPath = "..\\Policies";
+            string policiesFolderPath = "./Policies";
 
             if (Directory.Exists(policiesFolderPath))
             {
@@ -105,6 +105,10 @@ namespace Dyconit.Overlord
                     }
                 }
             }
+            else
+            {
+                Log.Error("Policies folder does not exist.");
+            }
         }
 
         public void StartListening()
@@ -156,6 +160,7 @@ namespace Dyconit.Overlord
             var json = JObject.Parse(message);
             var eventType = json.Value<string>("eventType");
             var adminClientPort = json.Value<int?>("port");
+            var host = json.Value<string>("host");
 
             switch (eventType)
             {
@@ -163,8 +168,8 @@ namespace Dyconit.Overlord
                     var conits = json["conits"] as JObject;
                     if (adminClientPort.HasValue && conits != null)
                     {
-                        ProcessNewAdminEvent(adminClientPort.Value, conits);
-                        WelcomeNewNode(adminClientPort.Value, conits);
+                        ProcessNewAdminEvent(adminClientPort.Value, conits, host);
+                        WelcomeNewNode(adminClientPort.Value, conits, host);
                     };
                     break;
                 case "heartbeatResponse":
@@ -208,6 +213,20 @@ namespace Dyconit.Overlord
 
         }
 
+        private void RemoveNode(int port)
+        {
+            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Nodes != null && c.Nodes.Any(n => n.Port == port));
+            if (collection != null)
+            {
+                var node = collection.Nodes?.FirstOrDefault(n => n.Port == port);
+                if (node != null)
+                {
+                    collection.Nodes?.Remove(node);
+                }
+            }
+        }
+
+
         private async void ProcessFinishedEvent(int port, string collecitonName, JToken data)
         {
             // send a syncResponse to every node in the collectionName except the one that sent the finishedEvent
@@ -234,13 +253,24 @@ namespace Dyconit.Overlord
                 {
                     ["eventType"] = "syncResponse",
                     ["port"] = port,
+                    ["host"] = node.Host,
                     ["data"] = JToken.Parse(data.ToString()),
                     ["collection"] = collecitonName
                 };
 
                 Log.Warning($"-- Sending FINISHED DATA to node {node.Port} for collection {collecitonName}");
 
-                await SendMessageOverTcp(syncResponse.ToString(), node.Port!.Value);
+                try
+                {
+                    await SendMessageOverTcp(syncResponse.ToString(), node.Port!.Value, node.Host!);
+                }
+                catch (Exception ex)
+                {
+                    // Handle exception here, e.g. log the error and continue with the next node
+                    Log.Error(ex, $"Error sending message to port {port}. Removing node and continuing...");
+                    RemoveNode(port);
+                }
+
             }
 
         }
@@ -386,6 +416,7 @@ namespace Dyconit.Overlord
                 {
                     ["eventType"] = "updateConitEvent",
                     ["collectionName"] = collection.Name,
+                    ["host"] = node.Host,
                     ["port"] = adminClientPort,
                     ["bounds"] = new JObject
                     {
@@ -396,7 +427,17 @@ namespace Dyconit.Overlord
 
                 Log.Information($" Upadted bounds to {message} for collection {collection.Name} on node {node.Port}");
 
-                await SendMessageOverTcp(message.ToString(), node.Port ?? 0).ConfigureAwait(false);
+                try
+                {
+                    await SendMessageOverTcp(message.ToString(), node.Port ?? 0, node.Host!);
+                }
+                catch (Exception ex)
+                {
+                    // Handle exception here, e.g. log the error and continue with the next node
+                    Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
+                    RemoveNode(node.Port!.Value);
+                }
+
             }
         }
 
@@ -486,7 +527,7 @@ namespace Dyconit.Overlord
             }
         }
 
-        private void ProcessNewAdminEvent(int adminClientPort, JObject? conits)
+        private void ProcessNewAdminEvent(int adminClientPort, JObject? conits, string host)
         {
             var collectionName = conits?.Value<string>("collectionName");
             var staleness = conits?.Value<int?>("Staleness");
@@ -518,6 +559,7 @@ namespace Dyconit.Overlord
             {
                 node = new Node
                 {
+                    Host = host,
                     Port = adminClientPort,
                     LastHeartbeatTime = DateTime.Now,
                     Bounds = new Bounds
@@ -546,7 +588,7 @@ namespace Dyconit.Overlord
             }
         }
 
-        private async void WelcomeNewNode(int adminClientPort, JObject? conits)
+        private async void WelcomeNewNode(int adminClientPort, JObject? conits, string host)
         {
             var collectionName = conits?.Value<string>("collectionName");
             var staleness = conits?.Value<int?>("Staleness");
@@ -565,23 +607,44 @@ namespace Dyconit.Overlord
                         {
                             ["eventType"] = "newNodeEvent",
                             ["port"] = adminClientPort,
+                            ["host"] = host,
                             ["collectionName"] = collectionName,
                             ["staleness"] = staleness,
                             ["numericalError"] = numericalError
                         };
 
-                        await SendMessageOverTcp(newAdminMessage.ToString(), node.Port.Value);
+                        try
+                        {
+                            await SendMessageOverTcp(newAdminMessage.ToString(), node.Port.Value, node.Host!);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Handle exception here, e.g. log the error and continue with the next node
+                            Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
+                            RemoveNode(node.Port!.Value);
+                        }
+
 
                         var welcomeMessage = new JObject
                         {
                             ["eventType"] = "newNodeEvent",
+                            ["host"] = host,
                             ["port"] = node.Port.Value,
                             ["collectionName"] = collectionName,
                             ["staleness"] = staleness,
                             ["numericalError"] = numericalError
                         };
 
-                        await SendMessageOverTcp(welcomeMessage.ToString(), adminClientPort);
+                        try
+                        {
+                            await SendMessageOverTcp(welcomeMessage.ToString(), adminClientPort, host);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Handle exception here, e.g. log the error and continue with the next node
+                            Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
+                            RemoveNode(adminClientPort);
+                        }
                     }
                 }
             }
@@ -632,7 +695,16 @@ namespace Dyconit.Overlord
                         if (node.Port != null)
                         {
                             Log.Information($"Sending heartbeat to node {node.Port}");
-                            await SendMessageOverTcp(heartbeatMessage.ToString(), node.Port.Value);
+                            try
+                            {
+                                await SendMessageOverTcp(heartbeatMessage.ToString(), node.Port.Value, node.Host!);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Handle exception here, e.g. log the error and continue with the next node
+                                Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
+                                RemoveNode(node.Port.Value);
+                            }
                         }
                     }
                 }
@@ -679,7 +751,16 @@ namespace Dyconit.Overlord
 
                                 Log.Warning($"Node {nodeToRemove.Port} has been removed from collection {collection.Name}");
 
-                                await SendMessageOverTcp(removeNodeMessage.ToString(), otherNode.Port.Value);
+                                try
+                                {
+                                    await SendMessageOverTcp(removeNodeMessage.ToString(), otherNode.Port.Value, otherNode.Host!);
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Handle exception here, e.g. log the error and continue with the next node
+                                    Log.Error(ex, $"Error sending message to port {otherNode.Port.Value}. Removing node and continuing...");
+                                    RemoveNode(otherNode.Port.Value);
+                                }
                             }
                         }
                     }
@@ -687,40 +768,21 @@ namespace Dyconit.Overlord
             }
         }
 
-
-        private async Task SendMessageOverTcp(string message, int port)
+        private async Task SendMessageOverTcp(string message, int port, string host)
         {
-            try
+            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30))) // timeout of 30 seconds
             {
-                using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30))) // timeout of 30 seconds
+                using (var client = new TcpClient())
                 {
-                    using (var client = new TcpClient())
+                    await client.ConnectAsync(host, port).ConfigureAwait(false);
+                    using (var stream = client.GetStream())
+                    using (var writer = new StreamWriter(stream))
                     {
-                        await client.ConnectAsync("localhost", port).ConfigureAwait(false);
-                        using (var stream = client.GetStream())
-                        using (var writer = new StreamWriter(stream))
-                        {
-                            await writer.WriteLineAsync(message).ConfigureAwait(false);
-                            await writer.FlushAsync().ConfigureAwait(false);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error sending message over TCP");
-                // Remove the admin client from the dyconit collections
-                var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Nodes != null && c.Nodes.Any(n => n.Port == port));
-                if (collection != null)
-                {
-                    var node = collection.Nodes?.FirstOrDefault(n => n.Port == port);
-                    if (node != null)
-                    {
-                        collection.Nodes?.Remove(node);
+                        await writer.WriteLineAsync(message).ConfigureAwait(false);
+                        await writer.FlushAsync().ConfigureAwait(false);
                     }
                 }
             }
         }
-
     }
 }
