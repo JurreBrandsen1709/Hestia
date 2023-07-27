@@ -57,13 +57,13 @@ def extract_information(file, file_id):
 
     return overhead_throughput, message_throughput, consumer_count, cpu_utilization
 
-file_path = 'C:\\Users\\JurreB\\Documents\\kafka-dotnet-getting-started\\star_topology\\'
+file_path = 'C:\\Users\\JurreB\\Documents\\Dyconits\\experiment\\logs\\'
 
 # List of file paths
-file_paths = [file_path + 'C1\\log_20230721_105229.txt',
-              file_path + 'C2\\log_20230721_105229.txt',
-              file_path + 'C3\\log_20230721_105230.txt',
-              file_path + 'C4\\log_20230721_105230.txt']
+file_paths = [file_path + 'e1_w2_p0_1.txt',
+              file_path + 'e1_w2_p0_2.txt',
+              file_path + 'e1_w2_p0_3.txt',
+              file_path + 'e1_w2_p0_4.txt']
 
 
 # DataFrames
@@ -89,7 +89,7 @@ for file_id, file_path in enumerate(file_paths, start=1):
                                           for time, utilization, file_id in data], columns=['Port', 'Time', 'Utilization', 'FileId'])], ignore_index=True)
 
 # Save data to CSV
-overhead_df.to_csv('e1_w2/p3_dyconit_overhead_throughput.csv', index=False)
-message_df.to_csv('e1_w2/p3_dyconit_message_throughput.csv', index=False)
-consumer_df.to_csv('e1_w2/p3_dyconit_consumer_count.csv', index=False)
-cpu_df.to_csv('e1_w2/p3_dyconit_cpu_utilization.csv', index=False)
+overhead_df.to_csv('docker/p0_overhead_throughput.csv', index=False)
+message_df.to_csv('docker/p0_message_throughput.csv', index=False)
+consumer_df.to_csv('docker/p0_consumer_count.csv', index=False)
+cpu_df.to_csv('docker/p0_cpu_utilization.csv', index=False)

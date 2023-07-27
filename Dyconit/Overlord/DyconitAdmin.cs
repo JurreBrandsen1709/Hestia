@@ -1,3 +1,8 @@
+// TODO: Toevoegen latency van berichten (events en dyconit events)
+// TODO: Toevoegen wat de bounds zijn elk moment een bericht wordt consumed.
+// Ik heb het namelijk over latency in de NFRs. Dus daar moet ik eigenlijk ook op testen.
+// Wat ik voor me zie is een coole grafiek waarbij je de bounds hebt en dan daaronder de werkelijke latency.
+
 using Newtonsoft.Json.Linq;
 using Dyconit.Helper;
 using Newtonsoft.Json;
@@ -52,7 +57,6 @@ namespace Dyconit.Overlord
                 .WriteTo.File(logFileName, rollingInterval: RollingInterval.Infinite)
                 .CreateLogger();
         }
-
 
         private async void ListenForMessagesAsync()
         {
@@ -344,8 +348,6 @@ namespace Dyconit.Overlord
             {
                 node.SyncCount++;
             }
-
-
         }
 
         private async Task HandleHeartbeatEventAsync(JObject messageObject)
@@ -589,6 +591,8 @@ namespace Dyconit.Overlord
                 ?.Where(n => n.Port != _listenPort)
                 ?.ToList();
 
+            Log.Information($"There are {otherNodes?.Count} other nodes in the collection {collectionName}");
+
             // if there are no other nodes, we can't do anything
             if (otherNodes == null || !otherNodes.Any())
             {
@@ -602,6 +606,9 @@ namespace Dyconit.Overlord
             foreach (var node in otherNodes)
             {
                 var timeSincePull = consumedTime - node.LastTimeSincePull;
+
+                Log.Information($"Time since pull for port {node.Port} is {timeSincePull!.Value.TotalMilliseconds} milliseconds, staleness bound is {stalenessBound.Value} milliseconds");
+
                 if (timeSincePull.HasValue && timeSincePull.Value.TotalMilliseconds > stalenessBound.Value)
                 {
                     portsStalenessExceeded.Add(node.Port!.Value);
@@ -667,6 +674,8 @@ namespace Dyconit.Overlord
                 ?.Nodes
                 ?.Count;
 
+            Log.Information($"There are {numberOfNodes} nodes in the collection {topic}");
+
             // if the number of nodes is null, we can't do anything
             if (!numberOfNodes.HasValue || numberOfNodes.Value == 0 || numberOfNodes.Value == 1)
             {
@@ -686,6 +695,8 @@ namespace Dyconit.Overlord
 
                     // calculate the average weight per node
                     double averageWeightPerNode = totalLocalWeight / (numberOfNodes.Value - 1);
+
+                    Log.Information($"Average weight per node is {averageWeightPerNode}, numerical error bound is {numericalErrorBound}");
 
                     // if the average weight per node is greater than the numerical error bound, we need to send data to the other node
                     if (averageWeightPerNode > numericalErrorBound)

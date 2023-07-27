@@ -13,6 +13,7 @@ namespace Dyconit
             var dyconitOverlord = new DyconitOverlord();
             Console.WriteLine("- Dyconit overlord started.");
             dyconitOverlord.ParsePolicies();
+            Console.WriteLine("- Policies parsed.");
             dyconitOverlord.StartListening();
             dyconitOverlord.SendHeartbeatAsync();
             dyconitOverlord.KeepTrackOfNodesAsync();

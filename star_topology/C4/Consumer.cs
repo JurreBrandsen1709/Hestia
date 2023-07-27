@@ -122,7 +122,7 @@ class Consumer
 
                     Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
 
-                    _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
+                    _totalWeight[topic] += 1.0;
                     _lastCommittedOffset = consumeResult.Offset;
                     _currentOffset[topic] += 1;
 

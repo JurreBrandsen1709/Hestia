@@ -97,7 +97,7 @@ class Consumer
                     _consumerCount[topic] += 1;
 
                     // add random delay to simulate processing time
-                    await Task.Delay(_random.Next(200, 600));
+                    await Task.Delay(_random.Next(300, 900));
 
                     // check if we have consumed a message
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
@@ -122,7 +122,7 @@ class Consumer
 
                     Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
 
-                    _totalWeight[topic] += DyconitHelper.GetMessageWeight(consumeResult);
+                    _totalWeight[topic] += 1.0;
                     _lastCommittedOffset = consumeResult.Offset;
                     _currentOffset[topic] += 1;
 

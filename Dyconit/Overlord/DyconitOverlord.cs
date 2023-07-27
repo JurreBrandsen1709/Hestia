@@ -43,10 +43,11 @@ namespace Dyconit.Overlord
 
             if (Directory.Exists(policiesFolderPath))
             {
-                string[] policyFiles = Directory.GetFiles(policiesFolderPath, "*policy*.json");
+                string[] policyFiles = Directory.GetFiles(policiesFolderPath, "*.json");
                 foreach (string policyFile in policyFiles)
                 {
                     string jsonContent = File.ReadAllText(policyFile);
+                    Log.Information($"Content of {policyFile}: {jsonContent}");
                     JObject policyJson = JObject.Parse(jsonContent);
                     JArray ?collectionNames = policyJson["collectionNames"] as JArray;
                     JToken ?thresholds = policyJson["thresholds"];
@@ -102,6 +103,8 @@ namespace Dyconit.Overlord
                         }
 
                         _dyconitCollections.Collections?.Add(collection);
+                        Log.Information($"Collection {collectionName} added to DyconitCollections");
+                        Log.Information("DyconitCollections: " + JsonConvert.SerializeObject(_dyconitCollections, Formatting.Indented));
                     }
                 }
             }
@@ -168,8 +171,8 @@ namespace Dyconit.Overlord
                     var conits = json["conits"] as JObject;
                     if (adminClientPort.HasValue && conits != null)
                     {
-                        ProcessNewAdminEvent(adminClientPort.Value, conits, host);
-                        WelcomeNewNode(adminClientPort.Value, conits, host);
+                        ProcessNewAdminEvent(adminClientPort.Value, conits, host!);
+                        WelcomeNewNode(adminClientPort.Value, conits, host!);
                     };
                     break;
                 case "heartbeatResponse":
@@ -589,66 +592,69 @@ namespace Dyconit.Overlord
         }
 
         private async void WelcomeNewNode(int adminClientPort, JObject? conits, string host)
+{
+    var collectionName = conits?.Value<string>("collectionName");
+    var staleness = conits?.Value<int?>("Staleness");
+    var numericalError = conits?.Value<int?>("NumericalError");
+
+    var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
+    if (collection != null && collection.Nodes != null && collection.Nodes.Count > 1)
+    {
+        foreach (var node in collection.Nodes.ToList() ?? Enumerable.Empty<Node>())
         {
-            var collectionName = conits?.Value<string>("collectionName");
-            var staleness = conits?.Value<int?>("Staleness");
-            var numericalError = conits?.Value<int?>("NumericalError");
-
-            // Check if there are more than 1 nodes in the collection
-            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
-            if (collection != null && collection.Nodes != null && collection.Nodes.Count > 1)
+            if (node.Port != null && node.Port != adminClientPort)
             {
-                // Send a new node event to all the other nodes in the collection
-                foreach (var node in collection.Nodes.ToList() ?? Enumerable.Empty<Node>())
+                var newAdminMessage = new JObject
                 {
-                    if (node.Port != null && node.Port != adminClientPort)
-                    {
-                        var newAdminMessage = new JObject
-                        {
-                            ["eventType"] = "newNodeEvent",
-                            ["port"] = adminClientPort,
-                            ["host"] = host,
-                            ["collectionName"] = collectionName,
-                            ["staleness"] = staleness,
-                            ["numericalError"] = numericalError
-                        };
+                    ["eventType"] = "newNodeEvent",
+                    ["port"] = adminClientPort,
+                    ["host"] = host,
+                    ["collectionName"] = collectionName,
+                    ["staleness"] = staleness,
+                    ["numericalError"] = numericalError
+                };
 
-                        try
-                        {
-                            await SendMessageOverTcp(newAdminMessage.ToString(), node.Port.Value, node.Host!);
-                        }
-                        catch (Exception ex)
-                        {
-                            // Handle exception here, e.g. log the error and continue with the next node
-                            Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
-                            RemoveNode(node.Port!.Value);
-                        }
-
-
-                        var welcomeMessage = new JObject
-                        {
-                            ["eventType"] = "newNodeEvent",
-                            ["host"] = host,
-                            ["port"] = node.Port.Value,
-                            ["collectionName"] = collectionName,
-                            ["staleness"] = staleness,
-                            ["numericalError"] = numericalError
-                        };
-
-                        try
-                        {
-                            await SendMessageOverTcp(welcomeMessage.ToString(), adminClientPort, host);
-                        }
-                        catch (Exception ex)
-                        {
-                            // Handle exception here, e.g. log the error and continue with the next node
-                            Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
-                            RemoveNode(adminClientPort);
-                        }
-                    }
+                try
+                {
+                    await SendMessageOverTcp(newAdminMessage.ToString(), node.Port.Value, node.Host!);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Error sending message to port {node.Port}. Removing node and continuing...");
+                    RemoveNode(node.Port!.Value);
                 }
             }
         }
+
+        // Introduce existing nodes to the new node
+        foreach (var node in collection.Nodes.ToList() ?? Enumerable.Empty<Node>())
+        {
+            if (node.Port != null && node.Port != adminClientPort)
+            {
+                var existingNodeMessage = new JObject
+                {
+                    ["eventType"] = "newNodeEvent",
+                    ["port"] = node.Port,
+                    ["host"] = node.Host,
+                    ["collectionName"] = collectionName,
+                    ["staleness"] = node.Bounds?.Staleness,
+                    ["numericalError"] = node.Bounds?.NumericalError
+                };
+
+                try
+                {
+                    await SendMessageOverTcp(existingNodeMessage.ToString(), adminClientPort, host);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Error sending message to port {adminClientPort}. Removing node and continuing...");
+                    RemoveNode(adminClientPort);
+                }
+            }
+        }
+    }
+}
+
 
         private void ProcessHeartbeatResponse()
         {

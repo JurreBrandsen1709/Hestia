@@ -2,6 +2,7 @@
 **/bin/
 **/obj/
 **/.txt
+**/out/
 
 # Ignore all .txt files in every folder
 **/*.txt
