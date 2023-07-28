@@ -9,7 +9,7 @@ using Dyconit.Overlord;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Diagnostics;
-
+using System.Collections.Concurrent;
 
 class Consumer
 {
@@ -22,12 +22,16 @@ class Consumer
     private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
     private static Dictionary<string, int> _consumerCount = new Dictionary<string, int>();
     private static Process _currentProcess;
+    private static Dictionary<int, int> _delay = new Dictionary<int, int>();
+    private static ConcurrentDictionary<string, ConsumeInfo> _consumeInfos = new ConcurrentDictionary<string, ConsumeInfo>();
+
     static async Task Main()
     {
         var configuration = GetConsumerConfiguration();
 
         // Create a PerformanceCounter to monitor CPU usage
         _currentProcess = Process.GetCurrentProcess();
+        _delay = DyconitHelper.LoadDictionary("normal_consumer.json");
 
         var topics = new List<string>
         {
@@ -47,6 +51,7 @@ class Consumer
             _currentOffset.Add(topic, 0);
             _consumerCount.Add(topic, 0);
             _totalWeight.Add(topic, 0);
+            _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = 0 };
         }
 
         _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection, "app5");
@@ -96,15 +101,16 @@ class Consumer
                     var consumeResult = consumer.Consume(token);
                     _consumerCount[topic] += 1;
 
+                    // increase the local consume count by taking the current consume count and adding 1.
+                    _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = _consumeInfos[topic].Count + 1 };
+
                     // add random delay to simulate processing time
-                    await Task.Delay(_random.Next(200, 600));
+                    await Task.Delay(_delay[_consumeInfos[topic].Count]);
 
                     // check if we have consumed a message
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                     {
                         var inputMessage = consumeResult.Message.Value;
-                        // Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
-
                     }
                     else {
                         // we are finished consuming messages
@@ -217,51 +223,29 @@ class Consumer
 
     private static async Task CalculateThroughputAsync(IConsumer<Null, string> consumer, string topic)
     {
-        if (consumer == null)
+        if (consumer == null || !_consumeInfos.ContainsKey(topic))
         {
             return;
         }
 
-        var offsets = new Dictionary<TopicPartition, Tuple<double, DateTime>>();
-
-        // get all partitions for the topic
-        var partitions = _DyconitLogger._adminClient.GetMetadata(TimeSpan.FromSeconds(20)).Topics.First(t => t.Topic == topic).Partitions;
-        foreach (var partition in partitions)
-        {
-            var topicPartition = new TopicPartition(topic, partition.PartitionId);
-            double previousOffset = _currentOffset[topic];
-            offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));
-        }
-
+        var previousConsumeInfo = new ConsumeInfo { Time = DateTime.Now, Count = _consumeInfos[topic].Count };
         await Task.Delay(TimeSpan.FromSeconds(5));
 
-        double topicThroughput = 0.0;
-
-        foreach (var partition in partitions)
+        if (_consumeInfos.TryGetValue(topic, out var currentConsumeInfo))
         {
-            var topicPartition = new TopicPartition(topic, partition.PartitionId);
+            double topicThroughput = (currentConsumeInfo.Count - previousConsumeInfo.Count) / (DateTime.UtcNow - previousConsumeInfo.Time).TotalSeconds;
 
-            var previousValues = offsets[topicPartition];
-            double previousOffset = previousValues.Item1;
-            DateTime previousTimestamp = previousValues.Item2;
+            Log.Information($"Topic {topic} message throughput: {topicThroughput} messages/s");
 
-            double currentOffset = _currentOffset[topic];
-            DateTime currentTimestamp = DateTime.UtcNow;
+            var throughputMessage = new JObject
+            {
+                { "eventType", "throughput" },
+                { "throughput", topicThroughput },
+                { "port", adminPort },
+                { "collectionName", topic }
+            };
 
-            double consumptionRate = (currentOffset - previousOffset) / (currentTimestamp - previousTimestamp).TotalSeconds;
-            topicThroughput += consumptionRate;
+            await DyconitHelper.SendMessageOverTcp(throughputMessage.ToString(), 6666, adminPort);
         }
-
-        Log.Information($"Topic {topic} message throughput: {topicThroughput} messages/s");
-
-        var throughputMessage = new JObject
-        {
-            { "eventType", "throughput" },
-            { "throughput", topicThroughput },
-            { "port", adminPort },
-            { "collectionName", topic }
-        };
-
-        await DyconitHelper.SendMessageOverTcp(throughputMessage.ToString(), 6666, adminPort);
     }
 }

@@ -197,6 +197,12 @@ namespace Dyconit.Helper
         public byte[] Value { get; set; }
     }
 
+    public class ConsumeInfo
+    {
+        public DateTime Time { get; set; }
+        public int Count { get; set; }
+    }
+
     public class DyconitHelper
     {
         public static int FindPort()
@@ -258,19 +264,19 @@ namespace Dyconit.Helper
 
         public static long CommitStoredMessages(IConsumer<Null, string> consumer, List<ConsumeResult<Null, string>> uncommittedConsumedMessages, long lastCommittedOffset)
         {
-            // foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
-            // {
-            //     consumer.Commit(storedMessage);
-            // }
+            foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
+            {
+                consumer.Commit(storedMessage);
+            }
 
-            // // Retrieve the committed offsets for the assigned partitions
-            // var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
+            // Retrieve the committed offsets for the assigned partitions
+            var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
 
-            // // Process the committed offsets
-            // foreach (var committedOffset in committedOffsets)
-            // {
-            //     lastCommittedOffset = committedOffset.Offset.Value;
-            // }
+            // Process the committed offsets
+            foreach (var committedOffset in committedOffsets)
+            {
+                lastCommittedOffset = committedOffset.Offset.Value;
+            }
 
             return lastCommittedOffset;
         }
@@ -310,6 +316,23 @@ namespace Dyconit.Helper
             };
 
             SendMessageOverTcp(message.ToString(), 6666, port).Wait();
+        }
+
+        public static Dictionary<int, int> LoadDictionary(string FileName)
+        {
+            using (StreamReader file = File.OpenText(FileName))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                var result = serializer.Deserialize(file, typeof(Dictionary<int, int>));
+                if(result is Dictionary<int, int> dict)
+                {
+                    return dict;
+                }
+                else
+                {
+                    return new Dictionary<int, int>(); // or handle error as appropriate for your application
+                }
+            }
         }
 
     }

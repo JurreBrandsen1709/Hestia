@@ -1,48 +1,58 @@
-using System;
-using System.Text;
-using System.Collections.Generic;
-using Confluent.Kafka;
+// using System;
+// using System.Collections.Generic;
+// using System.IO;
+// using System.Text.Json;
 
-public class Producer
-    {
-        public static void Main(string[] args)
-        {
-            var config = new ProducerConfig { BootstrapServers = "broker:9092" };
+// class Program
+// {
+//     private const string FileName = "numbers.json";
+//     private static Random random = new Random();
+//     private static Dictionary<int, int> numbers = new Dictionary<int, int>();
 
-            using (var producer = new ProducerBuilder<string, string>(config).Build())
-            using (var producer2 = new DependentProducerBuilder<Null, int>(producer.Handle).Build())
-            {
-                // write (null, int) data to topic "second-data" using the same underlying broker connections.
-                for (int i = 0; i < 50000; i++)
-                {
-                    producer2.Produce("topic6", new Message<Null, int> { Value = 42 });
+//     static void Main(string[] args)
+//     {
+//         if (File.Exists(FileName))
+//         {
+//             numbers = LoadDictionary();
+//         }
+//         else
+//         {
+//             PopulateDictionary();
+//             SaveDictionary();
+//         }
 
-                    // add a little delay between each message
-                    // System.Threading.Thread.Sleep(1);
-                }
+//         while (true)
+//         {
+//             Console.Write("Enter a key: ");
+//             string input = Console.ReadLine();
+//             if (int.TryParse(input, out int key) && numbers.ContainsKey(key))
+//             {
+//                 Console.WriteLine($"Value at key {key}: {numbers[key]}");
+//             }
+//             else
+//             {
+//                 Console.WriteLine("Invalid key. Please try again.");
+//             }
+//         }
+//     }
 
-                for (int i = 0; i < 50000; i++)
-                {
-                    producer2.ProduceAsync("topic2", new Message<Null, int> { Value = 42 });
-                }
+//     private static void PopulateDictionary()
+//     {
+//         for (int i = 0; i < 2000; i++)
+//         {
+//             numbers[i] = random.Next(200, 601); // Upper bound is exclusive
+//         }
+//     }
 
-                for (int i = 0; i < 50000; i++)
-                {
-                    producer2.ProduceAsync("topic3", new Message<Null, int> { Value = 42 });
-                }
+//     private static void SaveDictionary()
+//     {
+//         string jsonString = JsonSerializer.Serialize(numbers);
+//         File.WriteAllText(FileName, jsonString);
+//     }
 
-                for (int i = 0; i < 50000; i++)
-                {
-                    producer2.ProduceAsync("topic4", new Message<Null, int> { Value = 42 });
-                }
-
-                for (int i = 0; i < 50000; i++)
-                {
-                    producer2.ProduceAsync("topic5", new Message<Null, int> { Value = 42 });
-                }
-
-                // As the Tasks returned by ProduceAsync are not waited on there will still be messages in flight.
-                producer.Flush(TimeSpan.FromSeconds(10));
-            }
-        }
-    }
+//     private static Dictionary<int, int> LoadDictionary()
+//     {
+//         string jsonString = File.ReadAllText(FileName);
+//         return JsonSerializer.Deserialize<Dictionary<int, int>>(jsonString);
+//     }
+// }

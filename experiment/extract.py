@@ -16,7 +16,7 @@ def extract_information(file, file_id):
             overhead_match = re.search(r"Collection name: (\w+) overhead throughput (\d+) messages/s", line)
             if overhead_match:
                 collection_name = overhead_match.group(1)
-                throughput = int(overhead_match.group(2))
+                throughput = str(overhead_match.group(2))
 
                 if collection_name not in overhead_throughput:
                     overhead_throughput[collection_name] = []
@@ -24,14 +24,15 @@ def extract_information(file, file_id):
 
             # Extract message throughput
             topic_match = re.search(r'Topic\s(\w+)', line)
-            throughput_match = re.search(r'throughput:\s([\d,]+)', line)
+            throughput_match = re.search(r'throughput:\s([\d.]+)', line)
             if topic_match and throughput_match:
                 topic = topic_match.group(1)
-                throughput = float(throughput_match.group(1).replace(',', '.'))
+                throughput = throughput_match.group(1)  # no need to replace ',' with '.' anymore
 
                 if topic not in message_throughput:
                     message_throughput[topic] = []
                 message_throughput[topic].append((time, throughput, file_id))
+
 
             # Extract consumer count
             consumer_match = re.search(r"Topic: (\w+) - consumer count (\d+)", line)
@@ -67,7 +68,7 @@ file_paths = [file_path + 'e1_w2_p0_1.txt',
 
 
 # DataFrames
-overhead_df = pd.DataFrame(columns=['Collection', 'Time', 'Throughput', 'FileId'])
+overhead_df = pd.DataFrame(columns=['Topic', 'Time', 'Throughput', 'FileId'])
 message_df = pd.DataFrame(columns=['Topic', 'Time', 'Throughput', 'FileId'])
 consumer_df = pd.DataFrame(columns=['Topic', 'Time', 'ConsumerCount', 'FileId'])
 cpu_df = pd.DataFrame(columns=['Port', 'Time', 'Utilization', 'FileId'])
@@ -76,7 +77,7 @@ cpu_df = pd.DataFrame(columns=['Port', 'Time', 'Utilization', 'FileId'])
 for file_id, file_path in enumerate(file_paths, start=1):
     overhead_throughput, message_throughput, consumer_count, cpu_utilization = extract_information(file_path, f'log-{file_id}')
 
-    overhead_df = pd.concat([overhead_df, pd.DataFrame([(collection, time, throughput, file_id) for collection, data in overhead_throughput.items()
+    overhead_df = pd.concat([overhead_df, pd.DataFrame([(Topic, time, throughput, file_id) for Topic, data in overhead_throughput.items()
                                                    for time, throughput, file_id in data], columns=['Topic', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
 
     message_df = pd.concat([message_df, pd.DataFrame([(topic, time, throughput, file_id) for topic, data in message_throughput.items()

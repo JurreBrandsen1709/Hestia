@@ -39,7 +39,8 @@ def process_file(file_path):
 file_paths = [
     'docker/p0_consumer_count.csv',
     'docker/p1_consumer_count.csv',
-    'docker/p2_consumer_count.csv'
+    'docker/p2_consumer_count.csv',
+    'docker/p3_consumer_count.csv',
 ]
 
 # Dictionary to store average Consumer Lags for each file
@@ -53,7 +54,8 @@ for file_path in file_paths:
 file_labels = {
     'p0_consumer_count.csv': 'No Sync',
     'p1_consumer_count.csv': 'Reverse TCP policy',
-    'p2_consumer_count.csv': 'Moving Average Policy'
+    'p2_consumer_count.csv': 'Moving Average Policy',
+    'p3_consumer_count.csv': 'Exponential Smoothing Policy'
 }
 
 # Figure for 'topic_priority'
