@@ -126,7 +126,7 @@ class Consumer
                     }
 
 
-                    Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
+                    Log.Information($"========================= Topic: {topic} - consumer count {_consumerCount[topic]} =========================");
 
                     _totalWeight[topic] += 1.0;
                     _lastCommittedOffset = consumeResult.Offset;

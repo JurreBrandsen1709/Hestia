@@ -42,9 +42,9 @@ namespace Dyconit.Helper
 
     public class Thresholds
     {
-        public int ?Throughput { get; set; }
+        public double ?Throughput { get; set; }
         [JsonProperty("overhead_throughput")]
-        public int ?OverheadThroughput { get; set; }
+        public double ?OverheadThroughput { get; set; }
     }
 
     public class PolicyAction
@@ -264,19 +264,19 @@ namespace Dyconit.Helper
 
         public static long CommitStoredMessages(IConsumer<Null, string> consumer, List<ConsumeResult<Null, string>> uncommittedConsumedMessages, long lastCommittedOffset)
         {
-            foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
-            {
-                consumer.Commit(storedMessage);
-            }
+            // foreach (ConsumeResult<Null, string> storedMessage in uncommittedConsumedMessages.ToList())
+            // {
+            //     consumer.Commit(storedMessage);
+            // }
 
-            // Retrieve the committed offsets for the assigned partitions
-            var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
+            // // Retrieve the committed offsets for the assigned partitions
+            // var committedOffsets = consumer.Committed(TimeSpan.FromSeconds(10));
 
-            // Process the committed offsets
-            foreach (var committedOffset in committedOffsets)
-            {
-                lastCommittedOffset = committedOffset.Offset.Value;
-            }
+            // // Process the committed offsets
+            // foreach (var committedOffset in committedOffsets)
+            // {
+            //     lastCommittedOffset = committedOffset.Offset.Value;
+            // }
 
             return lastCommittedOffset;
         }

@@ -3,11 +3,11 @@ run_duration=30
 echo "Running task..."
 
 # Start second command and get its process ID
-ksunami --brokers broker:9092 --topic topic_priority --min 6 --max 7 --payload bytes:1000 &
+ksunami --brokers broker:9092 --topic topic_priority --min 6 --max 7 --payload alpha:1 &
 job2=$!
 
 # Start first command and get its process ID
-ksunami --brokers broker:9092 --topic topic_normal --min 30 --max 31 --payload bytes:100 &
+ksunami --brokers broker:9092 --topic topic_normal --min 30 --max 31 --payload alpha:2 &
 job1=$!
 
 # Sleep for run_duration

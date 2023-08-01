@@ -37,10 +37,7 @@ def process_file(file_path):
 
 # List of file paths
 file_paths = [
-    'docker/p0_consumer_count.csv',
-    'docker/p1_consumer_count.csv',
-    'docker/p2_consumer_count.csv',
-    'docker/p3_consumer_count.csv',
+    'improvement/s_w1_p1_consumer_count.csv',
 ]
 
 # Dictionary to store average Consumer Lags for each file
@@ -52,10 +49,7 @@ for file_path in file_paths:
 
 # Define labels for each file name
 file_labels = {
-    'p0_consumer_count.csv': 'No Sync',
-    'p1_consumer_count.csv': 'Reverse TCP policy',
-    'p2_consumer_count.csv': 'Moving Average Policy',
-    'p3_consumer_count.csv': 'Exponential Smoothing Policy'
+    's_w1_p1_consumer_count.csv': 'Reverse TCP policy',
 }
 
 # Figure for 'topic_priority'
@@ -68,7 +62,7 @@ plt.xlabel('ConsumerCount')
 plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
-plt.savefig('docker/e1_w2_consumer_lag_priority.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig('improvement/s_w1_p1_lag_priority.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 # plt.show()
 
 # Figure for 'topic_normal'
@@ -81,5 +75,5 @@ plt.xlabel('ConsumerCount')
 plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
-plt.savefig('docker/e1_w2_consumer_lag_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig('improvement/s_w1_p1_lag_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 # plt.show()

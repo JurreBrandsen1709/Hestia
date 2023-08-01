@@ -48,6 +48,7 @@ services:
     command: dotnet run
     depends_on:
       - broker
+      - app5
       - app1
     environment:
       - Consumer:Host=broker
@@ -61,7 +62,7 @@ services:
     depends_on:
       - broker
       - app1
-      - app2
+      - app5
     environment:
       - Consumer:Host=broker
       - Consumer:Port=9092
@@ -74,7 +75,7 @@ services:
     depends_on:
       - broker
       - app1
-      - app3
+      - app5
     environment:
       - Consumer:Host=broker
       - Consumer:Port=9092
@@ -87,7 +88,6 @@ services:
     depends_on:
       - broker
       - app1
-      - app4
     environment:
       - Consumer:Host=broker
       - Consumer:Port=9092

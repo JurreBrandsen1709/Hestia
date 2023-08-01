@@ -69,8 +69,8 @@ namespace Dyconit.Overlord
                             Name = collectionName,
                             Thresholds = thresholds != null ? new Thresholds
                             {
-                                Throughput = thresholds.Value<int>("throughput"),
-                                OverheadThroughput = thresholds.Value<int>("overhead_throughput")
+                                Throughput = thresholds.Value<double>("throughput"),
+                                OverheadThroughput = thresholds.Value<double>("overhead_throughput")
                             } : null,
                             Rules = new List<Rule>(),
 
@@ -164,6 +164,7 @@ namespace Dyconit.Overlord
             var eventType = json.Value<string>("eventType");
             var adminClientPort = json.Value<int?>("port");
             var host = json.Value<string>("host");
+            var collectionName = json.Value<string>("collectionName");
 
             switch (eventType)
             {
@@ -180,7 +181,6 @@ namespace Dyconit.Overlord
                     break;
                 case "throughput":
                     var throughput = json.Value<double?>("throughput");
-                    var collectionName = json.Value<string>("collectionName");
                     if (adminClientPort.HasValue && throughput.HasValue && collectionName != null)
                     {
                         ProcessThroughput(throughput, adminClientPort, collectionName, json);
@@ -196,16 +196,15 @@ namespace Dyconit.Overlord
                 case "finishedEvent":
 
                     Console.WriteLine("!!!!!!!!!!!!!!!!!!!Finished event received!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    var collecitonName = json.Value<string>("collectionName");
 
-                    if (collecitonName != null && adminClientPort.HasValue && json["data"] != null)
+                    if (collectionName != null && adminClientPort.HasValue && json["data"] != null)
                     {
-                        ProcessFinishedEvent(adminClientPort.Value, collecitonName, json["data"]!);
+                        ProcessFinishedEvent(adminClientPort.Value, collectionName, json["data"]!);
                     }
                     else
                     {
                         Log.Error("Finished event is not valid");
-                        Log.Error($"collecitonName: {collecitonName}, adminClientPort: {adminClientPort}, data: {json["data"]}");
+                        Log.Error($"collectionName: {collectionName}, adminClientPort: {adminClientPort}, data: {json["data"]}");
                     }
                     break;
                 default:
@@ -230,38 +229,38 @@ namespace Dyconit.Overlord
         }
 
 
-        private async void ProcessFinishedEvent(int port, string collecitonName, JToken data)
+        private async void ProcessFinishedEvent(int port, string collectionName, JToken data)
         {
             // send a syncResponse to every node in the collectionName except the one that sent the finishedEvent
-            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collecitonName);
+            var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == collectionName);
             if (collection == null)
             {
-                Log.Error($"Collection {collecitonName} not found");
+                Log.Error($"Collection {collectionName} not found");
                 return;
             }
 
-            Console.WriteLine($"There are {collection.Nodes?.Count()} nodes in collection {collecitonName}");
-
+            Console.WriteLine($"There are {collection.Nodes?.Count()} nodes in collection {collectionName}");
+            List<int> portsToRemove = new List<int>();
             var nodes = collection.Nodes?.Where(n => n.Port != port);
             if (nodes == null)
             {
                 return;
             }
 
-            Console.WriteLine($"There are {nodes.Count()} nodes in collection {collecitonName} except the one that sent the finishedEvent");
+            Console.WriteLine($"There are {nodes.Count()} nodes in collection {collectionName} except the one that sent the finishedEvent");
 
             foreach (var node in nodes)
             {
                 var syncResponse = new JObject
                 {
-                    ["eventType"] = "syncResponse",
+                    ["eventType"] = "finishEvent",
                     ["port"] = port,
                     ["host"] = node.Host,
                     ["data"] = JToken.Parse(data.ToString()),
-                    ["collection"] = collecitonName
+                    ["collection"] = collectionName
                 };
 
-                Log.Warning($"-- Sending FINISHED DATA to node {node.Port} for collection {collecitonName}");
+                Log.Warning($"-- Sending FINISHED DATA to node {node.Port} for collection {collectionName}");
 
                 try
                 {
@@ -271,9 +270,13 @@ namespace Dyconit.Overlord
                 {
                     // Handle exception here, e.g. log the error and continue with the next node
                     Log.Error(ex, $"Error sending message to port {port}. Removing node and continuing...");
-                    RemoveNode(port);
+                    portsToRemove.Add(node.Port!.Value);
                 }
 
+            }
+            foreach (int p in portsToRemove)
+            {
+                RemoveNode(p);
             }
 
         }
@@ -312,7 +315,6 @@ namespace Dyconit.Overlord
 
         private void ProcessThroughput(double? throughput, int? adminClientPort, string? collectionName, JObject json)
         {
-            Console.WriteLine($"Throughput received: {throughput} for collection {collectionName} from node {adminClientPort}");
             if (throughput <= 0 || throughput == null || collectionName == null || adminClientPort == null)
             {
                 Log.Error($"-- Received invalid throughput: {throughput}. Ignoring...");
@@ -328,11 +330,13 @@ namespace Dyconit.Overlord
                 return;
             }
 
+            Console.WriteLine($"Throughput received: {throughput} with threshold: {collection.Thresholds.Throughput} for collection {collectionName} from node {adminClientPort}");
+
             collection.MovingAverageThroughput?.Add(throughput.Value);
             ApplyRules(collection, collection.Thresholds.Throughput, throughput.Value, adminClientPort.Value, collection.MovingAverageThroughput);
         }
 
-        private async void ApplyRules(Collection collection, int? threshold, double throughput, int? adminClientPort, MovingAverage? movingAverage)
+        private async void ApplyRules(Collection collection, double? threshold, double throughput, int? adminClientPort, MovingAverage? movingAverage)
         {
             if (collection.Rules == null || threshold == null)
             {
@@ -362,15 +366,9 @@ namespace Dyconit.Overlord
 
                 if (isConditionMet)
                 {
-                    Log.Warning($"-- Condition {condition} is met for collection {collection.Name} in node {adminClientPort}");
                     ApplyActions(collection, policyActions, adminClientPort);
                     await SendUpdatedBoundsToCollection(collection, adminClientPort);
                     break;
-                }
-                else
-                {
-                    Log.Error($"-- Condition {condition} is not met for collection {collection.Name} in node {adminClientPort}");
-                    Log.Error($"-- Throughput: {throughput} | Threshold: {threshold}");
                 }
             }
         }
@@ -445,7 +443,7 @@ namespace Dyconit.Overlord
         }
 
 
-        bool EvaluateCondition(string condition, double throughput, int? threshold, MovingAverage? movingAverage)
+        bool EvaluateCondition(string condition, double throughput, double? threshold, MovingAverage? movingAverage)
         {
             // Assuming the condition format is "{variable} {operator} {threshold}"
             var parts = condition.Split(' ');
@@ -732,8 +730,9 @@ namespace Dyconit.Overlord
 
                     foreach (var node in collection.Nodes ?? new List<Node>())
                     {
-                        if (node.LastHeartbeatTime.HasValue && heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds > 300)
+                        if (node.LastHeartbeatTime.HasValue && heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds > 3000)
                         {
+                            Log.Error($"Node {node.Port} has heartbeat time {node.LastHeartbeatTime} which is more {heartbeatTime.Subtract(node.LastHeartbeatTime.Value).TotalSeconds} seconds ago. Removing node...");
                             nodesToRemove.Add(node);
                         }
                     }

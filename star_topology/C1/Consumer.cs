@@ -126,7 +126,7 @@ class Consumer
                     }
 
 
-                    Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
+                    Log.Information($"========================= Topic: {topic} - consumer count {_consumerCount[topic]} =========================");
 
                     _totalWeight[topic] += 1.0;
                     _lastCommittedOffset = consumeResult.Offset;
@@ -140,9 +140,17 @@ class Consumer
 
                     _uncommittedConsumedMessages[topic].Add(consumeResult);
 
+                    // count the number of distinct topics we have consumed
+                    var distinctTopics = _uncommittedConsumedMessages[topic].Select(x => x.Topic).Distinct().ToList();
+                    var distinctTopicsCount = distinctTopics.Count;
+
+                    Log.Information($"******************** Topic: {topic} - distinct topics count {distinctTopicsCount} ********************");
+
                     SyncResult result = await DyconitLogger.BoundStaleness(_uncommittedConsumedMessages[topic], topic);
                     _uncommittedConsumedMessages[topic] = result.Data;
                     var commit = result.changed;
+
+                    Log.Information($"commit is {commit} for topic {topic}");
 
                     if (_uncommittedConsumedMessages[topic].Count > 0)
                     {
@@ -154,6 +162,8 @@ class Consumer
 
                     bool boundResult = DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
                     commit = boundResult || commit;
+
+                    Log.Information($"After BoundNumericalError, commit is {commit} for topic {topic}");
 
                     _uncommittedConsumedMessages[topic] = result.Data;
 
@@ -167,6 +177,7 @@ class Consumer
 
                     if (commit)
                     {
+                        Log.Information($"WE ARE COMMITTING! FOR TOPIC {topic}");
                         _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
                         _totalWeight[topic] = 0.0;
                     }

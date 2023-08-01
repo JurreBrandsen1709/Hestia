@@ -2,7 +2,13 @@
 **/bin/
 **/obj/
 **/.txt
+
+
+# Ignore all content within any 'out' directory
 **/out/
+
+# Ignore the 'out' directory itself (optional)
+out/
 
 # Ignore all .txt files in every folder
 **/*.txt
