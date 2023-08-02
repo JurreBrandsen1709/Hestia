@@ -497,11 +497,11 @@ namespace Dyconit.Overlord
                 switch (actionType)
                 {
                     case "add":
-                        bounds.Staleness = ApplyAction(bounds.Staleness, actionValue, (x, y) => x + y);
+                        bounds.Staleness = ApplyAction(bounds.Staleness, (actionValue*1000), (x, y) => x + y);
                         bounds.NumericalError = ApplyAction(bounds.NumericalError, actionValue, (x, y) => x + y);
                         break;
                     case "subtract":
-                        bounds.Staleness = ApplyAction(bounds.Staleness, actionValue, (x, y) => x - y);
+                        bounds.Staleness = ApplyAction(bounds.Staleness, (actionValue*1000), (x, y) => x - y);
                         bounds.NumericalError = ApplyAction(bounds.NumericalError, actionValue, (x, y) => x - y);
                         break;
                     case "multiply":

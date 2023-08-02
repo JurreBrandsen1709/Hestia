@@ -143,6 +143,9 @@ namespace Dyconit.Overlord
                             var consumeResult = consumer.Consume();
                             if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                             {
+                                var commitTimestamp = consumeResult.Message.Timestamp.UtcDateTime;
+                                Log.Information($"Overhead latency for host {_host} is {DateTime.UtcNow.Subtract(commitTimestamp).TotalMilliseconds}ms");
+
                                 // the message is 'data;host' extract that.
                                 var messageParts = consumeResult.Message.Value.Split(';');
                                 var messageHost = messageParts[0];
@@ -222,105 +225,6 @@ namespace Dyconit.Overlord
             });
         }
 
-
-        // async Task ConsumeSyncResponse(string topic, ConsumerConfig configuration)
-        // {
-        //     await Task.Run(() =>
-        //     {
-        //         configuration.GroupId = $"syncRequest_{_host}";
-        //         configuration.MessageMaxBytes = 1000000000;
-        //         using (var consumer = new ConsumerBuilder<Ignore, string>(configuration).Build())
-        //         {
-        //             consumer.Subscribe(topic);
-        //             try
-        //             {
-        //                 while (true)
-        //                 {
-        //                     Log.Information($"Listening for sync requests on {topic}");
-
-        //                     var consumeResult = consumer.Consume();
-        //                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
-        //                     {
-        //                         // the message is 'data;host' extract that.
-        //                         var messageParts = consumeResult.Message.Value.Split(';');
-        //                         var messageHost = messageParts[0];
-
-        //                         // The remaining part is the data
-        //                         var messageData = string.Join(';', messageParts.Skip(1));
-
-        //                         Log.Information($"Received sync response from {messageHost}");
-
-        //                         List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(messageData);
-        //                         if (deserializedList != null)
-        //                         {
-        //                             // Convert back to original format
-        //                             _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
-        //                             {
-        //                                 Topic = dw.Topic ?? string.Empty, // Handle possible null value
-        //                                 Partition = dw.Partition,
-        //                                 Offset = dw.Offset,
-        //                                 Message = new Message<Null, string>
-        //                                 {
-        //                                     Key = dw.Message?.Key, // Handle possible null value
-        //                                     Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
-        //                                     Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
-        //                                     Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
-        //                                 },
-        //                                 IsPartitionEOF = dw.IsPartitionEOF
-        //                             }).ToList();
-
-        //                             var receivedTopic = _receivedData.FirstOrDefault()?.Topic;
-
-        //                             Log.Information($"Received data count: {_receivedData.Count()} - collection name: {receivedTopic} - sender host: {messageHost}");
-
-        //                             // update the last time since pull for the sender port and collection combination
-        //                             var collection = _dyconitCollections.Collections
-        //                                 ?.FirstOrDefault(c => c.Name == receivedTopic);
-        //                             if (collection != null)
-        //                             {
-        //                                 var sender = collection.Nodes
-        //                                     ?.FirstOrDefault(s => s.Host == messageHost);
-        //                                 if (sender != null)
-        //                                 {
-        //                                     sender.LastTimeSincePull = DateTime.Now;
-        //                                 }
-        //                             }
-
-        //                             // update the syn counter for the _listenPort and collection combination
-        //                             var node = _dyconitCollections.Collections
-        //                                 ?.FirstOrDefault(c => c.Name == receivedTopic)
-        //                                 ?.Nodes
-        //                                 ?.FirstOrDefault(n => n.Port == _listenPort);
-
-        //                             if (node != null)
-        //                             {
-        //                                 node.SyncCount++;
-        //                             }
-        //                         }
-        //                         else
-        //                         {
-        //                             Log.Warning($"Invalid message data: {messageData}");
-        //                         }
-        //                     }
-        //                     else
-        //                     {
-        //                         Log.Warning("Received null or invalid message.");
-        //                     }
-        //                 }
-        //             }
-        //             catch (OperationCanceledException)
-        //             {
-        //                 // Ctrl+C was pressed.
-        //             }
-        //             finally
-        //             {
-        //                 consumer.Close();
-        //             }
-        //         }
-        //     });
-        // }
-
-
         static public void ConfigureLogging()
         {
             string logFileName = $"log_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
@@ -380,10 +284,6 @@ namespace Dyconit.Overlord
                     return HandleUpdateConitEventAsync(messageObject);
                 case "heartbeatEvent":
                     return HandleHeartbeatEventAsync(messageObject);
-                // case "syncRequest":
-                    // return HandleSyncRequestAsync(messageObject);
-                // case "syncResponse":
-                    // return HandleSyncResponseAsync(messageObject);
                 case "finishEvent":
                     return HandleFinishEventAsync(messageObject);
                 default:
@@ -442,75 +342,6 @@ namespace Dyconit.Overlord
             return Task.CompletedTask;
         }
 
-        // private Task HandleSyncResponseAsync(JObject messageObject)
-        // {
-        //     var data = messageObject["data"]?.ToString();
-        //     var collectionName = messageObject["collection"]?.ToString();
-        //     var senderPort = messageObject["port"]?.ToObject<int>();
-        //     var senderHost = messageObject["host"]?.ToString();
-
-        //     // check for null
-        //     if (data == null || collectionName == null || senderPort == null)
-        //     {
-        //         Log.Error("SyncResponse data, collectionName or senderPort is null");
-        //         return Task.CompletedTask;
-        //     }
-
-        //     Log.Information($"Received sync response from {senderHost} for collection {collectionName}");
-
-        //     // deserialize the data
-        //     List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(data)!;
-
-        //     // Convert back to original format
-        //     _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
-        //     {
-        //         Topic = dw.Topic ?? string.Empty, // Handle possible null value
-        //         Partition = dw.Partition,
-        //         Offset = dw.Offset,
-        //         Message = new Message<Null, string>
-        //         {
-        //             Key = dw.Message?.Key!, // Handle possible null value
-        //             Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
-        //             Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
-        //             Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
-        //         },
-        //         IsPartitionEOF = dw.IsPartitionEOF
-        //     }).ToList();
-
-        //     Log.Information($"Received data count: {_receivedData.Count()} - collection name: {collectionName} - sender port: {senderPort}");
-
-        //     // update the last time since pull for the sender port and collection combination
-        //     var collection = _dyconitCollections.Collections
-        //         ?.FirstOrDefault(c => c.Name == collectionName);
-        //     if (collection != null)
-        //     {
-        //         var sender = collection.Nodes
-        //             ?.FirstOrDefault(s => s.Port == senderPort);
-        //         if (sender != null)
-        //         {
-        //             sender.LastTimeSincePull = DateTime.Now;
-        //         }
-        //     }
-
-        //     // update the syn counter for the _listenPort and collection combination
-        //     var node = _dyconitCollections.Collections
-        //         ?.FirstOrDefault(c => c.Name == collectionName)
-        //         ?.Nodes
-        //         ?.FirstOrDefault(n => n.Port == _listenPort);
-
-        //     if (node != null)
-        //     {
-        //         node.SyncCount++;
-        //     }
-
-        //     _syncResponses.Add(senderPort.Value);
-
-        //     Log.Information("Handled sync request from {SenderPort} for data {collectionName}", senderPort, collectionName);
-
-        //     return Task.CompletedTask;
-        // }
-
-
         private Headers ConvertToKafkaHeaders(List<HeaderWrapper> headerWrappers)
         {
             var headers = new Headers();
@@ -520,186 +351,6 @@ namespace Dyconit.Overlord
             }
             return headers;
         }
-
-        // private SyncResult UpdateLocalData(List<ConsumeResult<Null, string>> localData, string collectionName)
-        // {
-        //     if (localData == null)
-        //     {
-        //         Log.Error("Local data is null");
-        //         return new SyncResult
-        //         {
-        //             changed = false,
-        //             Data = _localData[collectionName],
-        //         };
-        //     }
-
-        //     _localData[collectionName] = localData;
-
-        //     // Make a local copy of localData
-        //     var localDataCopy = localData.ToList();
-        //     var _localDataCopy = _localData[collectionName].ToList();
-
-        //     var topic = localDataCopy.First().Topic;
-
-        //     if (_receivedData == null)
-        //     {
-        //         Log.Error("Received data is null");
-        //         return new SyncResult
-        //         {
-        //             changed = false,
-        //             Data = _localDataCopy,
-        //         };
-        //     }
-
-        //     // Make a local copy of _receivedData
-        //     var receivedDataCopy = _receivedData.ToList();
-
-        //     if (receivedDataCopy.Count == 0)
-        //     {
-
-        //         if (_buffer.ContainsKey(topic))
-        //         {
-        //             receivedDataCopy = _buffer[topic];
-
-        //             _buffer.Remove(topic);
-        //         }
-        //         else
-        //         {
-        //             Log.Error("Received data is empty");
-        //             return new SyncResult
-        //             {
-        //                 changed = false,
-        //                 Data = _localDataCopy,
-        //             };
-        //         }
-        //     }
-
-        //     if (receivedDataCopy.First().Topic != localDataCopy.First().Topic)
-        //     {
-        //         if (_buffer.ContainsKey(topic))
-        //         {
-        //             receivedDataCopy = _buffer[topic];
-        //             _buffer.Remove(topic);
-        //         }
-        //         else
-        //         {
-        //             var key = receivedDataCopy.First().Topic;
-
-        //             if (_buffer.ContainsKey(key))
-        //             {
-        //                 _buffer[key] = receivedDataCopy;
-        //             }
-        //             else
-        //             {
-        //                 _buffer.Add(key, receivedDataCopy);
-        //             }
-
-        //             Log.Information("Received data topic is not the same as local data topic");
-        //             return new SyncResult
-        //             {
-        //                 changed = false,
-        //                 Data = _localDataCopy,
-        //             };
-        //         }
-        //     }
-
-        //     // check if the topic of the receivedDataCopy is the same as the topic of localDataCopy
-        //     if (receivedDataCopy == null || receivedDataCopy.Count < localDataCopy.Count)
-        //     {
-        //         Log.Information("Received data is null or smaller than local data");
-        //         SyncResult earlyResult = new SyncResult
-        //         {
-        //             changed = (_synced || false),
-        //             Data = _localDataCopy,
-        //         };
-        //         _synced = _synced ? false : _synced;
-        //         return earlyResult;
-        //     }
-
-
-        //     // Merge the received data with the local data
-        //     var mergedData = receivedDataCopy.Union(localDataCopy, new ConsumeResultComparer()).ToList();
-
-
-        //     // foreach (var item in localDataCopy)
-        //     // {
-        //     //     Log.Debug($"[{_listenPort}] - localDataCopy: {item.Message.Value}");
-        //     // }
-        //     // Log.Debug("--------------------------------------------------");
-        //     // foreach (var item in receivedDataCopy)
-        //     // {
-        //     //     Log.Debug($"[{_listenPort}] - receivedDataCopy: {item.Message.Value}");
-        //     // }
-        //     // Log.Debug("--------------------------------------------------");
-        //     // foreach (var item in mergedData)
-        //     // {
-        //     //     Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
-        //     // }
-
-        //     if (mergedData == null || !mergedData.Any())
-        //     {
-        //         Log.Error("Merged data is null or empty");
-        //         return new SyncResult
-        //         {
-        //             changed = false,
-        //             Data = _localDataCopy,
-        //         };
-        //     }
-
-        //     bool isNotSame = false;
-
-        //     if (mergedData != null && localDataCopy != null)
-        //     {
-        //         isNotSame = mergedData.Count() != localDataCopy.Count();
-        //     }
-        //     else
-        //     {
-        //         Log.Error("Merged data or local data is null");
-        //         return new SyncResult
-        //         {
-        //             changed = false,
-        //             Data = _localDataCopy,
-        //         };
-        //     }
-
-        //     Log.Debug("isNotSame: {IsNotSame}, localDataCopy.Count: {LocalDataCount}, receivedDataCopy.Count: {ReceivedDataCount}, mergedData.Count: {MergedDataCount}", isNotSame, localDataCopy.Count(), receivedDataCopy.Count(), mergedData.Count());
-
-
-        //     // check if the merged data has the same topic as the collection name. if this is not the case, store the merged data in the buffer
-        //     if (mergedData != null && mergedData.Any() && mergedData.First().Topic != collectionName)
-        //     {
-        //         if (_buffer.ContainsKey(topic))
-        //         {
-        //             _buffer[topic] = mergedData;
-        //         }
-        //         else
-        //         {
-        //             _buffer.Add(topic, mergedData);
-        //         }
-
-        //         Log.Information($"Merged data topic is not the same as collection name -- {mergedData.First().Topic} != {collectionName}");
-        //         return new SyncResult
-        //         {
-        //             changed = false,
-        //             Data = _localDataCopy,
-        //         };
-        //     }
-
-        //     SyncResult result = new SyncResult
-        //     {
-        //         changed = isNotSame || _synced,
-        //         Data = mergedData
-        //     };
-
-        //     _localDataCopy = mergedData;
-        //     _synced = _synced ? false : _synced;
-
-        //     // Clear the received data
-        //     _receivedData = null;
-
-        //     Log.Information("Updated local data for collection {CollectionName}", collectionName);
-        //     return result;
-        // }
 
         private SyncResult UpdateLocalData(List<ConsumeResult<Null, string>> localData, string collectionName)
         {
@@ -736,8 +387,8 @@ namespace Dyconit.Overlord
 
             Log.Information($"Number of topics in local data: {localTopicCount} - Number of topics in received data: {receivedTopicCount}");
 
-            var mergedData = MergeReceivedLocalData(receivedDataCopy, localDataCopy);
-            var isDataChanged = mergedData.Count() != localDataCopy.Count();
+            var mergedData = receivedDataCopy;
+            var isDataChanged = mergedData.Count() > localDataCopy.Count();
 
             if (!isDataChanged)
             {
@@ -852,56 +503,6 @@ namespace Dyconit.Overlord
             Log.Information($"Data has changed. Updated local data for collection {collectionName}");
             return new SyncResult {changed = isDataChanged, Data = mergedData};
         }
-
-
-        // private async Task HandleSyncRequestAsync(JObject messageObject)
-        // {
-
-        //     var syncRequestPort = messageObject["port"]?.ToObject<int>();
-        //     var collectionName = messageObject["collectionName"]?.ToString();
-        //     var syncRequestHost = messageObject["host"]?.ToString();
-
-        //     // check for null
-        //     if (syncRequestPort == null || collectionName == null)
-        //     {
-        //         Log.Error("SyncRequest port or collectionName is null");
-        //         return;
-        //     }
-        //     Log.Information($"Received Sync Request from host {syncRequestHost} for data in {collectionName}",syncRequestHost, collectionName);
-
-
-        //     List<ConsumeResultWrapper<Null, string>> wrapperList = _localData[collectionName]!.Select(cr => new ConsumeResultWrapper<Null, string>(cr)).ToList();
-        //     string consumeResultWrapped = JsonConvert.SerializeObject(wrapperList, Formatting.Indented);
-
-        //     // var syncResponse = new JObject
-        //     // {
-        //     //     { "eventType", "syncResponse" },
-        //     //     { "port", _listenPort },
-        //     //     { "host", _host},
-        //     //     { "data", consumeResultWrapped },
-        //     //     { "collection", collectionName}
-        //     // };
-
-        //     Log.Information("Sending Sync Response to host {Host} for data in {collectionName} with number of items {count}", syncRequestHost, collectionName, consumeResultWrapped.Count());
-
-        //     // await SendMessageOverTcp(syncResponse.ToString(), syncRequestPort.Value, syncRequestHost!);
-
-        //     // create a producer and send the data to the host
-
-        //     await _producer.ProduceAsync("syncResponse", new Message<Null, string> { Value = consumeResultWrapped });
-
-        //     _synced = true;
-
-        //     // increment the sync for the port and colleciton combination
-        //     var collection = _dyconitCollections.Collections
-        //         ?.FirstOrDefault(c => c.Name == collectionName);
-        //     var node = collection?.Nodes
-        //         ?.FirstOrDefault(n => n.Port == _listenPort);
-        //     if (node != null)
-        //     {
-        //         node.SyncCount++;
-        //     }
-        // }
 
         private async Task HandleHeartbeatEventAsync(JObject messageObject)
         {
@@ -1091,34 +692,6 @@ namespace Dyconit.Overlord
             return dyconitCollections;
         }
 
-        // private async Task SendMessageOverTcp(string message, int port, string host)
-        // {
-        //     try
-        //     {
-        //         using (var client = new TcpClient())
-        //         {
-        //             client.Connect(host, port);
-
-        //             using (var stream = client.GetStream())
-        //             using (var writer = new StreamWriter(stream))
-        //             {
-        //                 await writer.WriteLineAsync(message);
-        //                 await writer.FlushAsync();
-        //             }
-        //         }
-        //     }
-        //     catch (Exception)
-        //     {
-        //         Log.Error($"Error sending message to {host}:{port}");
-        //         // remove this node from every collection
-        //         foreach (var collection in _dyconitCollections.Collections ?? Enumerable.Empty<Collection>())
-        //         {
-        //             collection.Nodes?.RemoveAll(n => n.Port == port);
-        //         }
-
-        //     }
-        // }
-
         private async Task SendMessageOverTcp(string message, int port, string host, int maxRetries = 3)
         {
             int retries = 0;
@@ -1159,8 +732,6 @@ namespace Dyconit.Overlord
                 }
             }
         }
-
-
 
         public async Task<SyncResult> BoundStaleness(List<ConsumeResult<Null, string>> localData, string collectionName)
         {

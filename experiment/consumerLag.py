@@ -29,18 +29,20 @@ def process_file(file_path):
     data_priority['TimeDifference'] = data_priority['TimeDifference'].dt.total_seconds()
     data_normal['TimeDifference'] = data_normal['TimeDifference'].dt.total_seconds()
 
-    # Calculate the average Consumer Lag for each ConsumerCount for each Topic
-    average_time_diff_priority = data_priority.groupby('ConsumerCount')['TimeDifference'].mean()
-    average_time_diff_normal = data_normal.groupby('ConsumerCount')['TimeDifference'].mean()
+    # Calculate the maximum Consumer Lag for each ConsumerCount for each Topic
+    max_time_diff_priority = data_priority.groupby('ConsumerCount')['TimeDifference'].max()
+    max_time_diff_normal = data_normal.groupby('ConsumerCount')['TimeDifference'].max()
 
-    return average_time_diff_priority, average_time_diff_normal
+    # Calculate the average Consumer Lag for each ConsumerCount for each Topic
+    # average_time_diff_priority = data_priority.groupby('ConsumerCount')['TimeDifference'].mean()
+    # average_time_diff_normal = data_normal.groupby('ConsumerCount')['TimeDifference'].mean()
+
+    return max_time_diff_priority, max_time_diff_normal
 
 # List of file paths
 file_paths = [
-    'star_topology/s_w1_p1_consumer_count.csv',
     'star_topology/s_w1_p2_consumer_count.csv',
     'star_topology/s_w1_p3_consumer_count.csv',
-    'star_topology/s_w1_p4_consumer_count.csv',
 ]
 
 # Dictionary to store average Consumer Lags for each file
@@ -52,10 +54,8 @@ for file_path in file_paths:
 
 # Define labels for each file name
 file_labels = {
-    's_w1_p1_consumer_count.csv': 'Reverse TCP policy',
-    's_w1_p2_consumer_count.csv': 'Priority policy',
-    's_w1_p3_consumer_count.csv': 'Normal policy',
-    's_w1_p4_consumer_count.csv': 'Random policy',
+    's_w1_p2_consumer_count.csv': 'Dyconits Enabled - Moving Average Policy',
+    's_w1_p3_consumer_count.csv': 'Dyconits Enabled - Exponential Smoothing Policy',
 }
 
 # Figure for 'topic_priority'
@@ -63,8 +63,7 @@ plt.figure(figsize=(10, 6))
 for file_name, (average_time_diff_priority, _) in average_time_diffs.items():
     label = file_labels.get(file_name, file_name)  # Get the label from the dictionary, or use the file name as the label
     plt.plot(average_time_diff_priority.index, average_time_diff_priority.values, label=label)
-plt.title('Average Consumer Lag for each ConsumerCount - topic_priority')
-plt.xlabel('ConsumerCount')
+plt.xlabel('Consumer count')
 plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
