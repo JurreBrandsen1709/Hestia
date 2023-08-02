@@ -58,13 +58,13 @@ def extract_information(file, file_id):
 
     return overhead_throughput, message_throughput, consumer_count, cpu_utilization
 
-file_path = 'C:\\Users\\JurreB\\Documents\\Dyconits\\experiment\\improvement\\'
+file_path = 'C:\\Users\\JurreB\\Documents\\Dyconits\\experiment\\logs\\'
 
 # List of file paths
-file_paths = [file_path + 's_w1_p1_1.txt',
-              file_path + 's_w1_p1_2.txt',
-              file_path + 's_w1_p1_3.txt',
-              file_path + 's_w1_p1_4.txt']
+file_paths = [file_path + 's_w1_p4_1.txt',
+              file_path + 's_w1_p4_2.txt',
+              file_path + 's_w1_p4_3.txt',
+              file_path + 's_w1_p4_4.txt']
 
 
 # DataFrames
@@ -90,7 +90,7 @@ for file_id, file_path in enumerate(file_paths, start=1):
                                           for time, utilization, file_id in data], columns=['Port', 'Time', 'Utilization', 'FileId'])], ignore_index=True)
 
 # Save data to CSV
-overhead_df.to_csv('improvement/s_w1_p1_overhead_throughput.csv', index=False)
-message_df.to_csv('improvement/s_w1_p1_message_throughput.csv', index=False)
-consumer_df.to_csv('improvement/s_w1_p1_consumer_count.csv', index=False)
-cpu_df.to_csv('improvement/s_w1_p1_cpu_utilization.csv', index=False)
+overhead_df.to_csv('star_topology/s_w1_p4_overhead_throughput.csv', index=False)
+message_df.to_csv('star_topology/s_w1_p4_message_throughput.csv', index=False)
+consumer_df.to_csv('star_topology/s_w1_p4_consumer_count.csv', index=False)
+cpu_df.to_csv('star_topology/s_w1_p4_cpu_utilization.csv', index=False)

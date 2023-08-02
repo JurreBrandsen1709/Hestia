@@ -23,10 +23,11 @@ def load_and_process_data(file_path, configuration):
     return priority_df, normal_df
 
 # Load and process the data
-normal_priority, normal_normal = load_and_process_data('s_w1_p1_message_throughput.csv', 'No Sync')
+normal_priority, normal_normal = load_and_process_data('improvement/s_w1_p1_message_throughput.csv', 'No Sync')
+p1_priority, p1_normal = load_and_process_data('improvement/s_w1_p2_message_throughput.csv', 'Policy 1')
 
 # Combine all dataframes
-all_data = pd.concat([normal_priority, normal_normal])
+all_data = pd.concat([normal_priority, normal_normal, p1_priority, p1_normal])
 
 # Define the color palette
 colors = sns.color_palette("tab10", n_colors=4)  # 4 colors for 4 policies
@@ -49,4 +50,4 @@ sns.violinplot(x="Configuration", y="Throughput", data=all_data, cut=0, palette=
 plt.xticks(rotation=45)
 plt.title('Throughput Distributions for Different Configurations')
 plt.ylim(bottom=0)
-plt.savefig('docker/e1_w2_message_throughput.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig('improvement/s_w1_throughput.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)

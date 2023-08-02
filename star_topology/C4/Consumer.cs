@@ -54,7 +54,7 @@ class Consumer
             _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = 0 };
         }
 
-        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection, "app5");
+        _DyconitLogger = new DyconitAdmin(configuration, adminPort, _localCollection, "app5");
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -152,7 +152,7 @@ class Consumer
                         _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
 
-                    bool boundResult = DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
+                    bool boundResult = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
                     commit = boundResult || commit;
 
                     _uncommittedConsumedMessages[topic] = result.Data;

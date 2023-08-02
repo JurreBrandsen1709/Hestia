@@ -16,62 +16,310 @@ using System.Collections.Concurrent;
 
 namespace Dyconit.Overlord
 {
-    // Assuming _buffer is some sort of concurrent dictionary, we add these methods to manage it.
-    public static class ConcurrentDictionaryExtensions
-    {
-        public static void AddOrUpdate<T>(this ConcurrentDictionary<string, T> dict, string key, T data)
-        {
-            dict.AddOrUpdate(key, data, (_, __) => data);
-        }
-
-        public static T GetOrRemove<T>(this ConcurrentDictionary<string, T> dict, string key)
-        {
-            dict.TryRemove(key, out var data);
-            return data;
-        }
-
-        public static T GetOrAdd<T>(this ConcurrentDictionary<string, T> dict, string key, T data)
-        {
-            return dict.GetOrAdd(key, data);
-        }
-    }
     public class DyconitAdmin
     {
         public readonly IAdminClient _adminClient;
         private readonly int _listenPort;
         private readonly string _host;
         private readonly AdminClientConfig _adminClientConfig;
+        private readonly ProducerConfig _producerConfig;
+        private readonly ConsumerConfig _consumerConfig;
+        private IProducer<Null, string> _producer;
         private RootObject _dyconitCollections;
-        private ConcurrentDictionary<string, List<ConsumeResult<Null, string>>> _localData = new ConcurrentDictionary<string, List<ConsumeResult<Null, string>>>();
+        private Dictionary <string, List<ConsumeResult<Null, string>>> _localData = new Dictionary<string, List<ConsumeResult<Null, string>>>();
         // private List<ConsumeResult<Null, string>> ?_localData = new List<ConsumeResult<Null, string>>();
         private List<ConsumeResult<Null, string>> ?_receivedData;
         private bool _synced;
         private HashSet<int> _syncResponses = new HashSet<int>();
-        private ConcurrentDictionary<string, List<ConsumeResult<Null, string>>> _buffer = new ConcurrentDictionary<string, List<ConsumeResult<Null, string>>>();
+        private Dictionary<string, List<ConsumeResult<Null, string>>> _buffer = new Dictionary<string, List<ConsumeResult<Null, string>>>();
+        private Dictionary<string, List<string>> _receivedChunks = new Dictionary<string, List<string>>();
 
-        public DyconitAdmin(string bootstrapServers, int adminPort, JObject conitCollection, string host)
+
+        public DyconitAdmin(ConsumerConfig consumerConfig, int adminPort, JObject conitCollection, string host)
         {
             ConfigureLogging();
 
             _listenPort = adminPort;
             _host = host;
+            _consumerConfig = consumerConfig;
             _adminClientConfig = new AdminClientConfig
             {
-                BootstrapServers = bootstrapServers,
+                BootstrapServers = _consumerConfig.BootstrapServers,
             };
             _adminClient = new AdminClientBuilder(_adminClientConfig).Build();
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "trans_topic_priority", NumPartitions = 1, ReplicationFactor = 1 } });
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "trans_topic_normal", NumPartitions = 1, ReplicationFactor = 1 } });
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "topic_normal", NumPartitions = 1, ReplicationFactor = 1 } });
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = "topic_priority", NumPartitions = 1, ReplicationFactor = 1 } });
+
+            // create the special topics by looping over the hosts and creating syncRequests and syncResponses
+            _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = $"syncRequest_{_host}", NumPartitions = 1, ReplicationFactor = 1 } });
+            _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = $"syncResponse_{_host}", NumPartitions = 1, ReplicationFactor = 1 } });
             _dyconitCollections = CreateDyconitCollections(conitCollection, adminPort, host);
 
             // create two keys for the _localData dictionary
-            _localData.AddOrUpdate("topic_normal", new List<ConsumeResult<Null, string>>());
-            _localData.AddOrUpdate("topic_priority", new List<ConsumeResult<Null, string>>());
+            _localData.Add("topic_normal", new List<ConsumeResult<Null, string>>());
+            _localData.Add("topic_priority", new List<ConsumeResult<Null, string>>());
+
+            // create a procuder for the admin
+            _producerConfig = new ProducerConfig { BootstrapServers = _consumerConfig.BootstrapServers };
+            _producer = new ProducerBuilder<Null, string>(_producerConfig).Build();
 
             ListenForMessagesAsync();
         }
+
+        async Task ConsumeSyncRequest(string topic, ConsumerConfig configuration)
+        {
+            configuration.GroupId = $"syncRequest_{_host}";
+            // increase message max bytes to max it can do.
+            using (var consumer = new ConsumerBuilder<Ignore, string>(configuration).Build())
+            {
+                consumer.Subscribe(topic);
+                try
+                {
+                    while (true)
+                    {
+                        Log.Information($"Listening for sync requests on {topic}");
+
+                        var consumeResult = consumer.Consume();
+                        if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
+                        {
+                            // the message is 'topic;host' extract that.
+                            var messageParts = consumeResult.Message.Value.Split(';');
+                            if (messageParts.Length == 2)
+                            {
+                                var messageTopic = messageParts[0];
+                                var messageHost = messageParts[1];
+
+                                Log.Information($"Received sync request from {messageHost} for topic {messageTopic}");
+
+                                // Sync Request. I should send a sync response.
+                                List<ConsumeResultWrapper<Null, string>> wrapperList = _localData[messageTopic]!.Select(cr => new ConsumeResultWrapper<Null, string>(cr)).ToList();
+                                string consumeResultWrapped = JsonConvert.SerializeObject(wrapperList, Formatting.Indented);
+
+                                // send the consumeResultwrapped and the host to the syncResponse topic. Also send your own host as a message.
+                                await _producer.ProduceAsync($"syncResponse_{messageHost}", new Message<Null, string> { Value = $"{_host};{consumeResultWrapped}" });
+
+                                Log.Information($"Sent sync response to {messageHost} for topic {messageTopic}");
+
+                                _synced = true;
+
+                                // increment the sync for the port and colleciton combination
+                                var collection = _dyconitCollections.Collections?.FirstOrDefault(c => c.Name == messageTopic);
+                                var node = collection?.Nodes?.FirstOrDefault(n => n.Port == _listenPort);
+                                if (node != null)
+                                {
+                                    node.SyncCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Ctrl+C was pressed.
+                }
+                finally
+                {
+                    consumer.Close();
+                }
+            }
+        }
+
+        async Task ConsumeSyncResponse(string topic, ConsumerConfig configuration)
+        {
+            await Task.Run(() =>
+            {
+                configuration.GroupId = $"syncRequest_{_host}";
+                using (var consumer = new ConsumerBuilder<Ignore, string>(configuration).Build())
+                {
+                    consumer.Subscribe(topic);
+                    try
+                    {
+                        while (true)
+                        {
+                            Log.Information($"Listening for sync requests on {topic}");
+
+                            var consumeResult = consumer.Consume();
+                            if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
+                            {
+                                // the message is 'data;host' extract that.
+                                var messageParts = consumeResult.Message.Value.Split(';');
+                                var messageHost = messageParts[0];
+
+                                // The remaining part is the data
+                                var messageData = string.Join(';', messageParts.Skip(1));
+
+                                Log.Information($"Received sync response from {messageHost}");
+
+                                List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(messageData);
+                                if (deserializedList != null)
+                                {
+                                    // Convert back to original format
+                                    _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
+                                    {
+                                        Topic = dw.Topic ?? string.Empty, // Handle possible null value
+                                        Partition = dw.Partition,
+                                        Offset = dw.Offset,
+                                        Message = new Message<Null, string>
+                                        {
+                                            Key = dw.Message?.Key, // Handle possible null value
+                                            Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
+                                            Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
+                                            Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
+                                        },
+                                        IsPartitionEOF = dw.IsPartitionEOF
+                                    }).ToList();
+
+                                    var receivedTopic = _receivedData.FirstOrDefault()?.Topic;
+
+                                    Log.Information($"Received data count: {_receivedData.Count()} - collection name: {receivedTopic} - sender host: {messageHost}");
+
+                                    // update the last time since pull for the sender port and collection combination
+                                    var collection = _dyconitCollections.Collections
+                                        ?.FirstOrDefault(c => c.Name == receivedTopic);
+                                    if (collection != null)
+                                    {
+                                        var sender = collection.Nodes
+                                            ?.FirstOrDefault(s => s.Host == messageHost);
+                                        if (sender != null)
+                                        {
+                                            sender.LastTimeSincePull = DateTime.Now;
+                                        }
+                                    }
+
+                                    // update the syn counter for the _listenPort and collection combination
+                                    var node = _dyconitCollections.Collections
+                                        ?.FirstOrDefault(c => c.Name == receivedTopic)
+                                        ?.Nodes
+                                        ?.FirstOrDefault(n => n.Port == _listenPort);
+
+                                    if (node != null)
+                                    {
+                                        node.SyncCount++;
+                                    }
+                                }
+                                else
+                                {
+                                    Log.Warning($"Invalid message data: {messageData}");
+                                }
+                            }
+                            else
+                            {
+                                Log.Warning("Received null or invalid message.");
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Ctrl+C was pressed.
+                    }
+                    finally
+                    {
+                        consumer.Close();
+                    }
+                }
+            });
+        }
+
+
+        // async Task ConsumeSyncResponse(string topic, ConsumerConfig configuration)
+        // {
+        //     await Task.Run(() =>
+        //     {
+        //         configuration.GroupId = $"syncRequest_{_host}";
+        //         configuration.MessageMaxBytes = 1000000000;
+        //         using (var consumer = new ConsumerBuilder<Ignore, string>(configuration).Build())
+        //         {
+        //             consumer.Subscribe(topic);
+        //             try
+        //             {
+        //                 while (true)
+        //                 {
+        //                     Log.Information($"Listening for sync requests on {topic}");
+
+        //                     var consumeResult = consumer.Consume();
+        //                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
+        //                     {
+        //                         // the message is 'data;host' extract that.
+        //                         var messageParts = consumeResult.Message.Value.Split(';');
+        //                         var messageHost = messageParts[0];
+
+        //                         // The remaining part is the data
+        //                         var messageData = string.Join(';', messageParts.Skip(1));
+
+        //                         Log.Information($"Received sync response from {messageHost}");
+
+        //                         List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(messageData);
+        //                         if (deserializedList != null)
+        //                         {
+        //                             // Convert back to original format
+        //                             _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
+        //                             {
+        //                                 Topic = dw.Topic ?? string.Empty, // Handle possible null value
+        //                                 Partition = dw.Partition,
+        //                                 Offset = dw.Offset,
+        //                                 Message = new Message<Null, string>
+        //                                 {
+        //                                     Key = dw.Message?.Key, // Handle possible null value
+        //                                     Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
+        //                                     Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
+        //                                     Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
+        //                                 },
+        //                                 IsPartitionEOF = dw.IsPartitionEOF
+        //                             }).ToList();
+
+        //                             var receivedTopic = _receivedData.FirstOrDefault()?.Topic;
+
+        //                             Log.Information($"Received data count: {_receivedData.Count()} - collection name: {receivedTopic} - sender host: {messageHost}");
+
+        //                             // update the last time since pull for the sender port and collection combination
+        //                             var collection = _dyconitCollections.Collections
+        //                                 ?.FirstOrDefault(c => c.Name == receivedTopic);
+        //                             if (collection != null)
+        //                             {
+        //                                 var sender = collection.Nodes
+        //                                     ?.FirstOrDefault(s => s.Host == messageHost);
+        //                                 if (sender != null)
+        //                                 {
+        //                                     sender.LastTimeSincePull = DateTime.Now;
+        //                                 }
+        //                             }
+
+        //                             // update the syn counter for the _listenPort and collection combination
+        //                             var node = _dyconitCollections.Collections
+        //                                 ?.FirstOrDefault(c => c.Name == receivedTopic)
+        //                                 ?.Nodes
+        //                                 ?.FirstOrDefault(n => n.Port == _listenPort);
+
+        //                             if (node != null)
+        //                             {
+        //                                 node.SyncCount++;
+        //                             }
+        //                         }
+        //                         else
+        //                         {
+        //                             Log.Warning($"Invalid message data: {messageData}");
+        //                         }
+        //                     }
+        //                     else
+        //                     {
+        //                         Log.Warning("Received null or invalid message.");
+        //                     }
+        //                 }
+        //             }
+        //             catch (OperationCanceledException)
+        //             {
+        //                 // Ctrl+C was pressed.
+        //             }
+        //             finally
+        //             {
+        //                 consumer.Close();
+        //             }
+        //         }
+        //     });
+        // }
+
 
         static public void ConfigureLogging()
         {
@@ -88,6 +336,17 @@ namespace Dyconit.Overlord
         {
 
             _ = SendSyncCount();
+            // _ = ConsumeSyncRequest($"syncRequest_{_host}", _consumerConfig);
+            // _ = ConsumeSyncResponse($"syncResponse_{_host}", _consumerConfig);
+
+            // create a new thread for consuming sync requests
+            var consumeSyncRequest = new Thread(async () => await ConsumeSyncRequest($"syncRequest_{_host}", _consumerConfig));
+            consumeSyncRequest.Start();
+
+            // create a new thread for consuming sync responses
+            var consumeSyncResponse = new Thread(async () => await ConsumeSyncResponse($"syncResponse_{_host}", _consumerConfig));
+            consumeSyncResponse.Start();
+
             var listener = new TcpListener(IPAddress.Any, _listenPort);
             listener.Start();
 
@@ -121,10 +380,10 @@ namespace Dyconit.Overlord
                     return HandleUpdateConitEventAsync(messageObject);
                 case "heartbeatEvent":
                     return HandleHeartbeatEventAsync(messageObject);
-                case "syncRequest":
-                    return HandleSyncRequestAsync(messageObject);
-                case "syncResponse":
-                    return HandleSyncResponseAsync(messageObject);
+                // case "syncRequest":
+                    // return HandleSyncRequestAsync(messageObject);
+                // case "syncResponse":
+                    // return HandleSyncResponseAsync(messageObject);
                 case "finishEvent":
                     return HandleFinishEventAsync(messageObject);
                 default:
@@ -183,70 +442,73 @@ namespace Dyconit.Overlord
             return Task.CompletedTask;
         }
 
-        private Task HandleSyncResponseAsync(JObject messageObject)
-        {
-            var data = messageObject["data"]?.ToString();
-            var collectionName = messageObject["collection"]?.ToString();
-            var senderPort = messageObject["port"]?.ToObject<int>();
+        // private Task HandleSyncResponseAsync(JObject messageObject)
+        // {
+        //     var data = messageObject["data"]?.ToString();
+        //     var collectionName = messageObject["collection"]?.ToString();
+        //     var senderPort = messageObject["port"]?.ToObject<int>();
+        //     var senderHost = messageObject["host"]?.ToString();
 
-            // check for null
-            if (data == null || collectionName == null || senderPort == null)
-            {
-                Log.Error("SyncResponse data, collectionName or senderPort is null");
-                return Task.CompletedTask;
-            }
+        //     // check for null
+        //     if (data == null || collectionName == null || senderPort == null)
+        //     {
+        //         Log.Error("SyncResponse data, collectionName or senderPort is null");
+        //         return Task.CompletedTask;
+        //     }
 
-            // deserialize the data
-            List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(data)!;
+        //     Log.Information($"Received sync response from {senderHost} for collection {collectionName}");
 
-            // Convert back to original format
-            _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
-            {
-                Topic = dw.Topic ?? string.Empty, // Handle possible null value
-                Partition = dw.Partition,
-                Offset = dw.Offset,
-                Message = new Message<Null, string>
-                {
-                    Key = dw.Message?.Key!, // Handle possible null value
-                    Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
-                    Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
-                    Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
-                },
-                IsPartitionEOF = dw.IsPartitionEOF
-            }).ToList();
+        //     // deserialize the data
+        //     List<ConsumeResultWrapper<Null, string>> deserializedList = JsonConvert.DeserializeObject<List<ConsumeResultWrapper<Null, string>>>(data)!;
 
-            Log.Information($"Received data count: {_receivedData.Count()} - collection name: {collectionName} - sender port: {senderPort}");
+        //     // Convert back to original format
+        //     _receivedData = deserializedList.Select(dw => new ConsumeResult<Null, string>
+        //     {
+        //         Topic = dw.Topic ?? string.Empty, // Handle possible null value
+        //         Partition = dw.Partition,
+        //         Offset = dw.Offset,
+        //         Message = new Message<Null, string>
+        //         {
+        //             Key = dw.Message?.Key!, // Handle possible null value
+        //             Value = dw.Message?.Value ?? string.Empty, // Handle possible null value
+        //             Timestamp = dw.Message?.Timestamp ?? default, // Handle possible null value
+        //             Headers = dw.Message?.Headers != null ? ConvertToKafkaHeaders(dw.Message.Headers) : null
+        //         },
+        //         IsPartitionEOF = dw.IsPartitionEOF
+        //     }).ToList();
 
-            // update the last time since pull for the sender port and collection combination
-            var collection = _dyconitCollections.Collections
-                ?.FirstOrDefault(c => c.Name == collectionName);
-            if (collection != null)
-            {
-                var sender = collection.Nodes
-                    ?.FirstOrDefault(s => s.Port == senderPort);
-                if (sender != null)
-                {
-                    sender.LastTimeSincePull = DateTime.Now;
-                }
-            }
+        //     Log.Information($"Received data count: {_receivedData.Count()} - collection name: {collectionName} - sender port: {senderPort}");
 
-            // update the syn counter for the _listenPort and collection combination
-            var node = _dyconitCollections.Collections
-                ?.FirstOrDefault(c => c.Name == collectionName)
-                ?.Nodes
-                ?.FirstOrDefault(n => n.Port == _listenPort);
+        //     // update the last time since pull for the sender port and collection combination
+        //     var collection = _dyconitCollections.Collections
+        //         ?.FirstOrDefault(c => c.Name == collectionName);
+        //     if (collection != null)
+        //     {
+        //         var sender = collection.Nodes
+        //             ?.FirstOrDefault(s => s.Port == senderPort);
+        //         if (sender != null)
+        //         {
+        //             sender.LastTimeSincePull = DateTime.Now;
+        //         }
+        //     }
 
-            if (node != null)
-            {
-                node.SyncCount++;
-            }
+        //     // update the syn counter for the _listenPort and collection combination
+        //     var node = _dyconitCollections.Collections
+        //         ?.FirstOrDefault(c => c.Name == collectionName)
+        //         ?.Nodes
+        //         ?.FirstOrDefault(n => n.Port == _listenPort);
 
-            _syncResponses.Add(senderPort.Value);
+        //     if (node != null)
+        //     {
+        //         node.SyncCount++;
+        //     }
 
-            Log.Information("Handled sync request from {SenderPort} for data {collectionName}", senderPort, collectionName);
+        //     _syncResponses.Add(senderPort.Value);
 
-            return Task.CompletedTask;
-        }
+        //     Log.Information("Handled sync request from {SenderPort} for data {collectionName}", senderPort, collectionName);
+
+        //     return Task.CompletedTask;
+        // }
 
 
         private Headers ConvertToKafkaHeaders(List<HeaderWrapper> headerWrappers)
@@ -267,15 +529,15 @@ namespace Dyconit.Overlord
         //         return new SyncResult
         //         {
         //             changed = false,
-        //             Data = _localData,
+        //             Data = _localData[collectionName],
         //         };
         //     }
 
-        //     _localData = localData;
+        //     _localData[collectionName] = localData;
 
         //     // Make a local copy of localData
         //     var localDataCopy = localData.ToList();
-        //     var _localDataCopy = _localData.ToList();
+        //     var _localDataCopy = _localData[collectionName].ToList();
 
         //     var topic = localDataCopy.First().Topic;
 
@@ -359,20 +621,20 @@ namespace Dyconit.Overlord
         //     var mergedData = receivedDataCopy.Union(localDataCopy, new ConsumeResultComparer()).ToList();
 
 
-        //     foreach (var item in localDataCopy)
-        //     {
-        //         Log.Debug($"[{_listenPort}] - localDataCopy: {item.Message.Value}");
-        //     }
-        //     Log.Debug("--------------------------------------------------");
-        //     foreach (var item in receivedDataCopy)
-        //     {
-        //         Log.Debug($"[{_listenPort}] - receivedDataCopy: {item.Message.Value}");
-        //     }
-        //     Log.Debug("--------------------------------------------------");
-        //     foreach (var item in mergedData)
-        //     {
-        //         Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
-        //     }
+        //     // foreach (var item in localDataCopy)
+        //     // {
+        //     //     Log.Debug($"[{_listenPort}] - localDataCopy: {item.Message.Value}");
+        //     // }
+        //     // Log.Debug("--------------------------------------------------");
+        //     // foreach (var item in receivedDataCopy)
+        //     // {
+        //     //     Log.Debug($"[{_listenPort}] - receivedDataCopy: {item.Message.Value}");
+        //     // }
+        //     // Log.Debug("--------------------------------------------------");
+        //     // foreach (var item in mergedData)
+        //     // {
+        //     //     Log.Debug($"[{_listenPort}] - mergedData: {item.Message.Value}");
+        //     // }
 
         //     if (mergedData == null || !mergedData.Any())
         //     {
@@ -508,7 +770,7 @@ namespace Dyconit.Overlord
                 if (_buffer.ContainsKey(topic))
                 {
                     receivedDataCopy = _buffer[topic];
-                    _buffer.TryRemove(topic, out _);
+                    _buffer.Remove(topic);
                     Log.Information($"Received data was empty, using buffered data for topic {topic}");
                 }
                 else
@@ -526,7 +788,7 @@ namespace Dyconit.Overlord
                 {
                     Log.Information($"Buffered data found for topic {topic}, using this data");
                     receivedDataCopy = _buffer[topic];
-                    _buffer.TryRemove(topic, out _);
+                    _buffer.Remove(topic);
                 }
                 else
                 {
@@ -570,7 +832,17 @@ namespace Dyconit.Overlord
             var topic = mergedData.First().Topic;
             if (topic != collectionName)
             {
-                _buffer.GetOrAdd(topic, mergedData);
+                if (_buffer.ContainsKey(topic))
+                {
+                    _buffer[topic] = mergedData;
+                    Log.Information($"Buffered data updated for topic {topic}");
+                }
+                else
+                {
+                    _buffer.TryAdd(topic, mergedData);
+                    Log.Information($"Buffered data added for topic {topic}");
+                }
+
                 Log.Information($"Merged data topic is not the same as collection name -- {mergedData.First().Topic} != {collectionName}, data buffered");
                 return new SyncResult {changed = false, Data = _localData[collectionName]};
             }
@@ -582,48 +854,54 @@ namespace Dyconit.Overlord
         }
 
 
-        private async Task HandleSyncRequestAsync(JObject messageObject)
-        {
+        // private async Task HandleSyncRequestAsync(JObject messageObject)
+        // {
 
-            var syncRequestPort = messageObject["port"]?.ToObject<int>();
-            var collectionName = messageObject["collectionName"]?.ToString();
-            var syncRequestHost = messageObject["host"]?.ToString();
+        //     var syncRequestPort = messageObject["port"]?.ToObject<int>();
+        //     var collectionName = messageObject["collectionName"]?.ToString();
+        //     var syncRequestHost = messageObject["host"]?.ToString();
 
-            // check for null
-            if (syncRequestPort == null || collectionName == null)
-            {
-                Log.Error("SyncRequest port or collectionName is null");
-                return;
-            }
+        //     // check for null
+        //     if (syncRequestPort == null || collectionName == null)
+        //     {
+        //         Log.Error("SyncRequest port or collectionName is null");
+        //         return;
+        //     }
+        //     Log.Information($"Received Sync Request from host {syncRequestHost} for data in {collectionName}",syncRequestHost, collectionName);
 
-            List<ConsumeResultWrapper<Null, string>> wrapperList = _localData[collectionName]!.Select(cr => new ConsumeResultWrapper<Null, string>(cr)).ToList();
-            string consumeResultWrapped = JsonConvert.SerializeObject(wrapperList, Formatting.Indented);
 
-            var syncResponse = new JObject
-            {
-                { "eventType", "syncResponse" },
-                { "port", _listenPort },
-                { "host", _host},
-                { "data", consumeResultWrapped },
-                { "collection", collectionName}
-            };
+        //     List<ConsumeResultWrapper<Null, string>> wrapperList = _localData[collectionName]!.Select(cr => new ConsumeResultWrapper<Null, string>(cr)).ToList();
+        //     string consumeResultWrapped = JsonConvert.SerializeObject(wrapperList, Formatting.Indented);
 
-            Log.Information("Sending Sync Request to port {Port} for data in {collectionName} with number of items {count}", syncRequestPort, collectionName, consumeResultWrapped.Count());
+        //     // var syncResponse = new JObject
+        //     // {
+        //     //     { "eventType", "syncResponse" },
+        //     //     { "port", _listenPort },
+        //     //     { "host", _host},
+        //     //     { "data", consumeResultWrapped },
+        //     //     { "collection", collectionName}
+        //     // };
 
-            await SendMessageOverTcp(syncResponse.ToString(), syncRequestPort.Value, syncRequestHost!);
+        //     Log.Information("Sending Sync Response to host {Host} for data in {collectionName} with number of items {count}", syncRequestHost, collectionName, consumeResultWrapped.Count());
 
-            _synced = true;
+        //     // await SendMessageOverTcp(syncResponse.ToString(), syncRequestPort.Value, syncRequestHost!);
 
-            // increment the sync for the port and colleciton combination
-            var collection = _dyconitCollections.Collections
-                ?.FirstOrDefault(c => c.Name == collectionName);
-            var node = collection?.Nodes
-                ?.FirstOrDefault(n => n.Port == _listenPort);
-            if (node != null)
-            {
-                node.SyncCount++;
-            }
-        }
+        //     // create a producer and send the data to the host
+
+        //     await _producer.ProduceAsync("syncResponse", new Message<Null, string> { Value = consumeResultWrapped });
+
+        //     _synced = true;
+
+        //     // increment the sync for the port and colleciton combination
+        //     var collection = _dyconitCollections.Collections
+        //         ?.FirstOrDefault(c => c.Name == collectionName);
+        //     var node = collection?.Nodes
+        //         ?.FirstOrDefault(n => n.Port == _listenPort);
+        //     if (node != null)
+        //     {
+        //         node.SyncCount++;
+        //     }
+        // }
 
         private async Task HandleHeartbeatEventAsync(JObject messageObject)
         {
@@ -667,8 +945,6 @@ namespace Dyconit.Overlord
 
             return Task.CompletedTask;
         }
-
-
 
         private Task HandleRemoveNodeEventAsync(JObject messageObject)
         {
@@ -815,32 +1091,76 @@ namespace Dyconit.Overlord
             return dyconitCollections;
         }
 
-        private async Task SendMessageOverTcp(string message, int port, string host)
+        // private async Task SendMessageOverTcp(string message, int port, string host)
+        // {
+        //     try
+        //     {
+        //         using (var client = new TcpClient())
+        //         {
+        //             client.Connect(host, port);
+
+        //             using (var stream = client.GetStream())
+        //             using (var writer = new StreamWriter(stream))
+        //             {
+        //                 await writer.WriteLineAsync(message);
+        //                 await writer.FlushAsync();
+        //             }
+        //         }
+        //     }
+        //     catch (Exception)
+        //     {
+        //         Log.Error($"Error sending message to {host}:{port}");
+        //         // remove this node from every collection
+        //         foreach (var collection in _dyconitCollections.Collections ?? Enumerable.Empty<Collection>())
+        //         {
+        //             collection.Nodes?.RemoveAll(n => n.Port == port);
+        //         }
+
+        //     }
+        // }
+
+        private async Task SendMessageOverTcp(string message, int port, string host, int maxRetries = 3)
         {
-            try
+            int retries = 0;
+            while (retries < maxRetries)
             {
-                using (var client = new TcpClient())
+                try
                 {
-                    client.Connect(host, port);
-
-                    using (var stream = client.GetStream())
-                    using (var writer = new StreamWriter(stream))
+                    using (var client = new TcpClient())
                     {
-                        await writer.WriteLineAsync(message);
-                        await writer.FlushAsync();
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                // remove this node from every collection
-                foreach (var collection in _dyconitCollections.Collections ?? Enumerable.Empty<Collection>())
-                {
-                    collection.Nodes?.RemoveAll(n => n.Port == port);
-                }
+                        client.Connect(host, port);
 
+                        using (var stream = client.GetStream())
+                        using (var writer = new StreamWriter(stream))
+                        {
+                            await writer.WriteLineAsync(message);
+                            await writer.FlushAsync();
+                        }
+                    }
+                    return; // Success, exit the method
+                }
+                catch (Exception)
+                {
+                    Log.Error($"Error sending message to {host}:{port}. Retrying {retries + 1} of {maxRetries}");
+                    // Increment the retry counter
+                    retries++;
+
+                    if (retries >= maxRetries)
+                    {
+                        Log.Error($"Error sending message to {host}:{port}. Max retries exceeded.");
+                        // remove this node from every collection
+                        foreach (var collection in _dyconitCollections.Collections ?? Enumerable.Empty<Collection>())
+                        {
+                            collection.Nodes?.RemoveAll(n => n.Port == port);
+                        }
+                    }
+                    // Optionally, you might introduce a delay before retrying
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                }
             }
         }
+
+
 
         public async Task<SyncResult> BoundStaleness(List<ConsumeResult<Null, string>> localData, string collectionName)
         {
@@ -848,20 +1168,6 @@ namespace Dyconit.Overlord
 
             // Check if we have received new data from an other node since the last time we checked
             SyncResult result = UpdateLocalData(localData, collectionName);
-
-            // retrieve the staleness bound for the collection name and port combination
-            // var stalenessBound = _dyconitCollections.Collections
-            //     ?.FirstOrDefault(c => c.Name == collectionName)
-            //     ?.Nodes
-            //     ?.FirstOrDefault(n => n.Port == _listenPort)
-            //     ?.Bounds
-            //     ?.Staleness;
-
-            // // if the staleness bound is null, we can't do anything
-            // if (!stalenessBound.HasValue)
-            // {;
-            //     return result;
-            // }
 
             // retrieve all the other nodes in the collection
             var otherNodes = _dyconitCollections.Collections
@@ -897,16 +1203,10 @@ namespace Dyconit.Overlord
                 if (timeSincePull.HasValue && timeSincePull.Value.TotalMilliseconds > stalenessBound.Value)
                 {
                     portsStalenessExceeded.Add(node.Port!.Value);
-                    // send a pull request to the other node
-                    var message = new JObject
-                    {
-                        ["eventType"] = "syncRequest",
-                        ["port"] = _listenPort,
-                        ["host"] = _host,
-                        ["collectionName"] = collectionName,
-                    };
+                    Log.Information($"Host {node.Host} port {node.Port} staleness bound exceeded. Sending pull request by producing to topic syncRequest_{node.Host}");
 
-                    await SendMessageOverTcp(message.ToString(), node.Port!.Value, node.Host!);
+                    // let the producer send the syncRequest
+                    await _producer.ProduceAsync($"syncRequest_{node.Host}", new Message<Null, string> { Value = collectionName + ";"+ _host });
 
                     // update the LastTimeSincePull for the node
                     node.LastTimeSincePull = DateTime.Now;
@@ -959,7 +1259,7 @@ namespace Dyconit.Overlord
         }
 
 
-        public bool BoundNumericalError(List<ConsumeResult<Null, string>> list, string topic, double totalLocalWeight)
+        public async Task<bool> BoundNumericalError(List<ConsumeResult<Null, string>> list, string topic, double totalLocalWeight)
         {
             bool exceeded = false;
             // get the number of nodes in the collection
@@ -994,16 +1294,11 @@ namespace Dyconit.Overlord
                     {
                         exceeded = true;
 
-                        // send a sync request to the other node
-                        var message = new JObject
-                        {
-                            ["eventType"] = "syncRequest",
-                            ["port"] = node.Port,
-                            ["host"] = node.Host,
-                            ["collectionName"] = topic,
-                        };
+                        Log.Information($"host {node.Host} port {node.Port} numerical error bound exceeded. Sending sync request to topic syncRequest_{node.Host}");
 
-                        SendMessageOverTcp(message.ToString(), _listenPort, _host).Wait();
+                        // await SendMessageOverTcp(message.ToString(), _listenPort, _host);
+                        await _producer.ProduceAsync($"syncRequest_{_host}", new Message<Null, string> { Value = topic + ";"+ node.Host });
+
                     }
                 }
 

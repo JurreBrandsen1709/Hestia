@@ -1,9 +1,9 @@
-run_duration=30
+run_duration=60
 
 echo "Running task..."
 
 # Start second command and get its process ID
-ksunami --brokers broker:9092 --topic topic_priority --min 6 --max 7 --payload alpha:1 &
+ksunami --brokers broker:9092 --topic topic_priority --min 15 --max 16 --payload alpha:1 &
 job2=$!
 
 # Start first command and get its process ID

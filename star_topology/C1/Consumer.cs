@@ -54,7 +54,7 @@ class Consumer
             _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = 0 };
         }
 
-        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection, "app2");
+        _DyconitLogger = new DyconitAdmin(configuration, adminPort, _localCollection, "app2");
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -160,7 +160,7 @@ class Consumer
                         _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
                     }
 
-                    bool boundResult = DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
+                    bool boundResult = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
                     commit = boundResult || commit;
 
                     Log.Information($"After BoundNumericalError, commit is {commit} for topic {topic}");
@@ -191,10 +191,12 @@ class Consumer
             catch (OperationCanceledException)
             {
                 // Ensure the consumer leaves the group cleanly and final offsets are committed.
+                Log.Information("Closing consumer.");
                 consumer.Close();
             }
             finally
             {
+                Log.Information("Closing consumer.");
                 consumer.Close();
             }
         }

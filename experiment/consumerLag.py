@@ -37,7 +37,10 @@ def process_file(file_path):
 
 # List of file paths
 file_paths = [
-    'improvement/s_w1_p1_consumer_count.csv',
+    'star_topology/s_w1_p1_consumer_count.csv',
+    'star_topology/s_w1_p2_consumer_count.csv',
+    'star_topology/s_w1_p3_consumer_count.csv',
+    'star_topology/s_w1_p4_consumer_count.csv',
 ]
 
 # Dictionary to store average Consumer Lags for each file
@@ -50,6 +53,9 @@ for file_path in file_paths:
 # Define labels for each file name
 file_labels = {
     's_w1_p1_consumer_count.csv': 'Reverse TCP policy',
+    's_w1_p2_consumer_count.csv': 'Priority policy',
+    's_w1_p3_consumer_count.csv': 'Normal policy',
+    's_w1_p4_consumer_count.csv': 'Random policy',
 }
 
 # Figure for 'topic_priority'
@@ -62,7 +68,7 @@ plt.xlabel('ConsumerCount')
 plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
-plt.savefig('improvement/s_w1_p1_lag_priority.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig('star_topology/s_w1_lag_priority.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 # plt.show()
 
 # Figure for 'topic_normal'
@@ -75,5 +81,5 @@ plt.xlabel('ConsumerCount')
 plt.ylabel('Average Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
-plt.savefig('improvement/s_w1_p1_lag_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig('star_topology/s_w1_lag_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 # plt.show()
