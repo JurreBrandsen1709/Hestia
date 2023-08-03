@@ -57,6 +57,9 @@ namespace Dyconit.Overlord
             _adminClient.CreateTopicsAsync(new List<TopicSpecification> { new TopicSpecification { Name = $"syncResponse_{_host}", NumPartitions = 1, ReplicationFactor = 1 } });
             _dyconitCollections = CreateDyconitCollections(conitCollection, adminPort, host);
 
+            // wait for 5 seconds to make sure the topics are created.
+            Thread.Sleep(5000);
+
             // create two keys for the _localData dictionary
             _localData.Add("topic_normal", new List<ConsumeResult<Null, string>>());
             _localData.Add("topic_priority", new List<ConsumeResult<Null, string>>());
@@ -74,6 +77,12 @@ namespace Dyconit.Overlord
             // increase message max bytes to max it can do.
             using (var consumer = new ConsumerBuilder<Ignore, string>(configuration).Build())
             {
+                // check if the topic already exists for the consumer. If not, wait for 5 seconds and try again.
+                while (!_adminClient.GetMetadata(topic, TimeSpan.FromSeconds(5)).Topics.Exists(t => t.Topic == topic))
+                {
+                    Log.Information($"Topic {topic} does not exist yet. Waiting 5 seconds.");
+                    Thread.Sleep(5000);
+                }
                 consumer.Subscribe(topic);
                 try
                 {
@@ -139,12 +148,17 @@ namespace Dyconit.Overlord
                         while (true)
                         {
                             Log.Information($"Listening for sync requests on {topic}");
+                            while (!_adminClient.GetMetadata(topic, TimeSpan.FromSeconds(5)).Topics.Exists(t => t.Topic == topic))
+                            {
+                                Log.Information($"Topic {topic} does not exist yet. Waiting 5 seconds.");
+                                Thread.Sleep(5000);
+                            }
 
                             var consumeResult = consumer.Consume();
                             if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                             {
                                 var commitTimestamp = consumeResult.Message.Timestamp.UtcDateTime;
-                                Log.Information($"Overhead latency for host {_host} is {DateTime.UtcNow.Subtract(commitTimestamp).TotalMilliseconds}ms");
+
 
                                 // the message is 'data;host' extract that.
                                 var messageParts = consumeResult.Message.Value.Split(';');
@@ -175,8 +189,10 @@ namespace Dyconit.Overlord
                                     }).ToList();
 
                                     var receivedTopic = _receivedData.FirstOrDefault()?.Topic;
+                                    Log.Information($"Overhead latency for topic {receivedTopic} is {DateTime.UtcNow.Subtract(commitTimestamp).TotalMilliseconds}ms");
 
-                                    Log.Information($"Received data count: {_receivedData.Count()} - collection name: {receivedTopic} - sender host: {messageHost}");
+
+                                    Log.Information($"Received data count: {_receivedData?.Count() ?? 0} - collection name: {receivedTopic} - sender host: {messageHost}");
 
                                     // update the last time since pull for the sender port and collection combination
                                     var collection = _dyconitCollections.Collections

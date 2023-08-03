@@ -35,13 +35,13 @@ RUN \
 	rm -rf /var/lib/apt/lists/*
 
 # Copy the bash script into the image
-COPY workload1.sh /workload1.sh
+COPY workload2.sh /workload2.sh
 
 # Make sure the script is executable
-RUN chmod +x /workload1.sh
+RUN chmod +x /workload2.sh
 
 # Convert the line endings of the script using dos2unix
-RUN dos2unix /workload1.sh
+RUN dos2unix /workload2.sh
 
 # Run the script when the container launches
-CMD ["/bin/bash", "/workload1.sh"]
+CMD ["/bin/bash", "/workload2.sh"]

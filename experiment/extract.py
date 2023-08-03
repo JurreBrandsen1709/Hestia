@@ -6,7 +6,7 @@ def extract_information(file, file_id):
     message_throughput = {}
     consumer_count = {}
     cpu_utilization = {}
-    latency = {}
+    latency_values = []
 
     with open(file, "r") as f:
         for line in f:
@@ -34,7 +34,6 @@ def extract_information(file, file_id):
                     message_throughput[topic] = []
                 message_throughput[topic].append((time, throughput, file_id))
 
-
             # Extract consumer count
             consumer_match = re.search(r"Topic: (\w+) - consumer count (\d+)", line)
             if consumer_match:
@@ -58,23 +57,21 @@ def extract_information(file, file_id):
                     cpu_utilization[port].append((time, utilization, file_id))
 
             # Extract latency
-            latency_match = re.search(r'Latency:\s([\d.]+)', line)
+            latency_match = re.search(r'Overhead latency for topic (\w+) is (\d+\.\d+)ms', line)
             if latency_match:
-                latency = latency_match.group(1)
+                topic = latency_match.group(1)
+                latency = float(latency_match.group(2))
+                latency_values.append((topic, latency, file_id))
 
-                if topic not in latency:
-                    latency[topic] = []
-                latency[topic].append((time, latency, file_id))
-
-    return overhead_throughput, message_throughput, consumer_count, cpu_utilization, latency
+    return overhead_throughput, message_throughput, consumer_count, cpu_utilization, latency_values
 
 file_path = 'C:\\Users\\JurreB\\Documents\\Dyconits\\experiment\\logs\\'
 
 # List of file paths
-file_paths = [file_path + 's_w1_p3_1.txt',
-              file_path + 's_w1_p3_2.txt',
-              file_path + 's_w1_p3_3.txt',
-              file_path + 's_w1_p3_4.txt']
+file_paths = [file_path + 's_w2_p3_1.txt',
+              file_path + 's_w2_p3_2.txt',
+              file_path + 's_w2_p3_3.txt',
+              file_path + 's_w2_p3_4.txt']
 
 
 # DataFrames
@@ -82,11 +79,11 @@ overhead_df = pd.DataFrame(columns=['Topic', 'Time', 'Throughput', 'FileId'])
 message_df = pd.DataFrame(columns=['Topic', 'Time', 'Throughput', 'FileId'])
 consumer_df = pd.DataFrame(columns=['Topic', 'Time', 'ConsumerCount', 'FileId'])
 cpu_df = pd.DataFrame(columns=['Port', 'Time', 'Utilization', 'FileId'])
-latency_df = pd.DataFrame(columns=['Topic', 'Time', 'Latency', 'FileId'])
+latency_df = pd.DataFrame(columns=['Topic', 'Latency', 'FileId'])
 
 # Loop through each file and append data to DataFrames
 for file_id, file_path in enumerate(file_paths, start=1):
-    overhead_throughput, message_throughput, consumer_count, cpu_utilization, latency = extract_information(file_path, f'log-{file_id}')
+    overhead_throughput, message_throughput, consumer_count, cpu_utilization, latency_values = extract_information(file_path, f'log-{file_id}')
 
     overhead_df = pd.concat([overhead_df, pd.DataFrame([(Topic, time, throughput, file_id) for Topic, data in overhead_throughput.items()
                                                    for time, throughput, file_id in data], columns=['Topic', 'Time', 'Throughput', 'FileId'])], ignore_index=True)
@@ -100,12 +97,12 @@ for file_id, file_path in enumerate(file_paths, start=1):
     cpu_df = pd.concat([cpu_df, pd.DataFrame([(port, time, utilization, file_id) for port, data in cpu_utilization.items()
                                           for time, utilization, file_id in data], columns=['Port', 'Time', 'Utilization', 'FileId'])], ignore_index=True)
 
-    latency_df = pd.concat([latency_df, pd.DataFrame([(topic, time, latency, file_id) for topic, data in latency.items()
-                                            for time, latency, file_id in data], columns=['Topic', 'Time', 'Latency', 'FileId'])], ignore_index=True)
+    latency_df = pd.concat([latency_df, pd.DataFrame([(topic, latency, file_id) for topic, latency, file_id in latency_values], columns=['Topic', 'Latency', 'FileId'])], ignore_index=True)
+
 
 # Save data to CSV
-overhead_df.to_csv('star_topology/s_w1_p3_overhead_throughput.csv', index=False)
-message_df.to_csv('star_topology/s_w1_p3_message_throughput.csv', index=False)
-consumer_df.to_csv('star_topology/s_w1_p3_consumer_count.csv', index=False)
-cpu_df.to_csv('star_topology/s_w1_p3_cpu_utilization.csv', index=False)
-latency_df.to_csv('star_topology/s_w1_p3_latency.csv', index=False)
+overhead_df.to_csv('star_topology/s_w2_p3_overhead_throughput.csv', index=False)
+message_df.to_csv('star_topology/s_w2_p3_message_throughput.csv', index=False)
+consumer_df.to_csv('star_topology/s_w2_p3_consumer_count.csv', index=False)
+cpu_df.to_csv('star_topology/s_w2_p3_cpu_utilization.csv', index=False)
+latency_df.to_csv('star_topology/s_w2_p3_latency.csv', index=False)

@@ -41,6 +41,7 @@ def process_file(file_path):
 
 # List of file paths
 file_paths = [
+    'star_topology/s_w1_p1_consumer_count.csv',
     'star_topology/s_w1_p2_consumer_count.csv',
     'star_topology/s_w1_p3_consumer_count.csv',
 ]
@@ -54,6 +55,7 @@ for file_path in file_paths:
 
 # Define labels for each file name
 file_labels = {
+    's_w1_p1_consumer_count.csv': 'Dyconits Enabled - TCP Policy',
     's_w1_p2_consumer_count.csv': 'Dyconits Enabled - Moving Average Policy',
     's_w1_p3_consumer_count.csv': 'Dyconits Enabled - Exponential Smoothing Policy',
 }
@@ -64,7 +66,7 @@ for file_name, (average_time_diff_priority, _) in average_time_diffs.items():
     label = file_labels.get(file_name, file_name)  # Get the label from the dictionary, or use the file name as the label
     plt.plot(average_time_diff_priority.index, average_time_diff_priority.values, label=label)
 plt.xlabel('Consumer count')
-plt.ylabel('Average Consumer Lag (seconds)')
+plt.ylabel('Maximum Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
 plt.savefig('star_topology/s_w1_lag_priority.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
@@ -75,9 +77,8 @@ plt.figure(figsize=(10, 6))
 for file_name, (_, average_time_diff_normal) in average_time_diffs.items():
     label = file_labels.get(file_name, file_name)  # Get the label from the dictionary, or use the file name as the label
     plt.plot(average_time_diff_normal.index, average_time_diff_normal.values, label=label)
-plt.title('Average Consumer Lag for each ConsumerCount - topic_normal')
 plt.xlabel('ConsumerCount')
-plt.ylabel('Average Consumer Lag (seconds)')
+plt.ylabel('Maximum Consumer Lag (seconds)')
 plt.legend()
 plt.grid(True)
 plt.savefig('star_topology/s_w1_lag_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)

@@ -12,8 +12,8 @@
         "condition": "avg > threshold",
         "actions": [
           {
-            "type": "multiply",
-            "value": 1.2
+            "type": "add",
+            "value": 1
           }
         ]
       },
@@ -22,8 +22,8 @@
         "condition": "avg < threshold",
         "actions": [
           {
-            "type": "multiply",
-            "value": 0.8
+            "type": "subtract",
+            "value": 0.5
           }
         ]
       }
