@@ -1,41 +1,45 @@
-using Confluent.Kafka;
 using System;
-using Dyconit.Message;
+using System.Threading.Tasks;
+using Confluent.Kafka;
+using System.IO;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
-class Producer {
-    static void Main(string[] args)
+class Producer
+{
+    static async Task Main(string[] args)
     {
-        // configure bootstrap.servers in text
-        var configuration = new ProducerConfig
+        var config = new ProducerConfig { BootstrapServers = "broker:9092" };
+
+        // Read the JSON file and convert it to a dictionary
+        var myDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("normal.json"));
+
+        using (var producer = new ProducerBuilder<Null, string>(config).Build())
         {
-            BootstrapServers = "broker:9092",
-            StatisticsIntervalMs = 2000,
-        };
+            int amplitude = 2000; // Maximum delay in milliseconds
+            int step = 50;        // Step size for increasing/decreasing delay
+            int delay = 0;         // Current delay in milliseconds
+            int i = 0;
+            int msgCount = 0;
 
-        const string topic = "topic_normal";
-        using (var producer = new ProducerBuilder<Null, String>(configuration).Build())
-        {
-            Console.WriteLine("Press Ctrl+C to quit.");
-
-            var numProduced = 0;
-            Random rnd = new Random();
-
-            for (int i = 0; i<500; i++)
+            while (msgCount != 800)
             {
-                    // create a random length payload string
-                    var payload = new string(i.ToString() + " " + topic);
+                // Get the message from the dictionary
+                string message = myDict[i.ToString()];
 
-                    var message = new DyconitMessage<Null, string>
-                    {
-                        Value = payload,
-                        Weight = 1.0
-                    };
+                var deliveryResult = await producer.ProduceAsync("topic_normal", new Message<Null, string> { Value = message + " normal" });
 
-                    var deliveryReport = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
-                    Console.WriteLine($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {numProduced}");
-                    }
+                await Task.Delay(delay); // Delay to control the message rate
 
-            producer.Flush(TimeSpan.FromSeconds(10));
+                delay += step;
+                if (delay >= amplitude || delay <= 0)
+                {
+                    step = -step;
+                }
+
+                i++;
+                msgCount++;
+            }
         }
     }
 }

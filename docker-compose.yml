@@ -26,12 +26,27 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFFA_CREATE_TOPICS: "syncRequest_app2:1:1,syncRequest_app3:1:1,syncRequest_app4:1:1,syncRequest_app5:1:1,syncResponse_app2:1:1,syncResponse_app3:1:1,syncResponse_app4:1:1,syncResponse_app5:1:1"
 
-  workload:
+  workload1:
     build:
       context: .
-      dockerfile: Dockerfile.workload
+      dockerfile: star_topology/Producer/Dockerfile
+    command: dotnet run
     depends_on:
       - broker
+    environment:
+      - Producer:Host=broker
+      - Producer:Port=9092
+
+  workload2:
+    build:
+      context: .
+      dockerfile: star_topology/Producer_normal/Dockerfile
+    command: dotnet run
+    depends_on:
+      - broker
+    environment:
+      - Producer:Host=broker
+      - Producer:Port=9092
 
   app1:
     build:
@@ -42,7 +57,8 @@ services:
       - "6666:6666"
     depends_on:
       - broker
-      - workload
+      - workload1
+      - workload2
 
   app2:
     build:
@@ -51,7 +67,6 @@ services:
     command: dotnet run
     depends_on:
       - broker
-      - app5
       - app1
     environment:
       - Consumer:Host=broker
@@ -65,7 +80,6 @@ services:
     depends_on:
       - broker
       - app1
-      - app5
     environment:
       - Consumer:Host=broker
       - Consumer:Port=9092
@@ -78,7 +92,6 @@ services:
     depends_on:
       - broker
       - app1
-      - app5
     environment:
       - Consumer:Host=broker
       - Consumer:Port=9092

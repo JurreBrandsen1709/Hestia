@@ -139,6 +139,12 @@ namespace Dyconit.Overlord
         {
             await Task.Run(() =>
             {
+                // check if the topic already exists for the consumer. If not, wait for 5 seconds and try again.
+                while (!_adminClient.GetMetadata(topic, TimeSpan.FromSeconds(5)).Topics.Exists(t => t.Topic == topic))
+                {
+                    Log.Information($"Topic {topic} does not exist yet. Waiting 5 seconds.");
+                    Thread.Sleep(5000);
+                }
                 configuration.GroupId = $"syncRequest_{_host}";
                 using (var consumer = new ConsumerBuilder<Ignore, string>(configuration).Build())
                 {
@@ -148,12 +154,6 @@ namespace Dyconit.Overlord
                         while (true)
                         {
                             Log.Information($"Listening for sync requests on {topic}");
-                            while (!_adminClient.GetMetadata(topic, TimeSpan.FromSeconds(5)).Topics.Exists(t => t.Topic == topic))
-                            {
-                                Log.Information($"Topic {topic} does not exist yet. Waiting 5 seconds.");
-                                Thread.Sleep(5000);
-                            }
-
                             var consumeResult = consumer.Consume();
                             if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                             {

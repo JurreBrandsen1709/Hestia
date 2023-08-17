@@ -16,38 +16,40 @@ def load_and_process_data(file_path, configuration):
     priority_df = df[df['Topic'] == 'topic_priority']
     normal_df = df[df['Topic'] == 'topic_normal']
 
-    # Add a new 'Configuration' column to distinguish them
-    priority_df['Configuration'] = f'{configuration} - Priority'
-    normal_df['Configuration'] = f'{configuration} - Normal'
+    # Add a new 'Config_Topic' column to distinguish them
+    priority_df['Config_Topic'] = f'{configuration} Priority'
+    normal_df['Config_Topic'] = f'{configuration} Normal'
 
     return priority_df, normal_df
 
-# Load and process the data
-normal_priority, normal_normal = load_and_process_data('improvement/s_w1_p1_message_throughput.csv', 'No Sync')
-p1_priority, p1_normal = load_and_process_data('improvement/s_w1_p2_message_throughput.csv', 'Policy 1')
+workloads = ['w3']
 
-# Combine all dataframes
-all_data = pd.concat([normal_priority, normal_normal, p1_priority, p1_normal])
+for workload in workloads:
+    all_data = pd.DataFrame()
 
-# Define the color palette
-colors = sns.color_palette("tab10", n_colors=4)  # 4 colors for 4 policies
+    # Load and process the data
+    configurations = ['TCP Policy', 'Moving Average Policy', 'Exponential Smoothing Policy']
+    file_paths = [f'star_topology/s_{workload}_p{i}_message_throughput.csv' for i in range(1, 4)]
 
-# Map the colors to the configurations
-color_dict = {
-    'No Sync - Priority': colors[0],
-    'No Sync - Normal': colors[0],
-    'Policy 1 - Priority': colors[1],
-    'Policy 1 - Normal': colors[1],
-    'Policy 2 - Priority': colors[2],
-    'Policy 2 - Normal': colors[2],
-    'Policy 3 - Priority': colors[3],
-    'Policy 3 - Normal': colors[3]
-}
+    for config, path in zip(configurations, file_paths):
+        priority_df, normal_df = load_and_process_data(path, config)
+        all_data = pd.concat([all_data, priority_df, normal_df])
 
-# Create the violin plot
-plt.figure(figsize=(12, 6))
-sns.violinplot(x="Configuration", y="Throughput", data=all_data, cut=0, palette=color_dict)
-plt.xticks(rotation=45)
-plt.title('Throughput Distributions for Different Configurations')
-plt.ylim(bottom=0)
-plt.savefig('improvement/s_w1_throughput.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    # Create color dictionary
+    color_dict = {'TCP Policy Priority': sns.color_palette()[3],  # orange
+                  'Moving Average Policy Priority': sns.color_palette()[3],  # blue
+                  'Exponential Smoothing Policy Priority': sns.color_palette()[3],  # green
+                  'TCP Policy Normal': sns.color_palette()[0],  # red
+                  'Moving Average Policy Normal': sns.color_palette()[0],
+                    'Exponential Smoothing Policy Normal': sns.color_palette()[0],  # green
+                  }  # green
+
+    # Plot for all data
+    plt.figure(figsize=(6, 4))
+    sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict)
+    plt.xlim(left=0)
+    plt.xlabel('Throughput (messages/s)')
+    plt.ylabel('')
+
+    plt.tight_layout()
+    plt.savefig(f'e4/s_w3_p1-3_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)

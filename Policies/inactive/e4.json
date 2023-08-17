@@ -1,0 +1,31 @@
+{
+    "policy": "moving-average-policy",
+    "collectionNames": ["topic_priority", "topic_normal"],
+    "description": "Adjusts the consistency bounds based on the moving average of event consumption. If the moving average is higher than the threshold, the bounds increase to lower the synchronization overhead. If the moving average is lower, the bounds decrease to improve the synchronization accuracy.",
+    "averageSizeThroughput" : 1.4,
+    "thresholds": {
+      "throughput": 1.4
+    },
+    "rules": [
+      {
+        "policyType": "standard",
+        "condition": "avg > threshold",
+        "actions": [
+          {
+            "type": "add",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "policyType": "standard",
+        "condition": "avg < threshold",
+        "actions": [
+          {
+            "type": "subtract",
+            "value": 0.5
+          }
+        ]
+      }
+    ]
+  }

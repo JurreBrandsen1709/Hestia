@@ -9,7 +9,7 @@ using Dyconit.Overlord;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Diagnostics;
-
+using System.Collections.Concurrent;
 
 class Consumer
 {
@@ -22,12 +22,16 @@ class Consumer
     private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
     private static Dictionary<string, int> _consumerCount = new Dictionary<string, int>();
     private static Process _currentProcess;
+    private static Dictionary<int, int> _delay = new Dictionary<int, int>();
+    private static ConcurrentDictionary<string, ConsumeInfo> _consumeInfos = new ConcurrentDictionary<string, ConsumeInfo>();
+
     static async Task Main()
     {
         var configuration = GetConsumerConfiguration();
 
         // Create a PerformanceCounter to monitor CPU usage
         _currentProcess = Process.GetCurrentProcess();
+        _delay = DyconitHelper.LoadDictionary("normal_consumer.json");
 
         var topics = new List<string>
         {
@@ -47,9 +51,10 @@ class Consumer
             _currentOffset.Add(topic, 0);
             _consumerCount.Add(topic, 0);
             _totalWeight.Add(topic, 0);
+            _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = 0 };
         }
 
-        _DyconitLogger = new DyconitAdmin(configuration.BootstrapServers, adminPort, _localCollection, "app3");
+        _DyconitLogger = new DyconitAdmin(configuration, adminPort, _localCollection, "app5");
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
@@ -77,7 +82,7 @@ class Consumer
         long _lastCommittedOffset = -1;
         var collectionConfiguration = _localCollection[topic];
 
-        using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort, "app3"))
+        using (var consumer = DyconitHelper.CreateDyconitConsumer(configuration, conitConfiguration, adminPort, "app5"))
         {
             consumer.Subscribe(topic);
 
@@ -94,33 +99,44 @@ class Consumer
                     Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
 
                     var consumeResult = consumer.Consume(token);
-                    _consumerCount[topic] += 1;
 
-                    // add random delay to simulate processing time
-                    await Task.Delay(_random.Next(200, 600));
-
-                    // check if we have consumed a message
+                    // check if we have consumed a message. Retry up to 10 time if we have not consumed a message then we exit.
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                     {
                         var inputMessage = consumeResult.Message.Value;
-                        // Log.Debug($"T: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")} - {topic} - {inputMessage}");
+                        _consumerCount[topic] += 1;
 
+                        // increase the local consume count by taking the current consume count and adding 1.
+                        _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = _consumeInfos[topic].Count + 1 };
+
+                        // add random delay to simulate processing time
+                        var delay = _delay[_consumeInfos[topic].Count];
+
+                        // add random delay to simulate processing time
+                        if (topic == "topic_priority")
+                        {
+                            await Task.Delay(delay);
+                        }
+                        else
+                        {
+                            await Task.Delay(delay);
+                        }
                     }
-                    else {
-                        // we are finished consuming messages
-                        Log.Warning($"===================== end of topic {topic} =====================");
+                    else
+                    {
+                        Log.Warning($"===================== Currently no message in topic {topic} =====================");
 
-                        // send message to the overlord to indicate that we are finished consuming messages
-                        DyconitHelper.SendFinishedMessage(adminPort, topic, _uncommittedConsumedMessages[topic]);
+                        // // send message to the overlord to indicate that we are finished consuming messages
+                        // DyconitHelper.SendFinishedMessage(adminPort, topic, _uncommittedConsumedMessages[topic]);
 
-                        // commit the last consumed message
-                        DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
+                        // // commit the last consumed message
+                        // DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
 
-                        break;
+                        continue;
                     }
 
 
-                    Log.Information($"Topic: {topic} - consumer count {_consumerCount[topic]}");
+                    Log.Information($"========================= Topic: {topic} - consumer count {_consumerCount[topic]} =========================");
 
                     _totalWeight[topic] += 1.0;
                     _lastCommittedOffset = consumeResult.Offset;
@@ -134,41 +150,41 @@ class Consumer
 
                     _uncommittedConsumedMessages[topic].Add(consumeResult);
 
-                    SyncResult result = await DyconitLogger.BoundStaleness(_uncommittedConsumedMessages[topic], topic);
-                    _uncommittedConsumedMessages[topic] = result.Data;
-                    var commit = result.changed;
+                    // SyncResult result = await DyconitLogger.BoundStaleness(_uncommittedConsumedMessages[topic], topic);
+                    // _uncommittedConsumedMessages[topic] = result.Data;
+                    // var commit = result.changed;
 
-                    if (_uncommittedConsumedMessages[topic].Count > 0)
-                    {
-                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
-                        _currentOffset[topic] += 1;
-                        _consumerCount[topic] = _uncommittedConsumedMessages[topic].Count;
-                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
-                    }
+                    // if (_uncommittedConsumedMessages[topic].Count > 0)
+                    // {
+                    //     var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                    //     _currentOffset[topic] += 1;
+                    //     _consumerCount[topic] = _uncommittedConsumedMessages[topic].Count;
+                    //     _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                    // }
 
-                    bool boundResult = DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
-                    commit = boundResult || commit;
+                    // bool boundResult = await DyconitLogger.BoundNumericalError(_uncommittedConsumedMessages[topic], topic, _totalWeight[topic]);
+                    // commit = boundResult || commit;
 
-                    _uncommittedConsumedMessages[topic] = result.Data;
+                    // _uncommittedConsumedMessages[topic] = result.Data;
 
-                    if (_uncommittedConsumedMessages[topic].Count > 0)
-                    {
-                        var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
-                        _currentOffset[topic] += 1;
-                        _consumerCount[topic] = _uncommittedConsumedMessages[topic].Count;
-                        _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
-                    }
+                    // if (_uncommittedConsumedMessages[topic].Count > 0)
+                    // {
+                    //     var lastConsumedOffset = _uncommittedConsumedMessages[topic].Last().Offset;
+                    //     _currentOffset[topic] += 1;
+                    //     _consumerCount[topic] = _uncommittedConsumedMessages[topic].Count;
+                    //     _lastCommittedOffset = Math.Max(_lastCommittedOffset, lastConsumedOffset + 1);
+                    // }
 
-                    if (commit)
-                    {
-                        _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
-                        _totalWeight[topic] = 0.0;
-                    }
+                    // if (commit)
+                    // {
+                    //     _lastCommittedOffset = DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
+                    //     _totalWeight[topic] = 0.0;
+                    // }
 
-                    if (_lastCommittedOffset > 0)
-                    {
-                        consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
-                    }
+                    // if (_lastCommittedOffset > 0)
+                    // {
+                    //     consumer.Assign(new List<TopicPartitionOffset>() { new TopicPartitionOffset(topic, 0, _lastCommittedOffset) });
+                    // }
                 }
             }
             catch (OperationCanceledException)
@@ -188,9 +204,9 @@ class Consumer
         return new ConsumerConfig
         {
             BootstrapServers = "broker:9092",
-            GroupId = "c2",
+            GroupId = "c4",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = false,
+            EnableAutoCommit = true,
             EnablePartitionEof = true,
             StatisticsIntervalMs = 5000,
         };
@@ -217,51 +233,29 @@ class Consumer
 
     private static async Task CalculateThroughputAsync(IConsumer<Null, string> consumer, string topic)
     {
-        if (consumer == null)
+        if (consumer == null || !_consumeInfos.ContainsKey(topic))
         {
             return;
         }
 
-        var offsets = new Dictionary<TopicPartition, Tuple<double, DateTime>>();
-
-        // get all partitions for the topic
-        var partitions = _DyconitLogger._adminClient.GetMetadata(TimeSpan.FromSeconds(20)).Topics.First(t => t.Topic == topic).Partitions;
-        foreach (var partition in partitions)
-        {
-            var topicPartition = new TopicPartition(topic, partition.PartitionId);
-            double previousOffset = _currentOffset[topic];
-            offsets.Add(topicPartition, Tuple.Create(previousOffset, DateTime.UtcNow));
-        }
-
+        var previousConsumeInfo = new ConsumeInfo { Time = DateTime.Now, Count = _consumeInfos[topic].Count };
         await Task.Delay(TimeSpan.FromSeconds(5));
 
-        double topicThroughput = 0.0;
-
-        foreach (var partition in partitions)
+        if (_consumeInfos.TryGetValue(topic, out var currentConsumeInfo))
         {
-            var topicPartition = new TopicPartition(topic, partition.PartitionId);
+            double topicThroughput = (currentConsumeInfo.Count - previousConsumeInfo.Count) / (DateTime.UtcNow - previousConsumeInfo.Time).TotalSeconds;
 
-            var previousValues = offsets[topicPartition];
-            double previousOffset = previousValues.Item1;
-            DateTime previousTimestamp = previousValues.Item2;
+            Log.Information($"Topic {topic} message throughput: {topicThroughput} messages/s");
 
-            double currentOffset = _currentOffset[topic];
-            DateTime currentTimestamp = DateTime.UtcNow;
+            var throughputMessage = new JObject
+            {
+                { "eventType", "throughput" },
+                { "throughput", topicThroughput },
+                { "port", adminPort },
+                { "collectionName", topic }
+            };
 
-            double consumptionRate = (currentOffset - previousOffset) / (currentTimestamp - previousTimestamp).TotalSeconds;
-            topicThroughput += consumptionRate;
+            await DyconitHelper.SendMessageOverTcp(throughputMessage.ToString(), 6666, adminPort);
         }
-
-        Log.Information($"Topic {topic} message throughput: {topicThroughput} messages/s");
-
-        var throughputMessage = new JObject
-        {
-            { "eventType", "throughput" },
-            { "throughput", topicThroughput },
-            { "port", adminPort },
-            { "collectionName", topic }
-        };
-
-        await DyconitHelper.SendMessageOverTcp(throughputMessage.ToString(), 6666, adminPort);
     }
 }

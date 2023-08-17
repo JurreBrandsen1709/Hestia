@@ -22,6 +22,7 @@ class Consumer
     private static Dictionary<string, double> _currentOffset = new Dictionary<string, double>();
     private static Dictionary<string, int> _consumerCount = new Dictionary<string, int>();
     private static Process _currentProcess;
+    private static Dictionary<string, int> _retry = new Dictionary<string, int>();
     private static Dictionary<int, int> _delay = new Dictionary<int, int>();
     private static ConcurrentDictionary<string, ConsumeInfo> _consumeInfos = new ConcurrentDictionary<string, ConsumeInfo>();
 
@@ -91,6 +92,8 @@ class Consumer
 
             _ = CalculateThroughput(consumer, adminPort, token, topic);
 
+
+
             try
             {
                 while (!token.IsCancellationRequested)
@@ -99,30 +102,39 @@ class Consumer
                     Log.Debug($"port: {adminPort} - CPU Utilization: {cpuUsage}%");
 
                     var consumeResult = consumer.Consume(token);
-                    _consumerCount[topic] += 1;
 
-                    // increase the local consume count by taking the current consume count and adding 1.
-                    _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = _consumeInfos[topic].Count + 1 };
-
-                    // add random delay to simulate processing time
-                    await Task.Delay(_delay[_consumeInfos[topic].Count]);
-
-                    // check if we have consumed a message
+                    // check if we have consumed a message. Retry up to 10 time if we have not consumed a message then we exit.
                     if (consumeResult != null && consumeResult.Message != null && consumeResult.Message.Value != null)
                     {
                         var inputMessage = consumeResult.Message.Value;
+                        _consumerCount[topic] += 1;
+
+                        // increase the local consume count by taking the current consume count and adding 1.
+                        _consumeInfos[topic] = new ConsumeInfo { Time = DateTime.UtcNow, Count = _consumeInfos[topic].Count + 1 };
+
+                        var delay = _delay[_consumeInfos[topic].Count];
+
+                        // add random delay to simulate processing time
+                        if (topic == "topic_priority")
+                        {
+                            await Task.Delay(delay);
+                        }
+                        else
+                        {
+                            await Task.Delay(delay);
+                        }
                     }
-                    else {
-                        // we are finished consuming messages
-                        Log.Warning($"===================== end of topic {topic} =====================");
+                    else
+                    {
+                        Log.Warning($"===================== Currently no message in topic {topic} =====================");
 
-                        // send message to the overlord to indicate that we are finished consuming messages
-                        DyconitHelper.SendFinishedMessage(adminPort, topic, _uncommittedConsumedMessages[topic]);
+                        // // send message to the overlord to indicate that we are finished consuming messages
+                        // DyconitHelper.SendFinishedMessage(adminPort, topic, _uncommittedConsumedMessages[topic]);
 
-                        // commit the last consumed message
-                        DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
+                        // // commit the last consumed message
+                        // DyconitHelper.CommitStoredMessages(consumer, _uncommittedConsumedMessages[topic], _lastCommittedOffset);
 
-                        break;
+                        continue;
                     }
 
 
@@ -209,7 +221,7 @@ class Consumer
             BootstrapServers = "broker:9092",
             GroupId = "c1",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = false,
+            EnableAutoCommit = true,
             EnablePartitionEof = true,
             StatisticsIntervalMs = 5000,
         };
