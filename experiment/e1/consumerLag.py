@@ -119,6 +119,7 @@ file_labels = {
 colors = sns.color_palette()
 
 sns.set_context("notebook")
+sns.set_style("whitegrid")
 
 # Create a figure with 2 subplots
 fig, axs = plt.subplots(2, 1, figsize=(12, 8))

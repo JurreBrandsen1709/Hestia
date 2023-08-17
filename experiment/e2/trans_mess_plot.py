@@ -137,6 +137,7 @@ hatch_dict = {
 }
 
 sns.set_context("notebook")
+sns.set_style("whitegrid")
 # print all configurations
 plot_with_legend(all_data, color_dict, hatch_dict)
 # Plot for all data

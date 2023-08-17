@@ -31,7 +31,7 @@ for workload in workloads:
 
     # Load and process the data
     configurations = ['Undersaturated Workload', 'Fluctuating Workload', 'Oversaturated Workload']
-    file_paths = [f'../star_topology/s_w{i}_p1_overhead_throughput.csv' for i in range(1, 4)]
+    file_paths = [f'../star_topology/s_w{i}_p1_consumer_count.csv' for i in range(1, 4)]
 
     for config, path in zip(configurations, file_paths):
         priority_df, normal_df = load_and_process_data(path, config)
@@ -78,4 +78,4 @@ for workload in workloads:
     plt.ylabel('')
 
     plt.tight_layout()
-    plt.savefig(f's_w1-3_p1_overhead_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's_w1-3_p1_lag_plot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)

@@ -148,7 +148,8 @@ color_settings = {
     'Multi-hop Topology - Dyconits Disabled': {'color': 'cyan', 'linestyle': '--'},
     'Multi-hop Topology - Dyconits Enabled': {'color': 'blue', 'linestyle': '-'}
 }
-sns.set_context("notebook")
+sns.set_context("talk")
+sns.set_style("whitegrid")
 
 # Create a single figure
 fig, ax = plt.subplots(figsize=(12, 8))
