@@ -57,7 +57,7 @@ for workload in workloads:
     mean_values = grouped_data.mean()
     percentiles = grouped_data.describe(percentiles=[.25, .5, .75])
 
-    print("Throughput Analysis:")
+    print("Overhead Analysis:")
     for config in color_dict.keys():
         print(f"\nConfiguration: {config}")
         print(f"Max: {max_values[config]:.2f}")

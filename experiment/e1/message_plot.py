@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 def load_and_process_data(file_path, configuration):
     # Load the CSV file into a pandas DataFrame

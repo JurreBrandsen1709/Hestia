@@ -13,6 +13,33 @@ def bin_times(df, bin_size=0.1):
     df_avg['Time'] = df_avg['TimeBin'].mid
     return df_avg.drop(columns='TimeBin')
 
+def calculate_stats(df):
+    """Calculate max, mean, and percentiles of Throughput."""
+    max_throughput = df['Throughput'].max()
+    mean_throughput = df['Throughput'].mean()
+    percentiles = np.percentile(df['Throughput'], [25, 50, 75])  # Change percentiles as needed
+    return max_throughput, mean_throughput, percentiles
+
+def plot_and_save(df0, df1, filename):
+    """Plot and save the throughput comparison."""
+    # ... (your existing plotting code)
+
+    max0, mean0, percentiles0 = calculate_stats(df0)
+    max1, mean1, percentiles1 = calculate_stats(df1)
+
+    print("Configuration 0:")
+    print(f"Max Throughput: {max0}")
+    print(f"Mean Throughput: {mean0}")
+    print("Percentiles:")
+    for i, percentile in enumerate([25, 50, 75]):
+        print(f"{percentile}th Percentile: {percentiles0[i]}")
+
+    print("\nConfiguration 1:")
+    print(f"Max Throughput: {max1}")
+    print(f"Mean Throughput: {mean1}")
+    print("Percentiles:")
+    for i, percentile in enumerate([25, 50, 75]):
+        print(f"{percentile}th Percentile: {percentiles1[i]}")
 
 for workload in workloads:
 
@@ -65,6 +92,9 @@ for workload in workloads:
 
     df0_priority_avg_m = df0_priority_avg_m[df0_priority_avg_m['RoundedTime'] <= 201]
     df1_priority_avg_m = df1_priority_avg_m[df1_priority_avg_m['RoundedTime'] <= 201]
+
+    plot_and_save(df0_priority_avg_m, df1_priority_avg_m, 'priority_throughput_comparison.pdf')
+    plot_and_save(df0_normal_avg_m, df1_normal_avg_m, 'normal_throughput_comparison.pdf')
 
     plt.figure(figsize=(14, 10))  # Increase the figure size
 

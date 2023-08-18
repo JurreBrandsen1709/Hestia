@@ -46,6 +46,22 @@ for workload in workloads:
                   'Exponential Smoothing Policy Normal': sns.color_palette()[0],  # green
                   }  # green
 
+    print("Unique Config_Topic values:", all_data['Config_Topic'].unique())
+
+    grouped_data = all_data.groupby("Config_Topic")["Throughput"]
+    max_values = grouped_data.max()
+    mean_values = grouped_data.mean()
+    percentiles = grouped_data.describe(percentiles=[.25, .5, .75])
+
+    print("Throughput Analysis:")
+    for config in color_dict.keys():
+        print(f"\nConfiguration: {config}")
+        print(f"Max: {max_values[config]:.2f}")
+        print(f"Mean: {mean_values[config]:.2f}")
+        print(f"25th percentile: {percentiles['25%'][config]:.2f}")
+        print(f"50th percentile (Median): {percentiles['50%'][config]:.2f}")
+        print(f"75th percentile: {percentiles['75%'][config]:.2f}")
+
     # Plot for all data
     sns.set_context("notebook")
     sns.set_style("whitegrid")

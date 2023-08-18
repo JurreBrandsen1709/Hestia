@@ -75,6 +75,30 @@ def process_file(file_path, topic1, topic2):
 
     return max_time_diff_priority, max_time_diff_normal
 
+def analyze_time_differences(time_diffs_star, file_labels):
+    """
+    Analyze and print out metrics such as max, mean, 25th, 50th and 75th percentiles for the time differences.
+    """
+    print("Analysis Results:\n")
+    for file_name, (time_diff_priority, time_diff_normal) in time_diffs_star.items():
+        print(f"For configuration: {file_labels[file_name]}")
+
+        # Priority
+        print("  Priority events:")
+        print(f"    Max: {time_diff_priority.max()}")
+        print(f"    Mean: {time_diff_priority.mean()}")
+        print(f"    25th percentile: {time_diff_priority.quantile(0.25)}")
+        print(f"    50th percentile: {time_diff_priority.quantile(0.50)}")
+        print(f"    75th percentile: {time_diff_priority.quantile(0.75)}\n")
+
+        # Normal
+        print("  Normal events:")
+        print(f"    Max: {time_diff_normal.max()}")
+        print(f"    Mean: {time_diff_normal.mean()}")
+        print(f"    25th percentile: {time_diff_normal.quantile(0.25)}")
+        print(f"    50th percentile: {time_diff_normal.quantile(0.50)}")
+        print(f"    75th percentile: {time_diff_normal.quantile(0.75)}\n")
+
 # List of file paths
 file_paths = ['../star_topology/s_w1_p1_consumer_count.csv',
               '../star_topology/s_w2_p1_consumer_count.csv',
@@ -100,13 +124,13 @@ all_data = []
 for file_name, (priority_data, normal_data) in average_time_diffs.items():
     label = file_labels.get(file_name, file_name)
     all_data.append(pd.DataFrame({
-        'Consumer Lag (s)': priority_data.values,
+        'Consumer Lag [seconds]': priority_data.values,
         'Events Consumed': priority_data.index,
         'Type': 'Priority',
         'Policy': label
     }))
     all_data.append(pd.DataFrame({
-        'Consumer Lag (s)': normal_data.values,
+        'Consumer Lag [seconds]': normal_data.values,
         'Events Consumed': normal_data.index,
         'Type': 'Normal',
         'Policy': label
@@ -126,10 +150,11 @@ palette = {
 
 # Boxplot rotated by 90 degrees with Seaborn's colors
 plt.figure(figsize=(6, 4))
-sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag (s)', hue='Type', palette=palette)
+sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag [seconds]', hue='Type', palette=palette)
 
 
-plt.legend(loc='upper right')
+plt.legend(loc='best')
+analyze_time_differences(average_time_diffs, file_labels)
 plt.savefig(f's_w1-3_p1_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
 
