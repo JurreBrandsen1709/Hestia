@@ -29,7 +29,7 @@ for workload in workloads:
 
     # Load and process the data
     configurations = ['No Policy','Simple Policy', 'Moving Average Policy', 'Exponential Smoothing Policy']
-    file_paths = [f'../star_topology/s_{workload}_p{i}_message_throughput.csv' for i in range(0, 4)]
+    file_paths = [f'../star_topology/s_{workload}_p{i}_overhead_throughput.csv' for i in range(0, 4)]
 
     for config, path in zip(configurations, file_paths):
         priority_df, normal_df = load_and_process_data(path, config)
@@ -47,13 +47,13 @@ for workload in workloads:
                   }  # green
 
     # Plot for all data
-    plt.figure(figsize=(6, 4))
     sns.set_context("notebook")
     sns.set_style("whitegrid")
+    plt.figure(figsize=(6, 4))
     sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict)
     plt.xlim(left=0)
-    plt.xlabel('Throughput [messages/s]')
+    plt.xlabel('Overhead [Dyconit messages/s]')
     plt.ylabel('')
 
     plt.tight_layout()
-    plt.savefig(f's_w3_p0-3_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's_w3_p0-3_overhead_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)

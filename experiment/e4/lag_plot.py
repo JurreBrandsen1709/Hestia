@@ -76,9 +76,10 @@ def process_file(file_path, topic1, topic2):
     return max_time_diff_priority, max_time_diff_normal
 
 # List of file paths
-file_paths = ['../star_topology/s_w1_p1_consumer_count.csv',
-              '../star_topology/s_w2_p1_consumer_count.csv',
+file_paths = ['../star_topology/s_w3_p0_consumer_count.csv',
               '../star_topology/s_w3_p1_consumer_count.csv',
+              '../star_topology/s_w3_p2_consumer_count.csv',
+              '../star_topology/s_w3_p3_consumer_count.csv',
               ]
 
 # Dictionary to store average Consumer Lags for each file
@@ -90,9 +91,10 @@ for file_path in file_paths:
 
 # Define labels for each file name
 file_labels = {
-    f's_w1_p1_consumer_count.csv': 'Undersaturated Workload',
-    f's_w2_p1_consumer_count.csv': 'Fluctuating Workload',
-    f's_w3_p1_consumer_count.csv': 'Oversaturated Workload',
+    f's_w3_p0_consumer_count.csv': 'No Policy',
+    f's_w3_p1_consumer_count.csv': 'Simple Policy',
+    f's_w3_p2_consumer_count.csv': 'Moving Average Policy',
+    f's_w3_p3_consumer_count.csv': 'Exponential Smoothing Policy',
 }
 
 # Preparing data for boxplot
@@ -125,11 +127,13 @@ palette = {
 }
 
 # Boxplot rotated by 90 degrees with Seaborn's colors
+sns.set_context("notebook")
+sns.set_style("whitegrid")
 plt.figure(figsize=(6, 4))
 sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag (s)', hue='Type', palette=palette)
 
 
 plt.legend(loc='upper right')
-plt.savefig(f's_w1-3_p1_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f's_w3_p0-3_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
 

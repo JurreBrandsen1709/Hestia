@@ -143,63 +143,63 @@ for ax in axs:
 
 plt.savefig(f'e2/s-t_w2_p1_lag.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
-# # List of file paths
-# file_paths = ['star_topology/s_w3_p1_consumer_count.csv',
-#               'star_topology/s_w3_p2_consumer_count.csv',
-#               'star_topology/s_w3_p3_consumer_count.csv',
-#               'star_topology/s_w3_p0_consumer_count.csv',
-#               ]
+# List of file paths
+file_paths = ['star_topology/s_w3_p1_consumer_count.csv',
+              'star_topology/s_w3_p2_consumer_count.csv',
+              'star_topology/s_w3_p3_consumer_count.csv',
+              'star_topology/s_w3_p0_consumer_count.csv',
+              ]
 
-# # Dictionary to store average Consumer Lags for each file
-# average_time_diffs = {}
+# Dictionary to store average Consumer Lags for each file
+average_time_diffs = {}
 
-# # Process each file
-# for file_path in file_paths:
-#     average_time_diffs[file_path.split('/')[-1]] = process_file(file_path)
+# Process each file
+for file_path in file_paths:
+    average_time_diffs[file_path.split('/')[-1]] = process_file(file_path)
 
-# # Define labels for each file name
-# file_labels = {
-#     f's_w3_p1_consumer_count.csv': 'TCP policy',
-#     f's_w3_p2_consumer_count.csv': 'Moving Average Policy',
-#     f's_w3_p3_consumer_count.csv': 'Exponential Smoothing Policy',
-#     f's_w3_p0_consumer_count.csv': 'No Policy',
-# }
+# Define labels for each file name
+file_labels = {
+    f's_w3_p1_consumer_count.csv': 'TCP policy',
+    f's_w3_p2_consumer_count.csv': 'Moving Average Policy',
+    f's_w3_p3_consumer_count.csv': 'Exponential Smoothing Policy',
+    f's_w3_p0_consumer_count.csv': 'No Policy',
+}
 
-# # Preparing data for boxplot
-# all_data = []
-# for file_name, (priority_data, normal_data) in average_time_diffs.items():
-#     label = file_labels.get(file_name, file_name)
-#     all_data.append(pd.DataFrame({
-#         'Consumer Lag (s)': priority_data.values,
-#         'Events Consumed': priority_data.index,
-#         'Type': 'Priority',
-#         'Policy': label
-#     }))
-#     all_data.append(pd.DataFrame({
-#         'Consumer Lag (s)': normal_data.values,
-#         'Events Consumed': normal_data.index,
-#         'Type': 'Normal',
-#         'Policy': label
-#     }))
+# Preparing data for boxplot
+all_data = []
+for file_name, (priority_data, normal_data) in average_time_diffs.items():
+    label = file_labels.get(file_name, file_name)
+    all_data.append(pd.DataFrame({
+        'Consumer Lag (s)': priority_data.values,
+        'Events Consumed': priority_data.index,
+        'Type': 'Priority',
+        'Policy': label
+    }))
+    all_data.append(pd.DataFrame({
+        'Consumer Lag (s)': normal_data.values,
+        'Events Consumed': normal_data.index,
+        'Type': 'Normal',
+        'Policy': label
+    }))
 
-# all_data_df = pd.concat(all_data)
+all_data_df = pd.concat(all_data)
 
-# # Extract Seaborn's default blue and red colors
-# sns_blue = sns.color_palette()[0]
-# sns_red = sns.color_palette()[3]
+# Extract Seaborn's default blue and red colors
+sns_blue = sns.color_palette()[0]
+sns_red = sns.color_palette()[3]
 
-# # Define the color palette
-# palette = {
-#     'Priority': sns_red,
-#     'Normal': sns_blue
-# }
+# Define the color palette
+palette = {
+    'Priority': sns_red,
+    'Normal': sns_blue
+}
 
-# # Boxplot rotated by 90 degrees with Seaborn's colors
-# plt.figure(figsize=(6, 4))
-# sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag (s)', hue='Type', palette=palette)
+# Boxplot rotated by 90 degrees with Seaborn's colors
+plt.figure(figsize=(6, 4))
+sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag (s)', hue='Type', palette=palette)
 
 
-# plt.legend(loc='upper right')
-# plt.savefig(f'e4/s_w3_p1-3_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.legend(loc='upper right')
+plt.savefig(f'e4/s_w3_p1-3_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
 

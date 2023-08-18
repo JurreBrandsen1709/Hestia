@@ -53,7 +53,7 @@ def plot_with_legend(all_data, color_dict, hatch_dict):
     plt.legend(handles=legend_elements, bbox_to_anchor=(1.05, 1), loc='upper left')
 
     plt.xlim(left=0)
-    plt.xlabel('Throughput (messages/s)')
+    plt.xlabel('Throughput [messages/s]')
     plt.ylabel('Topic Type')
     plt.tight_layout()
     plt.savefig(f's-t_w2_p0-1_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)

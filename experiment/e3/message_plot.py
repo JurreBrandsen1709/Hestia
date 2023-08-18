@@ -74,7 +74,7 @@ for workload in workloads:
     plt.figure(figsize=(6, 4))
     sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict)
     plt.xlim(left=0)
-    plt.xlabel('Throughput [Dyconit Messages/s]')
+    plt.xlabel('Throughput [Messages/s]')
     plt.ylabel('')
 
     plt.tight_layout()
