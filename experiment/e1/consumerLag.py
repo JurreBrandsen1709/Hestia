@@ -118,7 +118,7 @@ file_labels = {
 }
 colors = sns.color_palette()
 
-sns.set_context("notebook")
+sns.set_context("talk")
 sns.set_style("whitegrid")
 
 # Create a figure with 2 subplots
@@ -168,5 +168,5 @@ for ax in axs:
 
 
 analyze_time_differences(time_diffs_star, file_labels)
-plt.savefig(f's_w2_p0-1_lag.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f's_w2_p0-1_lag.png', bbox_inches='tight', pad_inches=0.05, dpi=300)
 

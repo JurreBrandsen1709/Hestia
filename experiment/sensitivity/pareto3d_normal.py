@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.gridspec as gridspec
+import seaborn as sns
 
 # Load data
 lag_data = pd.read_csv('sen_avg_lag_normal.csv')
@@ -44,6 +45,8 @@ dummy_text_data_3d = {
 merged_data_3d = merged_data_3d[~merged_data_3d['File'].isin(pareto_data_3d['File'])]
 
 # 3D visualization
+sns.set_style('whitegrid')
+sns.set_context('talk')
 fig = plt.figure(figsize=(14, 12))
 ax = fig.add_subplot(111, projection='3d')
 ax.set_xlim([0.90, 0.97])
@@ -78,4 +81,4 @@ ax.view_init(elev=20, azim=-70)
 plt.tight_layout()
 
 # Save figure
-plt.savefig(f'../e5/pareto3d_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f'../e5/pareto3d_normal.png', bbox_inches='tight', pad_inches=0.05, dpi=300)

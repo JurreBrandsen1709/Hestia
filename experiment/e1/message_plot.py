@@ -65,7 +65,7 @@ for workload in workloads:
     # Adjust figure size for clarity and try to manipulate aspect ratio
     plt.figure(figsize=(8, len(color_dict) * 1.2))  # Adjust the 1.2 value for tighter or looser spacing
 
-    sns.set_context("paper")
+    sns.set_context("talk")
     sns.set_style("whitegrid")
     sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict, dodge=False, width=0.6)
     sns.despine(left=True)
@@ -79,4 +79,4 @@ for workload in workloads:
     plt.yticks(fontsize=12)
 
     plt.tight_layout()
-    plt.savefig(f's_w2_p0-1_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's_w2_p0-1_throughput_all.png', bbox_inches='tight', pad_inches=0.05, dpi=300)

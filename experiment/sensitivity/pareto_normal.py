@@ -35,7 +35,7 @@ dummy_text_data = {
 }
 
 # Setup figure and grid
-sns.set_context("notebook")
+sns.set_context("talk")
 sns.set_style("whitegrid")
 fig = plt.figure(figsize=(10, 6))
 ax1 = fig.add_subplot(1, 1, 1)
@@ -56,4 +56,4 @@ ax1.set_ylabel('Inconsistency [seconds]')
 ax1.legend()
 
 plt.tight_layout()
-plt.savefig(f'../e5/pareto_normal.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f'../e5/pareto_normal.png', bbox_inches='tight', pad_inches=0.05, dpi=300)

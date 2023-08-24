@@ -69,13 +69,13 @@ for workload in workloads:
 
 
     # Plot for all data
-    sns.set_context("notebook")
+    sns.set_context("talk")
     sns.set_style("whitegrid")
-    plt.figure(figsize=(6, 4))
+    plt.figure(figsize=(12, 4))
     sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict)
     plt.xlim(left=0)
     plt.xlabel('Throughput [Dyconit Messages/s]')
     plt.ylabel('')
 
     plt.tight_layout()
-    plt.savefig(f's_w1-3_p1_overhead_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's_w1-3_p1_overhead_throughput_all.png', bbox_inches='tight', pad_inches=0.05, dpi=300)

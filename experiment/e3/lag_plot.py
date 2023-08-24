@@ -149,12 +149,14 @@ palette = {
 }
 
 # Boxplot rotated by 90 degrees with Seaborn's colors
+sns.set_context("talk")
+sns.set_style("whitegrid")
 plt.figure(figsize=(6, 4))
 sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag [seconds]', hue='Type', palette=palette)
 
 
 plt.legend(loc='best')
 analyze_time_differences(average_time_diffs, file_labels)
-plt.savefig(f's_w1-3_p1_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f's_w1-3_p1_lag_boxplot.png', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
 

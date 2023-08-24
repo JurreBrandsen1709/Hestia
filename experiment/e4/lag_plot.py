@@ -115,10 +115,10 @@ for file_path in file_paths:
 
 # Define labels for each file name
 file_labels = {
-    f's_w3_p0_consumer_count.csv': 'No Policy',
-    f's_w3_p1_consumer_count.csv': 'Simple Policy',
-    f's_w3_p2_consumer_count.csv': 'Moving Average Policy',
-    f's_w3_p3_consumer_count.csv': 'Exponential Smoothing Policy',
+    f's_w3_p0_consumer_count.csv': 'None',
+    f's_w3_p1_consumer_count.csv': 'S',
+    f's_w3_p2_consumer_count.csv': 'MA',
+    f's_w3_p3_consumer_count.csv': 'ES',
 }
 
 # Preparing data for boxplot
@@ -151,14 +151,14 @@ palette = {
 }
 
 # Boxplot rotated by 90 degrees with Seaborn's colors
-sns.set_context("notebook")
+sns.set_context("talk")
 sns.set_style("whitegrid")
-plt.figure(figsize=(6, 4))
+plt.figure(figsize=(8, 4))
 sns.boxplot(data=all_data_df, y='Policy', x='Consumer Lag [seconds]', hue='Type', palette=palette)
 
 
 plt.legend(loc='best')
 analyze_time_differences(average_time_diffs, file_labels)
-plt.savefig(f's_w3_p0-3_lag_boxplot.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f's_w3_p0-3_lag_boxplot.png', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
 

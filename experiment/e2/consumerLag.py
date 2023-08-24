@@ -179,5 +179,5 @@ ax.set_xticks(np.arange(50, 160, 10))
 
 analyze_time_differences(time_diffs_star, fl1)
 analyze_time_differences(time_diffs_trans, fl2)
-plt.savefig(f's-t_w2_p1_lag.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+plt.savefig(f's-t_w2_p1_lag.png', bbox_inches='tight', pad_inches=0.05, dpi=300)
 

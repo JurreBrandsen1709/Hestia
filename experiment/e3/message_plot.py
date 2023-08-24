@@ -51,7 +51,6 @@ for workload in workloads:
 
     print("Unique Config_Topic values:", all_data['Config_Topic'].unique())
 
-
     grouped_data = all_data.groupby("Config_Topic")["Throughput"]
     max_values = grouped_data.max()
     mean_values = grouped_data.mean()
@@ -66,16 +65,14 @@ for workload in workloads:
         print(f"50th percentile (Median): {percentiles['50%'][config]:.2f}")
         print(f"75th percentile: {percentiles['75%'][config]:.2f}")
 
-
-
     # Plot for all data
-    sns.set_context("notebook")
+    sns.set_context("talk")
     sns.set_style("whitegrid")
-    plt.figure(figsize=(6, 4))
+    plt.figure(figsize=(10, 4))
     sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict)
     plt.xlim(left=0)
     plt.xlabel('Throughput [Messages/s]')
     plt.ylabel('')
 
     plt.tight_layout()
-    plt.savefig(f's_w1-3_p1_message_throughput_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's_w1-3_p1_message_throughput_all.png', bbox_inches='tight', pad_inches=0.05, dpi=300)

@@ -96,6 +96,8 @@ for workload in workloads:
     plot_and_save(df0_priority_avg_m, df1_priority_avg_m, 'priority_throughput_comparison.pdf')
     plot_and_save(df0_normal_avg_m, df1_normal_avg_m, 'normal_throughput_comparison.pdf')
 
+    sns.set_context("talk")
+    # sns.set_style("whitegrid")
     plt.figure(figsize=(14, 10))  # Increase the figure size
 
     plt.subplot(2, 1, 1)
@@ -128,4 +130,4 @@ for workload in workloads:
     plt.legend(handles=legend_elements, loc='best', fontsize=12)  # Increase font size for legend
 
     plt.tight_layout()
-    plt.savefig(f's_w2_p0-1_message_throughput.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's_w2_p0-1_message_throughput.png', bbox_inches='tight', pad_inches=0.05, dpi=300)

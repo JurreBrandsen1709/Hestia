@@ -33,7 +33,7 @@ def load_and_process_data(file_path, configuration, topic1, topic2):
     return priority_df, normal_df
 
 def plot_with_legend(all_data, color_dict, hatch_dict):
-    plt.figure(figsize=(6, 4))
+    plt.figure(figsize=(8, 4))
 
     ax = sns.boxplot(x="Throughput", y="Config_Topic", data=all_data, order=color_dict.keys(), palette=color_dict)
 
@@ -57,7 +57,7 @@ def plot_with_legend(all_data, color_dict, hatch_dict):
     plt.xlabel('Throughput [Dyconit Messages/s]')
     plt.ylabel('Topic Type')
     plt.tight_layout()
-    plt.savefig(f's-t_w2_p0-1_throughput_overhead_all.pdf', bbox_inches='tight', pad_inches=0.05, dpi=300)
+    plt.savefig(f's-t_w2_p0-1_throughput_overhead_all.png', bbox_inches='tight', pad_inches=0.05, dpi=300)
 
 
 all_data = pd.DataFrame()
@@ -131,7 +131,7 @@ hatch_dict = {
     'Normal': '.'
 }
 
-sns.set_context("notebook")
+sns.set_context("talk")
 sns.set_style("whitegrid")
 plot_with_legend(all_data, color_dict, hatch_dict)
 # Plot for all data
