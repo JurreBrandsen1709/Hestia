@@ -16,9 +16,9 @@ def load_and_process_data(file_path, configuration):
     priority_df = df[df['Topic'] == 'topic_priority']
     normal_df = df[df['Topic'] == 'topic_normal']
 
-    # # Add a new 'Config_Topic' column to distinguish them
-    # priority_df['Config_Topic'] = f'{configuration} Priority'
-    # normal_df['Config_Topic'] = f'{configuration} Normal'
+    # Add a new 'Config_Topic' column to distinguish them
+    priority_df['Config_Topic'] = f'{configuration} Priority'
+    normal_df['Config_Topic'] = f'{configuration} Normal'
 
     return priority_df, normal_df
 
@@ -61,6 +61,8 @@ for workload in workloads:
         print(f"25th percentile: {percentiles['25%'][config]:.2f}")
         print(f"50th percentile (Median): {percentiles['50%'][config]:.2f}")
         print(f"75th percentile: {percentiles['75%'][config]:.2f}")
+        
+    
 
     # Plot for all data
     sns.set_context("talk")
